@@ -433,7 +433,6 @@ import joblib
 
 # Load the saved model and scalers
 svr_rbf_pure_water = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")
-scaler_x_pure_water = joblib.load(r"D:\MSc Results\scaler_x_pure_water.pkl")
 scaler_y_pure_water = joblib.load(r"D:\MSc Results\scaler_y_pure_water.pkl")
 
 # Prepare the plastic-water data
