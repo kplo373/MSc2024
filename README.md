@@ -9,4 +9,5 @@ The Effect of Microplastic on the Radiative Properties of Sand and Water
 * plot_hot_cold_retry.py is the file I accidentally deleted but have now recreated, to plot any other hot and cold datasets together for the same plastic proportion and calibrate it with the pure water .pkl files, giving the nice green plot.
 * read_CampbellSci.py is also part of the new set of functions, and it extracts data from the Campbell Scientific thermocouple .dat files. Two little functions at the end calculate the averages of sand and water experiments.
 * read_Optris.py is another new function, to extract data from the Optris thermal camera .dat files. It also includes one averaging function.
+
 The last few files are .pkl or .npy and are used within the plot_hot_cold_retry.py script to calibrate the raw data (coming from the plot_hot_cold_calibration.py script where pure water was used).
