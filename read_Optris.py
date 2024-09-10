@@ -110,10 +110,9 @@ def average_Optris(area1, area2):  # area1 and area2 here are 2 like areas: area
         mean_Op = (area1 + area2)/2   # taking the average
         
         for s in range(len(area1)):
-            print(type(area1[s]), area2[s])
             std_specs_sum = std_specs**2 + std_specs**2  # uncertainty as sum of the variances, because taking the mean of two areas
-            std_mean = np.std(area1[s] + area2[s])  # am getting a weird error for this line!! Does it need to be + not ,?? did that in read_campbellsci.py
-            #print(std_mean)  # just giving 0.0s
+            little_arr = np.array([area1[s], area2[s]])  # putting the two temperature values into an array to take the standard deviation of them below
+            std_mean = np.std(little_arr)
 
             std = np.sqrt(std_specs_sum + std_mean**2)
             stdev_arr[s] = std
