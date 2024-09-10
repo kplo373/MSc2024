@@ -8,8 +8,8 @@ A function to extract data from the Optris .dat files
 The Optris files (and filepaths) will be extracted from my 
 MSc Results folder using the get_filepaths.py script function.
 
-Two functions for calculating the averages of the measurement areas - WHICH?? -
-are included below as well (for sand and water experiments).
+One function for calculating the averages of any two measurement areas
+is included below as well (for sand and water experiments).
 
 @author: kplo373
 """
@@ -110,9 +110,10 @@ def average_Optris(area1, area2):  # area1 and area2 here are 2 like areas: area
         mean_Op = (area1 + area2)/2   # taking the average
         
         for s in range(len(area1)):
-            print(type(area1[s]), type(area2[s]))
+            print(type(area1[s]), area2[s])
             std_specs_sum = std_specs**2 + std_specs**2  # uncertainty as sum of the variances, because taking the mean of two areas
-            std_mean = np.std(area1[s], area2[s])  # am getting a weird error for this line!! Does it need to be + not ,?? did that in read_campbellsci.py
+            std_mean = np.std(area1[s] + area2[s])  # am getting a weird error for this line!! Does it need to be + not ,?? did that in read_campbellsci.py
+            #print(std_mean)  # just giving 0.0s
 
             std = np.sqrt(std_specs_sum + std_mean**2)
             stdev_arr[s] = std
