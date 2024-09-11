@@ -62,11 +62,11 @@ def read_Optris(filepath):
     # Add the time deltas to the initial datetime
     df_Optris['Datetime'] = df_Optris.iloc[:-2,0].apply(lambda x: start_datetimeobj + time_str_to_timedelta(x))
     # added in the stop before the last 2 rows, as these do not contain actual data (e.g. '---', 'End of File')
-    print(df_Optris['Datetime'])
+    #print(df_Optris['Datetime'])
 
     # Now get the other columns!!
     # Assign new names to the data columns
-    print(df_Optris.columns)   # has 11 columns
+    #print(df_Optris.columns)   # has 11 columns
     new_column_names = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']  # not sure what 'Unnamed: 5' column is for? so made it 'nan'
 
     df_Optris.columns = new_column_names      # assigning them to the DataFrame by correct length
@@ -90,13 +90,15 @@ def read_Optris(filepath):
     #print(area1)  # works! No NaNs or NaTs at the end anymore
     
     return datetimeOp, area1, area2, area3, area4
-    
 
+    
+"""
 #%% Testing the read_Optris() function
-the_filepath = r"D:\MSc Results\August_2024\Thursday1AugAM\Thurs1AugAMOptris.dat"
+the_filepath = r"D:\\MSc Results\\August_2024\\Thursday1AugAM\\Thurs1AugAMOptris.dat"  # was giving a SyntaxWarning because of slashes, said invalid escape sequence
 datetimes, a1, a2, a3, a4 = read_Optris(the_filepath)
 
 print(datetimes)
+"""
 
 #%% Averaging Function
     
@@ -124,7 +126,8 @@ def average_Optris(area1, area2):  # area1 and area2 here are 2 like areas: area
         print("The two area arrays don't have the same length")
         return
 
+"""
 #%% Test the averaging function
 avg_Op_half, stdevs, sterrs = average_Optris(a1, a3)
 print(avg_Op_half)
-
+"""

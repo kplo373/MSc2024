@@ -286,7 +286,7 @@ mean_Op_halfcold = (area1cold + area3cold)/2
 mean_Op_smallcold = (area2cold + area4cold)/2
 
 
-#%% To get average of mean/average Optris measurements - RESAMPLING
+#%% To get average of mean/average Optris measurements - RESAMPLING (this bit is in resample_Optris.py)
 #new_datetimes has 26 OR MORE measurements for each second. can't depend on an integer 26, need to actually just collect all the readings for that second and avg them!
 
 #using chatgpt to help resample the data into 5-second intervals, after loading the 2 arrays into pd dataframe
@@ -323,7 +323,7 @@ resampled_dfcold.columns = ['mean_temp_half', 'stdev_temp_half', 'sterr_temp_hal
 print(resampled_dfhot.columns)  # these are only for Optris, not Campbell Sci thermocouples.
 
 
-#%% Setting up dataframes for Optris cold temperature arrays
+#%% Setting up dataframes for Optris and Campbell Scientific cold temperature arrays
 # Assuming Tcold_Op is the temperature array and Tcold_time_Op is the corresponding time array
 dtcold_Op = pd.to_datetime(resampled_dfcold.index)  # getting datetime index column as an array from Optris, then converting to pandas datetime
 Tcold_Op = mean_Op_smallcold.to_numpy()
