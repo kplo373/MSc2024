@@ -31,7 +31,7 @@ def resample_Optris(datetimeOp, mean_Op, stdev_arrOp):  # this mean_Op could be 
     stdev_resampled = resampled_df.iloc[:, 1]
     
     
-    ##THIS ISN'T WORKING, NEED TO FIGURE OUT BEST WAY TO COMBINE THE TWO DIFFERENT STANDARD DEVIATIONS OR ERRORS##
+    ##THE BELOW ISN'T WORKING, NEED TO FIGURE OUT BEST WAY TO COMBINE THE TWO DIFFERENT STANDARD DEVIATIONS OR ERRORS##
     
     # get this std column (or stderr??) and combine it with stdev_arrOp using eqn written down in notebook!
     #comb_sterr = np.sqrt((stdev_resampled**2 / len(stdev_resampled)) + (stdev_arrOp**2 / len(stdev_arrOp)))  # both terms are large arrays of stdevs with different lengths
