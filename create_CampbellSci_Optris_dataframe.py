@@ -34,7 +34,8 @@ def create_CampbellSci_Optris_dataframe(Optris_df, CampbellSci_df):
     #Tcold_Op_resampled = df_optris_resampled['temperature'].values
     #Tcold_time_Op_resampled = df_optris_resampled.index
     
-    Tcold_C1 = ref_temps_C1cold
+    print(CampbellSci_df.index)  # not sure how to extract the temperature data from CampbellSci_df!
+    Tcold_C1 = CampbellSci_df[1] #ref_temps_C1cold
     
     # Verify the lengths now match
     print(f"Length of Tcold_Op_resampled: {len(Tcold_Op_resampled)}")
@@ -59,27 +60,29 @@ def create_CampbellSci_Optris_dataframe(Optris_df, CampbellSci_df):
 
 # To get the filepath
 from get_filepaths import get_filepaths
-#******************* then fix the stuff above, and use this instead of the_filepath below.
+path, files = get_filepaths('13/08/2024', 'AM')
+# path gives a folder, and files are the files in that folder. Need to select specific file from files list
+path_Op = path + '\\' + files[0]
+path_CS = path + '\\' + files[2]
 
 # To collect the Campbell Scientific thermocouple data
 from read_CampbellSci import read_CampbellSci
-the_filepath = r"D:\MSc Results\August_2024\Tuesday13AugAM\CR3000_Table1.dat"
-dt_objs, temps_arr, stdevs_arr = read_CampbellSci(the_filepath)
+dt_objsCS, temps_arrCS, stdevs_arrCS = read_CampbellSci(path_CS)
 
 from read_CampbellSci import sand_avgCS  # this function will depend on what type of test is being done...
-df_sand_avgCS = sand_avgCS(dt_objs, temps_arr)
+df_sand_avgCS = sand_avgCS(dt_objsCS, temps_arrCS)
 
 # To collect the Optris thermal camera data
 from read_Optris import read_Optris
-the_filepath = r"D:\MSc Results\August_2024\Thursday1AugAM\Thurs1AugAMOptris.dat"  # was giving a SyntaxWarning because of slashes, said invalid escape sequence
-datetimes, a1, a2, a3, a4 = read_Optris(the_filepath)
+dt_objsOp, a1, a2, a3, a4 = read_Optris(path_Op)
 
 from read_Optris import average_Optris
-avg_Op_half, stdevs, sterrs = average_Optris(a1, a3)
+avg_Op_half, stdevsOp, sterrsOp = average_Optris(a1, a3)
 print(avg_Op_half)
 
+#%%
 from resample_Optris import resample_Optris
-resampled_df = resample_Optris(datetimes, avg_Op_half, stdevs)
+resampled_df = resample_Optris(dt_objsOp, avg_Op_half, stdevsOp)
 
 # Now can use both the Campbell Scientific and Optris dataframes to test this new function
 
