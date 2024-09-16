@@ -8,8 +8,11 @@ A function to extract data from the Optris .dat files
 The Optris files (and filepaths) will be extracted from my 
 MSc Results folder using the get_filepaths.py script function.
 
-One function for calculating the averages of any two measurement areas
-is included below as well (for sand and water experiments).
+A resampling function then averages all the measurements per 5
+second interval into one value, and returns a resampled dataframe.
+
+Another function for calculating the averages of any two measurement area
+resampled dataframe is included below as well (for sand and water experiments).
 
 @author: kplo373
 """
@@ -92,73 +95,22 @@ def read_Optris(filepath):
     return datetimeOp, area1, area2, area3, area4
 
     
-
+'''
 #%% Testing the read_Optris() function
 the_filepath = r"D:\\MSc Results\\August_2024\\Thursday1AugAM\\Thurs1AugAMOptris.dat"  # was giving a SyntaxWarning because of slashes, said invalid escape sequence
 datetimes, a1, a2, a3, a4 = read_Optris(the_filepath)
 
 print(datetimes)
+'''
 
+#%% Resampling Function
 
-#%% Averaging, Resampling, and Uncertainties Function
-    
-def average_resample_Optris(datetimeOp, area1, area2):  # area1 and area2 here are 2 like areas: area1 & area3 for half the surface, or area2 & area4 for thermocouple surface
-    std_specs = 2.4  # deg C, the accuracy for the Optris thermal PI450 camera
-    stdev_arr = np.zeros(len(area1))
-    sterr_arr = np.zeros(len(area2))
-    
-    if len(area1) == len(area2):
-        mean_Op = np.zeros(len(area1))  # preallocating a mean temperature array
-        mean_Op = (area1 + area2)/2   # taking the average
-        
-        df_new = pd.DataFrame({     # creating a new dataframe
-            'datetimes': datetimeOp,
-            'Op_temp': mean_Op})
-        df_new.set_index('datetimes', inplace=True)  # setting the datetimes column as the index
-        # can extract datetimes using e.g. df_new.index
-        def standard_error(x):
-            return x.std() / np.sqrt(len(x))  # a function to calculate standard error
-        resampled_df = df_new.resample('5s').agg({'Op_temp': ['mean', 'std', standard_error]}) 
-        print(len(resampled_df.iloc[:, 1]))  # this gives the 'std' column length: 4539
-        #stdev_resampled = resampled_df.iloc[:, 1]  # this variable is the same as in the resampled_df below
-        resampled_df.columns = ['mean_temp', 'stdev_resampled', 'sterr_resampled']  # renaming columns
-        
-        print(len(area1))  # 226921, different length to resampling standard deviation so can't add directly to the std calculation below! How to combine it then???***
-        # should just calculate the rest of the uncertainty here now within this function, and have it in the resampled_df
-        for s in range(len(area1)):
-            std_specs_sum = std_specs**2 + std_specs**2  # uncertainty as sum of the variances, because taking the mean of two areas
-            little_arr = np.array([area1[s], area2[s]])  # putting the two temperature values into an array to take the standard deviation of them below
-            std_mean = np.std(little_arr)
-
-            std = np.sqrt(std_specs_sum + std_mean**2)
-            stdev_arr[s] = std
-            sterr = std / np.sqrt(2)
-            sterr_arr[s] = sterr
-        
-        
-        
-        return resampled_df
-
-    else:
-        print("The two area arrays don't have the same length")
-        return   
-        
-#%% Test the averaging function
-df = average_resample_Optris(datetimes, a1, a3)  #avg_Op_half, stdevs, sterrs
-print(df)
-
-        
-#%%
-    
-
-
-###put this function into the averaging function!!-------------------------------------------------------------------------------
 # datetimeOp has 26 OR MORE measurements for each second. can't depend on an integer 26, need to actually just collect all the readings for that second and avg them!
-def resample_Optris(datetimeOp, mean_Op, stdev_arrOp):  # this mean_Op could be for half of the surface or for the smaller area just over the thermocouples
+def resample_Optris(datetimeOp, areaOp):
     #using chatgpt to help resample the data into 5-second intervals, after loading the 2 arrays into pd dataframe
     df_new = pd.DataFrame({     # creating a new dataframe
         'datetimes': datetimeOp,
-        'Op_temp': mean_Op})    # can only read in one mean Optris temperature array at once from the averaging Optris function, this could be half or small area
+        'Op_temp': areaOp})    # can only read in one mean Optris temperature array at once from the averaging Optris function, this could be half or small area
     
     
     df_new.set_index('datetimes', inplace=True)  # setting the datetimes column as the index
@@ -170,44 +122,68 @@ def resample_Optris(datetimeOp, mean_Op, stdev_arrOp):  # this mean_Op could be 
     resampled_df = df_new.resample('5s').agg({'Op_temp': ['mean', 'std', standard_error]})  
     # resampling whole dataframe to 5 sec intervals by taking the mean of temp, plus getting stdev and sterr
     # e.g. df.resample("3s").agg({'x':'sum','y':'mean','z':'last'}) can be used if using different functions for different columns
-    print(resampled_df.iloc[:, 1])  # this gives the 'std' column
-    stdev_resampled = resampled_df.iloc[:, 1]
+    #print(resampled_df.iloc[:, 1])  # this gives the 'std' column
     
-    
-    ##THE BELOW ISN'T WORKING, NEED TO FIGURE OUT BEST WAY TO COMBINE THE TWO DIFFERENT STANDARD DEVIATIONS OR ERRORS##
-    
-    # get this std column (or stderr??) and combine it with stdev_arrOp using eqn written down in notebook!
-    #comb_sterr = np.sqrt((stdev_resampled**2 / len(stdev_resampled)) + (stdev_arrOp**2 / len(stdev_arrOp)))  # both terms are large arrays of stdevs with different lengths
-    #print(comb_sterr)  # will need to put this into the resampled_df dataframe that is returned for this function!
-    
-    resampled_df.columns = ['mean_temp', 'stdev_temp', 'sterr_temp']  # renaming columns
-    return resampled_df
-###-----------------------------------------------------------------------------------------------------------------------------------
+    resampled_df.columns = ['mean_temp', 'stdev_resampled', 'sterr_resampled']  # renaming columns
+    return resampled_df    
 
-#old version just in case...
-def average_Optris(area1, area2):  # area1 and area2 here are 2 like areas: area1 & area3 for half the surface, or area2 & area4 for thermocouple surface
+'''
+#%% Testing the resample_Optris() function
+resampled_df_a1 = resample_Optris(datetimes, a1)
+print(resampled_df_a1)  # looks good!
+
+resampled_df_a3 = resample_Optris(datetimes, a3)
+'''
+
+#%% Averaging and Uncertainties Function
+    
+def average_Optris(resampled_dfa1, resampled_dfa2):  # resampled_dfa1 and resampled_dfa2 represent 2 like areas: area1 & area3 for half the surface, or area2 & area4 for thermocouple surface
     std_specs = 2.4  # deg C, the accuracy for the Optris thermal PI450 camera
-    stdev_arr = np.zeros(len(area1))
-    sterr_arr = np.zeros(len(area2))
+    stdev_arr = np.zeros(len(resampled_dfa1.index))
+    sterr_arr = np.zeros(len(resampled_dfa1.index))
+    
+    datetimeOp = resampled_dfa1.index  # assuming that both resampled dataframes have the same datetime arrays
+    area1 = resampled_dfa1.iloc[:,0].to_numpy()
+    area2 = resampled_dfa2.iloc[:,0].to_numpy()
+    std_resampled1 = resampled_dfa1.iloc[:,1].to_numpy()  # add each element of these squared together as part of standard deviation calculation
+    std_resampled2 = resampled_dfa2.iloc[:,1].to_numpy()
+    print(np.shape(area1))  # changed from pandas series to np.ndarray with shape (4539,)
     
     if len(area1) == len(area2):
         mean_Op = np.zeros(len(area1))  # preallocating a mean temperature array
         mean_Op = (area1 + area2)/2   # taking the average
         
+        # should just calculate the rest of the uncertainty here now within this function, and have it in the resampled_df
         for s in range(len(area1)):
-            std_specs_sum = std_specs**2 + std_specs**2  # uncertainty as sum of the variances, because taking the mean of two areas
+            std_resamp = std_resampled1[s]**2 + std_resampled2[s]**2  # uncertainty as sum of the variances of standard deviations from resampling
             little_arr = np.array([area1[s], area2[s]])  # putting the two temperature values into an array to take the standard deviation of them below
             std_mean = np.std(little_arr)
+            std_specs_sum = std_specs**2 + std_specs**2  # uncertainty as sum of the variances, because taking the mean of two areas
 
-            std = np.sqrt(std_specs_sum + std_mean**2)
+            std = np.sqrt(std_specs_sum + std_resamp + std_mean**2)  # so am including the specification accuracy in the standard deviation!
             stdev_arr[s] = std
+            
             sterr = std / np.sqrt(2)
             sterr_arr[s] = sterr
         
-        return mean_Op, stdev_arr, sterr_arr
+        average_df = pd.DataFrame({     # creating a new dataframe
+            'datetimes': datetimeOp,
+            'Op_temp': mean_Op,
+            'stdevs': stdev_arr,
+            'sterrs': sterr_arr})
+       
+        return average_df
+
     else:
         print("The two area arrays don't have the same length")
-        return
+        return   
+
+'''
+#%% Test the averaging function
+avg_df = average_Optris(resampled_df_a1, resampled_df_a3)  #avg_Op_half, stdevs, sterrs
+print(avg_df)
+'''
+
 
 
 
