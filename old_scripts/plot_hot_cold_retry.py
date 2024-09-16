@@ -432,8 +432,10 @@ plt.show()
 import joblib
 
 # Load the saved model and scalers
-svr_rbf_pure_water = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")
-scaler_y_pure_water = joblib.load(r"D:\MSc Results\scaler_y_pure_water.pkl")
+svr_rbf_pure_water = joblib.load(r"C:\Users\kplo373\Documents\GitHub\MSc2024\old_scripts\svr_rbf_pure_water.pkl")
+    #r"D:\MSc Results\svr_rbf_pure_water.pkl")
+scaler_y_pure_water = joblib.load(r"C:\Users\kplo373\Documents\GitHub\MSc2024\old_scripts\scaler_y_pure_water.pkl")
+    #r"D:\MSc Results\scaler_y_pure_water.pkl")
 
 # Prepare the plastic-water data
 x_cold = tempC1cold.reshape(-1, 1)  # if an error, can do tempC1cold.to_numpy().reshape...
@@ -513,7 +515,7 @@ plt.grid()
 plt.show()
 
 
-#%% havent got this cell working yet
+#%% haven't got this cell working yet...
 # Calculate RMSE for both models (root mean square error)
 y_true_scaled = scaler_y.transform(y_comb.reshape(-1, 1)).ravel()
 y_pred_rbf_comb_scaled = svr_rbf.predict(x_comb_scaled)
