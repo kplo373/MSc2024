@@ -6,35 +6,49 @@ Main master script to run all the functions within the subroutines.
 
 @author: kplo373
 """
+# can run this main() function within a for loop if possible, would need to automate the date and 'AM'
+chosen_date = '13/08/2024'  # this test was hot 50% nurdle sand (can check the excel sheet)
+chosen_period = 'AM'
+# need to be careful if the sand_avgCS or the water_avgCS function is being used**
 
-#something def main as __main__??
+def main():
+    # To get the filepath
+    from get_filepaths import get_filepaths
+    path, files = get_filepaths(chosen_date, chosen_period)
+    # path gives a folder, and files are the files in that folder. Need to select specific file from files list
+    path_Op = path + '\\' + files[0]
+    path_CS = path + '\\' + files[2]
+    
+    # To collect the Campbell Scientific thermocouple data
+    from read_CampbellSci import read_CampbellSci
+    dt_objsCS, temps_arrCS, stdevs_arrCS = read_CampbellSci(path_CS)
+    
+    from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...
+    df_sand_avgCS = sand_avgCS(dt_objsCS, temps_arrCS)
+    print(df_sand_avgCS)
+    
+    
+    # To collect the Optris thermal camera data
+    from read_Optris import read_Optris
+    dt_objsOp, a1, a2, a3, a4 = read_Optris(path_Op)
+    
+    from read_Optris import resample_Optris
+    resampled_df_a1 = resample_Optris(dt_objsOp, a1)
+    resampled_df_a3 = resample_Optris(dt_objsOp, a3)
+    
+    from read_Optris import average_Optris
+    avgOp_df = average_Optris(resampled_df_a1, resampled_df_a3)
+    print(avgOp_df)
+    
+    
+    #then need to bring thermocouple and Optris average dataframes together into a df of times where both sensors record data
+    # will this be the create_CampbellSci_Optris_dataframe.py function??
+    
+    return
 
 
-# To get the filepath
-from get_filepaths import get_filepaths
-path, files = get_filepaths('13/08/2024', 'AM')
-# path gives a folder, and files are the files in that folder. Need to select specific file from files list
-path_Op = path + '\\' + files[0]
-path_CS = path + '\\' + files[2]
 
-# To collect the Campbell Scientific thermocouple data
-from read_CampbellSci import read_CampbellSci
-dt_objsCS, temps_arrCS, stdevs_arrCS = read_CampbellSci(path_CS)
-
-from read_CampbellSci import sand_avgCS  # this function will depend on what type of test is being done...
-df_sand_avgCS = sand_avgCS(dt_objsCS, temps_arrCS)
-
-# To collect the Optris thermal camera data
-from read_Optris import read_Optris
-dt_objsOp, a1, a2, a3, a4 = read_Optris(path_Op)
-
-from read_Optris import average_Optris
-avg_Op_half, stdevsOp, sterrsOp = average_Optris(a1, a3)
-print(avg_Op_half)
-
-#%%
-from resample_Optris import resample_Optris
-resampled_df = resample_Optris(dt_objsOp, avg_Op_half, stdevsOp)
-
+if __name__ == '__main__':
+    main()
 
 
