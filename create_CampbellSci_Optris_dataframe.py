@@ -34,7 +34,7 @@ def create_CampbellSci_Optris_dataframe(Optris_df, CampbellSci_df):
     #Tcold_Op_resampled = df_optris_resampled['temperature'].values
     #Tcold_time_Op_resampled = df_optris_resampled.index
     
-    print(CampbellSci_df.index)  # not sure how to extract the temperature data from CampbellSci_df!
+    print(CampbellSci_df.index)  # not sure how to extract the temperature data from CampbellSci_df! (THIS IS WHERE I'M UP TO)
     Tcold_C1 = CampbellSci_df[1] #ref_temps_C1cold
     
     # Verify the lengths now match
