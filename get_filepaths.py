@@ -15,7 +15,6 @@ from datetime import datetime
 
 folder_path = r"D:\MSc Results"  # can either get the files from the USB drive here, or OneDrive below if using MSc computer
 #folder_path = r'C:\Users\kplo373\OneDrive - The University of Auckland\MSc Kate\PlottingMScResults'
-# Will need to specify the month folder it's in within the function below!
 
 # The dates will be input and the Campbell Sci and Optris filepaths will be produced as output
 # given_date should be in string format: 'DD/MM/YYYY' - this will include the month but not in word form
