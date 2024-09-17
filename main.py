@@ -41,8 +41,10 @@ def main():
     print(avgOp_df)
     
     
-    #then need to bring thermocouple and Optris average dataframes together into a df of times where both sensors record data
-    # will this be the create_CampbellSci_Optris_dataframe.py function??
+    # To combine the thermocouple and Optris average dataframes together into a single df of times where both sensors record data
+    from create_CampbellSci_Optris_dataframe import create_CampbellSci_Optris_dataframe
+    df_merged = create_CampbellSci_Optris_dataframe(avgOp_df, df_sand_avgCS)
+    print(df_merged)
     
     return
 
