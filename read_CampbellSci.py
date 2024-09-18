@@ -139,6 +139,7 @@ def sand_avgCS(dt_objs, temps_arr):
         print('Only using 3 thermocouples')
         avg_temps = (temps_arr[0] + temps_arr[1] + temps_arr[2]) / 3  # only using H1, H2, and H3 thermocouples
         
+        print(len(temps_arr[0,:]), len(stdevs_arr[0]))  # have added this in as am stuck with the length of stuff in std_sum, getting IndexError***
         for s in range(len(temps_arr[0,:])):
             therm_std_sum = therm_std**2 + therm_std**2 + therm_std**2
             std_sum = (stdevs_arr[0][s])**2 + (stdevs_arr[1][s])**2 + (stdevs_arr[2][s])**2  # uncertainty in time (averaging every 5x1sec measurement into 5sec intervals)
