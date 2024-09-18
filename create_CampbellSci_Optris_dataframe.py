@@ -28,8 +28,8 @@ def create_CampbellSci_Optris_dataframe(Optris_df, CampbellSci_df):
     sterrCS = CampbellSci_df['sterr'].values
     
     # Compare the lengths of the mean temperature arrays, after resampling Optris in a previous function
-    print(f"Length of T_Op: {len(T_Op)}")
-    print(f"Length of T_CS: {len(T_CS)}")  # they don't actually match, but are on the same scale now!
+    #print(f"Length of T_Op: {len(T_Op)}")
+    #print(f"Length of T_CS: {len(T_CS)}")  # they don't actually match, but are on the same scale now!
     
     # Setting up dataframes for Optris and Campbell Scientific cold temperature arrays
     df_Op = pd.DataFrame({'temperature_Op': T_Op, 'stdev_Op': stdevOp, 'sterr_Op': sterrOp}, index = datetime_Op)
@@ -55,7 +55,7 @@ from read_CampbellSci import read_CampbellSci
 dt_objsCS, temps_arrCS, stdevs_arrCS = read_CampbellSci(path_CS)
     
 from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...
-df_sand_avgCS = sand_avgCS(dt_objsCS, temps_arrCS)
+df_sand_avgCS = sand_avgCS(dt_objsCS, temps_arrCS, stdevs_arrCS)
 # print(df_sand_avgCS)
 # The index here is actually just the numbers 0 to 5061, not the datetime objects! That is accessed by the 'datetimes' column
     

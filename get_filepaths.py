@@ -45,11 +45,11 @@ def get_filepaths(given_date, given_time):
         full_path = path + "\\" + folder  # adding two slashes as they can cancel the "" after them, causing an error in the code
         print(full_path)
         files = os.listdir(full_path)
-        print(files)
+        #print(files)
     
     return full_path, files
 
-
+'''
 #%% Check to see that the function works
 path, files = get_filepaths('13/08/2024', 'AM')  # now I just need to make sure that Friday always has an 'AM' in it when I save it on the USB...
-
+'''

@@ -28,7 +28,7 @@ def read_Optris(filepath):
     headers = []
     with open(filepath, 'r') as file:
         headers = [next(file).strip() for _ in range(7)]
-    print(headers)  # There are 4x different measurement areas
+    #print(headers)  # There are 4x different measurement areas
     
     # Extract date and time from the relevant lines
     date_line = headers[1]  # This is the line e.g. Date: 13/06/2024
@@ -75,7 +75,7 @@ def read_Optris(filepath):
     df_Optris.columns = new_column_names      # assigning them to the DataFrame by correct length
     df_Optris = df_Optris.drop(columns=['Time'])  # drop the 'Time' column if only 'Datetime' is needed
     df_Optris = df_Optris.drop(columns=['nan'])   # remove the unnecessary 'Unnamed: 5' column too
-    print(df_Optris.columns)
+    #print(df_Optris.columns)
     
     # Extract the data from these columns, into separate arrays
     area1 = df_Optris['Area1']  # temperature avg of whole/half [as excluding return pump] of water surface
@@ -147,7 +147,7 @@ def average_Optris(resampled_dfa1, resampled_dfa2):  # resampled_dfa1 and resamp
     area2 = resampled_dfa2.iloc[:,0].to_numpy()
     std_resampled1 = resampled_dfa1.iloc[:,1].to_numpy()  # add each element of these squared together as part of standard deviation calculation
     std_resampled2 = resampled_dfa2.iloc[:,1].to_numpy()
-    print(np.shape(area1))  # changed from pandas series to np.ndarray with shape (4539,)
+    #print(np.shape(area1))  # changed from pandas series to np.ndarray with shape (4539,)
     
     if len(area1) == len(area2):
         mean_Op = np.zeros(len(area1))  # preallocating a mean temperature array

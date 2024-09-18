@@ -93,7 +93,7 @@ def read_CampbellSci(filepath):
     stdev5 = stdev5[:count]
     stdev6 = stdev6[:count]
     
-    print(count, len(temp1)) 
+    #print(count, len(temp1)) 
     
     # Put the similar things to be returned into numpy arrays for efficiency
     temps_arr = np.array([temp1, temp2, temp3, temp4, temp5, temp6])
@@ -102,15 +102,14 @@ def read_CampbellSci(filepath):
     return dt_objs, temps_arr, stdevs_arr
 
 
-
+'''
 #%% Testing the read_CampbellSci() function
 the_filepath = r"D:\MSc Results\August_2024\Tuesday13AugAM\CR3000_Table1.dat"
 dt_objs, temps_arr, stdevs_arr = read_CampbellSci(the_filepath)
-# we don't actually use this stdevs_arr though... just get stdev array when taking average of temps_arr arrays
-
+'''
 
 #%% Averaging Function for Sand and Pure Experiments
-def sand_avgCS(dt_objs, temps_arr):
+def sand_avgCS(dt_objs, temps_arr, prev_std_arr):
     # Take the mean/average of all consistent thermocouples (only H1-3 for sand experiments, starting Wed 31 July PM and onwards)
     ref_dt = np.datetime64('2024-07-31T15:00:00')  # the 31 July PM experiment started at 15:09:30 PM and the AM test had the faulty computer so didn't work
     avg_temps = np.zeros(len(temps_arr[0,:]))  # preallocating the new average temperatures array to have same length as temp1
@@ -127,7 +126,7 @@ def sand_avgCS(dt_objs, temps_arr):
         # Get standard deviation of every time averaging in above step
         for s in range(len(temps_arr[0,:])):
             therm_std_sum = therm_std**2 + therm_std**2 + therm_std**2 + therm_std**2 + therm_std**2 + therm_std**2
-            std_sum = (stdevs_arr[0][s])**2 + (stdevs_arr[1][s])**2 + (stdevs_arr[2][s])**2 + (stdevs_arr[3][s])**2 + (stdevs_arr[4][s])**2 + (stdevs_arr[5][s])**2  # uncertainty in time (averaging every 5x1sec measurement into 5sec intervals)
+            std_sum = (prev_std_arr[0,s])**2 + (prev_std_arr[1,s])**2 + (prev_std_arr[2,s])**2 + (prev_std_arr[3,s])**2 + (prev_std_arr[4,s])**2 + (prev_std_arr[5,s])**2  # uncertainty in time (averaging every 5x1sec measurement into 5sec intervals)
             little_arr = np.array([temps_arr[0][s], temps_arr[1][s], temps_arr[2][s], temps_arr[3][s], temps_arr[4][s], temps_arr[5][s]])
             std_mean = np.std(little_arr)  # getting mean standard deviation from temperature measurements, using the array I made in the line above
             stdev = np.sqrt(therm_std_sum + std_sum + std_mean**2)  # combined standard deviation, including thermocouple uncertainties and averaging
@@ -139,10 +138,9 @@ def sand_avgCS(dt_objs, temps_arr):
         print('Only using 3 thermocouples')
         avg_temps = (temps_arr[0] + temps_arr[1] + temps_arr[2]) / 3  # only using H1, H2, and H3 thermocouples
         
-        print(len(temps_arr[0,:]), len(stdevs_arr[0]))  # have added this in as am stuck with the length of stuff in std_sum, getting IndexError***
         for s in range(len(temps_arr[0,:])):
             therm_std_sum = therm_std**2 + therm_std**2 + therm_std**2
-            std_sum = (stdevs_arr[0][s])**2 + (stdevs_arr[1][s])**2 + (stdevs_arr[2][s])**2  # uncertainty in time (averaging every 5x1sec measurement into 5sec intervals)
+            std_sum = (prev_std_arr[0,s])**2 + (prev_std_arr[1,s])**2 + (prev_std_arr[2,s])**2  # uncertainty in time (averaging every 5x1sec measurement into 5sec intervals)
             little_arr = np.array([temps_arr[0][s], temps_arr[1][s], temps_arr[2][s]])
             std_mean = np.std(little_arr)  # getting mean standard deviation from temperature measurements, using the array I made in the line above
             stdev = np.sqrt(therm_std_sum + std_sum + std_mean**2)  # combined standard deviation, including thermocouple uncertainties and averaging
@@ -150,7 +148,7 @@ def sand_avgCS(dt_objs, temps_arr):
             sterr = stdev / np.sqrt(3)
             sterr_arr[s] = sterr
     
-    print(avg_temps)
+    #print(avg_temps)
     df_sand_avgCS = pd.DataFrame({     # creating a new dataframe
         'datetimes': dt_objs,
         'mean_temperatures': avg_temps,
@@ -159,13 +157,13 @@ def sand_avgCS(dt_objs, temps_arr):
     
     return df_sand_avgCS
 
-
+'''
 # TEST the sand averaging function for Campbell Scientific data
-df_sand_avgCS = sand_avgCS(dt_objs, temps_arr)
-
+df_sand_avgCS = sand_avgCS(dt_objs, temps_arr, stdevs_arr)
+'''
 
 #%% Averaging Function for Water Experiments - CHANGE THIS AFTER THE MONDAY MEETING (HAVE ALREADY UPDATED THE BOX ABOVE)
-def water_avgCS(dt_objs, temps_arr):
+def water_avgCS(dt_objs, temps_arr, prev_std_arr):
     # Take the mean/average of all consistent thermocouples (only H4-6 for water experiments, starting Wed 31 July PM and onwards)
     ref_dt = np.datetime64('2024-07-31T15:00:00')  # the 31 July PM experiment started at 15:09:30 PM and the AM test had the faulty computer so didn't work
     avg_temps = np.zeros(len(temps_arr[0,:]))  # preallocating the new average temperatures array to have same length as temp1
@@ -182,7 +180,7 @@ def water_avgCS(dt_objs, temps_arr):
         # Get standard deviation of every time averaging in above step
         for s in range(len(temps_arr[0,:])):
             therm_std_sum = therm_std**2 + therm_std**2 + therm_std**2 + therm_std**2 + therm_std**2 + therm_std**2
-            std_sum = (stdevs_arr[0][s])**2 + (stdevs_arr[1][s])**2 + (stdevs_arr[2][s])**2 + (stdevs_arr[3][s])**2 + (stdevs_arr[4][s])**2 + (stdevs_arr[5][s])**2  # uncertainty in time (averaging every 5x1sec measurement into 5sec intervals)
+            std_sum = (prev_std_arr[0,s])**2 + (prev_std_arr[1,s])**2 + (prev_std_arr[2,s])**2 + (prev_std_arr[3,s])**2 + (prev_std_arr[4,s])**2 + (prev_std_arr[5,s])**2  # uncertainty in time (averaging every 5x1sec measurement into 5sec intervals)
             little_arr = np.array([temps_arr[0][s], temps_arr[1][s], temps_arr[2][s], temps_arr[3][s], temps_arr[4][s], temps_arr[5][s]])
             std_mean = np.std(little_arr)  # getting mean standard deviation from temperature measurements, using the array I made in the line above
             stdev = np.sqrt(therm_std_sum + std_sum + std_mean**2)  # combined standard deviation, including thermocouple uncertainties and averaging
@@ -197,7 +195,7 @@ def water_avgCS(dt_objs, temps_arr):
         
         for s in range(len(temps_arr[0,:])):
             therm_std_sum = therm_std**2 + therm_std**2 + therm_std**2
-            std_sum = (stdevs_arr[3][s])**2 + (stdevs_arr[4][s])**2 + (stdevs_arr[5][s])**2  # uncertainty in time (averaging every 5x1sec measurement into 5sec intervals)
+            std_sum = (prev_std_arr[3,s])**2 + (prev_std_arr[4,s])**2 + (prev_std_arr[5,s])**2  # uncertainty in time (averaging every 5x1sec measurement into 5sec intervals)
             little_arr = np.array([temps_arr[3][s], temps_arr[4][s], temps_arr[5][s]])
             std_mean = np.std(little_arr)  # getting mean stdev from the temperature measurements
             stdev = np.sqrt(therm_std_sum + std_sum + std_mean**2)  # combined standard deviation, including thermocouple uncertainties and averaging
@@ -214,8 +212,8 @@ def water_avgCS(dt_objs, temps_arr):
     
     return df_water_avgCS
 
-
+'''
 # Test the water averaging function for Campbell Scientific data
 df_water_avgCS = water_avgCS(dt_objs, temps_arr)
 print(df_water_avgCS['mean_temperatures'])
-
+'''
