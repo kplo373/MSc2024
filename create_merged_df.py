@@ -2,10 +2,10 @@
 """
 Created on Wed Sep 11 12:53:48 2024
 
-This is a function following on from resample_Optris.py that puts both the 
-Campbell Scientific thermocouple data and the Optris thermal camera 
-temperature data into one dataframe, with datetime as the index. Only the 
-common time data should be included in the dataframe.
+This is a function following on from the averaging Optris and CampbellSci 
+functions, putting both the Campbell Scientific thermocouple data and the 
+Optris thermal camera temperature data into one dataframe, with datetime 
+as the index. Only the common time data should be included in the dataframe.
 
 @author: kplo373
 """
@@ -15,7 +15,7 @@ common time data should be included in the dataframe.
 
 import pandas as pd
 
-def create_CampbellSci_Optris_dataframe(Optris_df, CampbellSci_df):    
+def create_merged_df(Optris_df, CampbellSci_df):    
     mean_Op = Optris_df['Op_temp']
     datetime_Op = Optris_df['datetimes']
     T_Op = mean_Op.to_numpy()  # creating a numpy array for the Optris average temperatures
@@ -74,5 +74,5 @@ avgOp_df = average_Optris(resampled_df_a1, resampled_df_a3)
 
 
 #%% Test this actual function
-df_merged = create_CampbellSci_Optris_dataframe(avgOp_df, df_sand_avgCS)
+df_merged = create_merged_df(avgOp_df, df_sand_avgCS)
 print(df_merged)

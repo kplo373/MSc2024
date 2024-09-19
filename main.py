@@ -56,15 +56,15 @@ def main():
     # print(avgOp_dfcold)
 
 
-    from create_CampbellSci_Optris_dataframe import create_CampbellSci_Optris_dataframe
-    df_merged_cold = create_CampbellSci_Optris_dataframe(avgOp_dfcold, df_sand_avgCScold)
-    df_merged_hot = create_CampbellSci_Optris_dataframe(avgOp_dfhot, df_sand_avgCShot)
+    from create_merged_df import create_merged_df
+    df_merged_cold = create_merged_df(avgOp_dfcold, df_sand_avgCScold)
+    df_merged_hot = create_merged_df(avgOp_dfhot, df_sand_avgCShot)
     #print(df_mergedcold) 
     
     #need to get all the hot/cold files imported above!
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
-    plot = plot1to1(df_merged_cold, df_merged_hot)
+    df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot)
     
     
     return
