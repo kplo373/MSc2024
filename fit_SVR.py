@@ -106,6 +106,8 @@ print(f'Root Mean Square Error (RMSE) for Linear SVR: {rmse_linear}')
 
 # getting a UnicodeDecodeError from the below script functions for this data... see website: https://saturncloud.io/blog/how-to-fix-the-pandas-unicodedecodeerror-utf8-codec-cant-decode-bytes-in-position-01-invalid-continuation-byte-error/
 #%% to test
+import sys
+sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
 # To get the filepath
 from get_filepaths import get_filepaths
 path_cold, files_cold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
@@ -116,13 +118,14 @@ path_CScold = path_cold + '\\' + files_cold[2]
 path_hot, files_hot = get_filepaths('18/07/2024', 'AM')  # for the hot pure water test: Thursday 18th July AM
 path_Ophot = path_hot + '\\' + files_hot[0]
 path_CShot = path_hot + '\\' + files_hot[2]
-
+#%%
 
 # To collect the Campbell Scientific thermocouple data
 from read_CampbellSci import read_CampbellSci
-dt_objsCScold, temps_arrCScold, stdevs_arrCScold = read_CampbellSci(path_CScold)
+dt_objsCScold, temps_arrCScold, stdevs_arrCScold = read_CampbellSci(path_CScold)  # this is giving the error!
+#%%
 dt_objsCShot, temps_arrCShot, stdevs_arrCShot = read_CampbellSci(path_CShot)
- 
+#%%
 #from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...
 from read_CampbellSci import water_avgCS
 #df_sand_avgCScold = sand_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)  
@@ -130,7 +133,9 @@ df_water_avgCScold = water_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScol
 #df_sand_avgCShot = sand_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
 df_water_avgCShot = water_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
 # print(df_sand_avgCScold)
-    
+print(df_water_avgCScold['mean_temperatures'])
+#%%
+
     
 # To collect the Optris thermal camera data
 from read_Optris import read_Optris
