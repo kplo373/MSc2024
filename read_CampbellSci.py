@@ -104,7 +104,7 @@ def read_CampbellSci(filepath):
 
 '''
 #%% Testing the read_CampbellSci() function
-the_filepath = r"D:\MSc Results\August_2024\Tuesday13AugAM\CR3000_Table1.dat"
+the_filepath = r"D:\MSc Results\July_2024\Wednesday24JulyPM\CR3000_Table1.dat"
 dt_objs, temps_arr, stdevs_arr = read_CampbellSci(the_filepath)
 '''
 
@@ -214,6 +214,6 @@ def water_avgCS(dt_objs, temps_arr, prev_std_arr):
 
 '''
 # Test the water averaging function for Campbell Scientific data
-df_water_avgCS = water_avgCS(dt_objs, temps_arr)
+df_water_avgCS = water_avgCS(dt_objs, temps_arr, stdevs_arr)
 print(df_water_avgCS['mean_temperatures'])
 '''

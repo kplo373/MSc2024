@@ -12,7 +12,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def plot1to1(df_merged_cold, df_merged_hot):
+# str_expt parameter should be a string of the type of experiment done, e.g. '50% Pellet-Sand'
+def plot1to1(df_merged_cold, df_merged_hot, str_expt):
     T_Opcold = df_merged_cold['temperature_Op']  # extracting the temperature arrays
     T_CScold = df_merged_cold['temperature_CS']
     T_Ophot = df_merged_hot['temperature_Op']
@@ -88,7 +89,7 @@ def plot1to1(df_merged_cold, df_merged_hot):
     #can add a plt.errorbar() here too for the hot data - assuming using standard error like Tom said
     plt.plot(tempCShot, tempOphot, 'r', label='Hot Raw Data')
     
-    plt.title('Sensor Comparison For 50% Pellet-Sand Experiment')  # have to manually add in what percentage of plastic etc.
+    plt.title('Sensor Comparison For ' + str_expt + ' Experiment')  # have to manually add in what percentage of plastic etc.
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
     plt.grid()
@@ -107,7 +108,7 @@ def plot1to1(df_merged_cold, df_merged_hot):
     
     return df_clipped_cold, df_clipped_hot
 
-#df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot)
+#df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
 
 
 #%% to test
@@ -154,9 +155,11 @@ avgOp_dfhot = average_Optris(resampled_df_a1hot, resampled_df_a3hot)
 from create_merged_df import create_merged_df
 df_merged_cold = create_merged_df(avgOp_dfcold, df_sand_avgCScold)
 df_merged_hot = create_merged_df(avgOp_dfhot, df_sand_avgCShot)
-#print(df_mergedcold) 
+#print(df_mergedcold)
+
+
 
 #%% Test this actual function
-df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot)
+df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
 
 

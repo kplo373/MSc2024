@@ -65,7 +65,9 @@ def main():
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
     df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot)
+    #print(df_cold.columns)
     
+    # add fit_SVR() function next...
     
     return
 
