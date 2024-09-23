@@ -33,11 +33,19 @@ def read_Optris(filepath):
     # Extract date and time from the relevant lines
     date_line = headers[1]  # This is the line e.g. Date: 13/06/2024
     time_line = headers[2]  # e.g. Time: 10:51:17.112
-    #print(type(date_line), time_line)
+    #print(date_line, time_line)  # and these are strings
+    
+    if '\t' in date_line and time_line:  # the columns are separated by either commas or tabs
+        delim = '\t'
+    elif ',' in date_line and time_line:  
+        delim = ','
+    else:
+        print('unidentified separator between date and time in Optris files')
+    # older Optris data files are likely to be tab delimited, and newer ones comma delimited
     
     # Split the lines to get the actual date and time values
-    date_val = date_line.split(',')[1]  # the columns are separated by commas
-    time_val = time_line.split(',')[1]
+    date_val = date_line.split(delim)[1]
+    time_val = time_line.split(delim)[1]    
     
     print(f"Date: {date_val}")
     print(f"Time: {time_val}")
@@ -51,7 +59,7 @@ def read_Optris(filepath):
     
     # Read the Optris files, ignoring errors (from chatGPT)
     try: 
-        df_Optris = pd.read_csv(filepath, delimiter='\t', encoding='utf-8', header=7)  # need to be weary of if the delimiter is ',' or '\t'
+        df_Optris = pd.read_csv(filepath, delimiter=delim, encoding='utf-8', header=7)  # need to be weary of if the delimiter is ',' or '\t'
     except UnicodeDecodeError as e:
         print(f"UnicodeDecodeError: {e}")
 

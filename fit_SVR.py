@@ -83,7 +83,7 @@ def fit_SVR(df_merged_cold, df_merged_hot):
     y_pred_linear_scaled = linear_svr.predict(x_test_scaled)
     y_pred_linear = scaler_y.inverse_transform(y_pred_linear_scaled.reshape(-1,1))  # shape (100, 1)
     
-    return scaler_y, svr_rbf, linear_svr, y_pred_linear
+    return scaler_y, svr_rbf, linear_svr, y_pred_linear  # just guessing what to return... can update this at the end
     # takes a while to run this cell^^
 
 #%% Test the actual function
@@ -107,7 +107,7 @@ print(f'Root Mean Square Error (RMSE) for Linear SVR: {rmse_linear}')
 # getting a UnicodeDecodeError from the below script functions for this data... see website: https://saturncloud.io/blog/how-to-fix-the-pandas-unicodedecodeerror-utf8-codec-cant-decode-bytes-in-position-01-invalid-continuation-byte-error/
 #%% to test
 import sys
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
+sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")
 # To get the filepath
 from get_filepaths import get_filepaths
 path_cold, files_cold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
@@ -115,6 +115,7 @@ path_cold, files_cold = get_filepaths('24/07/2024', 'PM')  # for the cold pure w
 path_CScold = path_cold + '\\' + files_cold[0]
 path_Opcold = path_cold + '\\' + files_cold[2]
 
+#%%
 path_hot, files_hot = get_filepaths('18/07/2024', 'AM')  # for the hot pure water test: Thursday 18th July AM
 path_CShot = path_hot + '\\' + files_hot[0]
 path_Ophot = path_hot + '\\' + files_hot[2]
@@ -155,8 +156,9 @@ avgOp_dfhot = average_Optris(resampled_df_a1hot, resampled_df_a3hot)
 from create_merged_df import create_merged_df
 df_merged_cold = create_merged_df(avgOp_dfcold, df_water_avgCScold)  #df_sand_avgCScold)
 df_merged_hot = create_merged_df(avgOp_dfhot, df_water_avgCShot)     #df_sand_avgCShot)
-#print(df_mergedcold)
+print(df_merged_cold)
 
+#%%
 from plot1to1 import plot1to1  # need to add text for title, relevant to what type of experiment was done
 df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, 'Pure Water')  # to give the clipped arrays... do we need these?
 
