@@ -11,8 +11,8 @@ import sys
 sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions in the second cell
 
 # can run this main() function within a for loop if possible, would need to automate the date and 'AM'
-chosen_date = '13/08/2024'  # this test was hot 50% nurdle sand (can check the excel sheet)
-chosen_period = 'AM'
+#chosen_date = '13/08/2024'  # this test was hot 50% nurdle sand (can check the excel sheet)
+#chosen_period = 'AM'
 # need to be careful if the sand_avgCS or the water_avgCS function is being used, and to change the title name in plot1to1.py**
 
 def main():
@@ -34,8 +34,11 @@ def main():
     dt_objsCShot, temps_arrCShot, stdevs_arrCShot = read_CampbellSci(path_CShot)
      
     from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...
+    #from read_CampbellSci import water_avgCS
     df_sand_avgCScold = sand_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)  
+    #df_water_avgCScold = water_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)
     df_sand_avgCShot = sand_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
+    #df_water_avgCShot = water_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
     # print(df_sand_avgCScold)
         
         
@@ -57,8 +60,8 @@ def main():
 
 
     from create_merged_df import create_merged_df
-    df_merged_cold = create_merged_df(avgOp_dfcold, df_sand_avgCScold)
-    df_merged_hot = create_merged_df(avgOp_dfhot, df_sand_avgCShot)
+    df_merged_cold = create_merged_df(avgOp_dfcold, df_water_avgCScold)
+    df_merged_hot = create_merged_df(avgOp_dfhot, df_water_avgCShot)
     #print(df_mergedcold) 
     
     #need to get all the hot/cold files imported above!

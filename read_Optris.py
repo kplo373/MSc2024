@@ -33,6 +33,7 @@ def read_Optris(filepath):
     # Extract date and time from the relevant lines
     date_line = headers[1]  # This is the line e.g. Date: 13/06/2024
     time_line = headers[2]  # e.g. Time: 10:51:17.112
+    #print(type(date_line), time_line)
     
     # Split the lines to get the actual date and time values
     date_val = date_line.split(',')[1]  # the columns are separated by commas
@@ -50,13 +51,15 @@ def read_Optris(filepath):
     
     # Read the Optris files, ignoring errors (from chatGPT)
     try: 
-        df_Optris = pd.read_csv(filepath, delimiter=',', encoding='utf-8', header=7)
+        df_Optris = pd.read_csv(filepath, delimiter='\t', encoding='utf-8', header=7)  # need to be weary of if the delimiter is ',' or '\t'
     except UnicodeDecodeError as e:
         print(f"UnicodeDecodeError: {e}")
-        
-    
+
     # Function to convert time string to timedelta
     def time_str_to_timedelta(time_str):
+        if ',' in time_str:
+            time_str = time_str.split(',')[0]  # only include the first column (actual time) if all columns are included
+        #print(time_str)
         # Time string format is 'HH:MM:SS.sss'
         hours, minutes, seconds = time_str.split(':')
         seconds, milliseconds = map(float, seconds.split('.'))
@@ -69,7 +72,8 @@ def read_Optris(filepath):
 
     # Now get the other columns!!
     # Assign new names to the data columns
-    #print(df_Optris.columns)   # has 11 columns
+    print(df_Optris.columns)   # has 11 columns
+    
     new_column_names = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']  # not sure what 'Unnamed: 5' column is for? so made it 'nan'
 
     df_Optris.columns = new_column_names      # assigning them to the DataFrame by correct length

@@ -102,11 +102,11 @@ def read_CampbellSci(filepath):
     return dt_objs, temps_arr, stdevs_arr
 
 
-
+"""
 #%% Testing the read_CampbellSci() function
 the_filepath = r"D:\MSc Results\July_2024\Wednesday24JulyPM\CR3000_Table1.dat"
 dt_objs, temps_arr, stdevs_arr = read_CampbellSci(the_filepath)
-
+"""
 
 #%% Averaging Function for Sand and Pure Experiments
 def sand_avgCS(dt_objs, temps_arr, prev_std_arr):
@@ -212,8 +212,8 @@ def water_avgCS(dt_objs, temps_arr, prev_std_arr):
     
     return df_water_avgCS
 
-
+'''
 # Test the water averaging function for Campbell Scientific data
 df_water_avgCS = water_avgCS(dt_objs, temps_arr, stdevs_arr)
 print(df_water_avgCS['mean_temperatures'])
-
+'''
