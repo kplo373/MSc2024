@@ -20,12 +20,12 @@ def main():
     from get_filepaths import get_filepaths
     path_cold, files_cold = get_filepaths('12/08/2024', 'AM')  # for the cold 50% nurdle-sand experiment
     # path gives a folder, and files are the files in that folder. Need to select specific file from files list
-    path_Opcold = path_cold + '\\' + files_cold[0]
-    path_CScold = path_cold + '\\' + files_cold[2]
+    path_CScold = path_cold + '\\' + files_cold[0]
+    path_Opcold = path_cold + '\\' + files_cold[2]
 
     path_hot, files_hot = get_filepaths('13/08/2024', 'AM')  # for the hot 50% nurdle-sand experiment
-    path_Ophot = path_hot + '\\' + files_hot[0]
-    path_CShot = path_hot + '\\' + files_hot[2]
+    path_CShot = path_hot + '\\' + files_hot[0]
+    path_Ophot = path_hot + '\\' + files_hot[2]
 
 
     # To collect the Campbell Scientific thermocouple data

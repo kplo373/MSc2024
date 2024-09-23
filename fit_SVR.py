@@ -112,20 +112,19 @@ sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
 from get_filepaths import get_filepaths
 path_cold, files_cold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
 # path gives a folder, and files are the files in that folder. Need to select specific file from files list
-path_Opcold = path_cold + '\\' + files_cold[0]
-path_CScold = path_cold + '\\' + files_cold[2]
+path_CScold = path_cold + '\\' + files_cold[0]
+path_Opcold = path_cold + '\\' + files_cold[2]
 
 path_hot, files_hot = get_filepaths('18/07/2024', 'AM')  # for the hot pure water test: Thursday 18th July AM
-path_Ophot = path_hot + '\\' + files_hot[0]
-path_CShot = path_hot + '\\' + files_hot[2]
-#%%
+path_CShot = path_hot + '\\' + files_hot[0]
+path_Ophot = path_hot + '\\' + files_hot[2]
+
 
 # To collect the Campbell Scientific thermocouple data
 from read_CampbellSci import read_CampbellSci
-dt_objsCScold, temps_arrCScold, stdevs_arrCScold = read_CampbellSci(path_CScold)  # this is giving the error!
-#%%
+dt_objsCScold, temps_arrCScold, stdevs_arrCScold = read_CampbellSci(path_CScold)
 dt_objsCShot, temps_arrCShot, stdevs_arrCShot = read_CampbellSci(path_CShot)
-#%%
+
 #from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...
 from read_CampbellSci import water_avgCS
 #df_sand_avgCScold = sand_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)  
@@ -133,14 +132,13 @@ df_water_avgCScold = water_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScol
 #df_sand_avgCShot = sand_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
 df_water_avgCShot = water_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
 # print(df_sand_avgCScold)
-print(df_water_avgCScold['mean_temperatures'])
-#%%
 
     
 # To collect the Optris thermal camera data
 from read_Optris import read_Optris
-dt_objsOpcold, a1cold, a2cold, a3cold, a4cold = read_Optris(path_Opcold)
+dt_objsOpcold, a1cold, a2cold, a3cold, a4cold = read_Optris(path_Opcold)  # giving error now, need to go to line 38 in read_Optris
 dt_objsOphot, a1hot, a2hot, a3hot, a4hot = read_Optris(path_Ophot)
+#%%
     
 from read_Optris import resample_Optris
 resampled_df_a1cold = resample_Optris(dt_objsOpcold, a1cold)
