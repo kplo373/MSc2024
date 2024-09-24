@@ -110,7 +110,7 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
 
 #df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
 
-"""
+
 #%% to test
 import sys
 #sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
@@ -170,5 +170,5 @@ df_merged_hot = create_merged_df(avgOp_dfhot, df_sand_avgCShot)
 
 #%% Test this actual function
 df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
-"""
+
 

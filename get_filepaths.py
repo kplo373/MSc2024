@@ -51,7 +51,7 @@ def get_filepaths(given_date, given_time):
     
     return full_path, sorted_files
 
-'''
+r'''
 #%% Check to see that the function works
 path, files = get_filepaths('13/08/2024', 'AM')  # now I just need to make sure that Friday always has an 'AM' in it when I save it on the USB...
 '''

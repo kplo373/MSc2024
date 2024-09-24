@@ -102,7 +102,7 @@ def read_CampbellSci(filepath):
     return dt_objs, temps_arr, stdevs_arr
 
 
-'''
+r'''
 #%% Testing the read_CampbellSci() function
 #the_filepath = r"D:\MSc Results\July_2024\Wednesday24JulyPM\CR3000_Table1.dat"
 the_filepath = r"D:\MSc Results\August_2024\Tuesday13AugAM\CR3000_Table1.dat"
