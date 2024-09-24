@@ -67,12 +67,13 @@ def main():
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
     df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
-    #print(df_cold.columns)
+    print(df_cold.columns)
    
     # then would be the fit_SVR() function, but this is only required once for pure water.
     
     # then the apply_calibration() function to apply this pure water fit to each mixture.
-    
+    from apply_calibration import apply_calibration
+    x_comb, y_pred_plastic = apply_calibration(df_cold, df_hot)
     
     return
 
