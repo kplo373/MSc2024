@@ -15,6 +15,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler  # used to scale the combined arrays below
 from sklearn.svm import SVR  # used to train the SVM below
 from sklearn.metrics import mean_squared_error
+import joblib
 
 #want to also make sure that the 95th percentile thing is included... should I get it from the plot1to1.py script maybe? and return clipped arrays in that function?
 def fit_SVR(df_merged_cold, df_merged_hot):
@@ -37,8 +38,7 @@ def fit_SVR(df_merged_cold, df_merged_hot):
     x_comb = np.vstack((x_cold, x_hot))  # shape is (16702, 1) so both the x and y arrays are put into the same column
     y_comb = np.concatenate((y_cold, y_hot))  # shape is (16702,) so also same column as there only is one
     print(f'x_combined shape: {x_comb.shape}, y_combined shape: {y_comb.shape}')
-    
-    
+     
     # Scale the combined dataset
     scaler_x = StandardScaler()  # has type: sklearn.preprocessing._data.StandardScaler
     scaler_y = StandardScaler()
@@ -46,8 +46,7 @@ def fit_SVR(df_merged_cold, df_merged_hot):
     x_comb_scaled = scaler_x.fit_transform(x_comb)                         # shape (16702, 1)
     y_comb_scaled = scaler_y.fit_transform(y_comb.reshape(-1, 1)).ravel()  # shape (16702,)
     # ravel() converts a multi-dimensional array into 1D, flattening the array but not creating a new one
-    
-    
+     
     # Train the SVR model
     svr_rbf = SVR(kernel='rbf', C=100, gamma=0.1, epsilon=0.1)  
     # Radial Basis Function (rbf kernel), good for nonlinear relationships
@@ -67,14 +66,12 @@ def fit_SVR(df_merged_cold, df_merged_hot):
     svr_rbf.fit(x_comb_scaled, y_comb_scaled)
     print(svr_rbf)  # SVR(C=100, gamma=0.1)
     
-    
     # Predict using the RBF SVR model
     x_test = np.linspace(x_comb.min(), x_comb.max(), 100).reshape(-1,1)       # shape (100, 1)
     x_test_scaled = scaler_x.transform(x_test)  # use this x_array for both the straight and curved fit
     y_pred_rbf_scaled = svr_rbf.predict(x_test_scaled)
     y_pred_rbf = scaler_y.inverse_transform(y_pred_rbf_scaled.reshape(-1,1))  # shape (100, 1)
-    
-    
+       
     # Train the linear SVR model
     linear_svr = SVR(kernel='linear', C=100, epsilon=0.1)
     linear_svr.fit(x_comb_scaled, y_comb_scaled)
@@ -83,28 +80,39 @@ def fit_SVR(df_merged_cold, df_merged_hot):
     y_pred_linear_scaled = linear_svr.predict(x_test_scaled)
     y_pred_linear = scaler_y.inverse_transform(y_pred_linear_scaled.reshape(-1,1))  # shape (100, 1)
     
-    return scaler_y, svr_rbf, linear_svr, y_pred_linear  # just guessing what to return... can update this at the end
-    # takes a while to run this cell^^
+    
+    # Calculate RMSE for both models (root mean square error)
+    y_true_scaled = scaler_y.transform(y_comb.reshape(-1, 1)).ravel()
+    y_pred_rbf_comb_scaled = svr_rbf.predict(x_comb_scaled)
+    y_pred_rbf_comb = scaler_y.inverse_transform(y_pred_rbf_comb_scaled.reshape(-1,1))
+    y_pred_linear_comb_scaled = linear_svr.predict(x_comb_scaled)
+    y_pred_linear_comb = scaler_y.inverse_transform(y_pred_linear_comb_scaled.reshape(-1,1))
+
+    rmse_rbf = np.sqrt(mean_squared_error(y_comb, y_pred_rbf_comb))
+    rmse_linear = np.sqrt(mean_squared_error(y_comb, y_pred_linear_comb))
+
+    print(f'Root Mean Square Error (RMSE) for RBF SVR: {rmse_rbf}')
+    print(f'Root Mean Square Error (RMSE) for Linear SVR: {rmse_linear}')
+    
+    # For calibrating the rest of the experiment mixtures, after fitting the SVR model and scaling the data
+    svr_rbf.fit(x_comb_scaled, y_comb_scaled)
+    joblib.dump(svr_rbf, 'svr_rbf_pure_water.pkl')
+    joblib.dump(scaler_x, 'scaler_x_pure_water.pkl')
+    joblib.dump(scaler_y, 'scaler_y_pure_water.pkl')
+
+    # Save the predictions if needed
+    y_pred_pure_scaled = svr_rbf.predict(x_test_scaled)
+    y_pred_pure = scaler_y.inverse_transform(y_pred_pure_scaled.reshape(-1, 1))
+    np.save('y_pred_pure.npy', y_pred_pure)
+    
+    return y_pred_pure_scaled, y_pred_pure    # might not even need these though
+    # takes a while to run this function^^
+
 
 #%% Test the actual function
-scaler_y, svr_rbf, linear_svr, y_pred_linear = fit_SVR(df_merged_cold, df_merged_hot)  # this should ONLY BE FOR PURE WATER
-
-#%%
-# Calculate RMSE for both models (root mean square error)
-y_true_scaled = scaler_y.transform(y_comb.reshape(-1, 1)).ravel()
-y_pred_rbf_comb_scaled = svr_rbf.predict(x_comb_scaled)
-y_pred_rbf_comb = scaler_y.inverse_transform(y_pred_rbf_comb_scaled.reshape(-1,1))
-y_pred_linear_comb_scaled = linear_svr.predict(x_comb_scaled)
-y_pred_linear_comb = scaler_y.inverse_transform(y_pred_linear_comb_scaled.reshape(-1,1))
-
-rmse_rbf = np.sqrt(mean_squared_error(y_comb, y_pred_rbf_comb))
-rmse_linear = np.sqrt(mean_squared_error(y_comb, y_pred_linear_comb))
-
-print(f'Root Mean Square Error (RMSE) for RBF SVR: {rmse_rbf}')
-print(f'Root Mean Square Error (RMSE) for Linear SVR: {rmse_linear}')
+#y_pred_pure_scaled, y_pred_pure = fit_SVR(df_merged_cold, df_merged_hot)  # this should ONLY BE FOR PURE WATER
 
 
-# getting a UnicodeDecodeError from the below script functions for this data... see website: https://saturncloud.io/blog/how-to-fix-the-pandas-unicodedecodeerror-utf8-codec-cant-decode-bytes-in-position-01-invalid-continuation-byte-error/
 #%% to test
 import sys
 #sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
