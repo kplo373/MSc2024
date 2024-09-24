@@ -40,15 +40,15 @@ def create_merged_df(Optris_df, CampbellSci_df):
     
     return df_merged
 
-
+'''
 #%% Required functions to test the function above
 
 # To get the filepath
 from get_filepaths import get_filepaths
 path, files = get_filepaths('13/08/2024', 'AM')
 # path gives a folder, and files are the files in that folder. Need to select specific file from files list
-path_Op = path + '\\' + files[0]
-path_CS = path + '\\' + files[2]
+path_CS = path + '\\' + files[0]
+path_Op = path + '\\' + files[2]
 
 # To collect the Campbell Scientific thermocouple data
 from read_CampbellSci import read_CampbellSci
@@ -76,3 +76,4 @@ avgOp_df = average_Optris(resampled_df_a1, resampled_df_a3)
 #%% Test this actual function
 df_merged = create_merged_df(avgOp_df, df_sand_avgCS)
 print(df_merged)
+'''

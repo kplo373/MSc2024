@@ -107,7 +107,8 @@ print(f'Root Mean Square Error (RMSE) for Linear SVR: {rmse_linear}')
 # getting a UnicodeDecodeError from the below script functions for this data... see website: https://saturncloud.io/blog/how-to-fix-the-pandas-unicodedecodeerror-utf8-codec-cant-decode-bytes-in-position-01-invalid-continuation-byte-error/
 #%% to test
 import sys
-sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")
+#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
+sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
 # To get the filepath
 from get_filepaths import get_filepaths
 path_cold, files_cold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
@@ -115,11 +116,9 @@ path_cold, files_cold = get_filepaths('24/07/2024', 'PM')  # for the cold pure w
 path_CScold = path_cold + '\\' + files_cold[0]
 path_Opcold = path_cold + '\\' + files_cold[2]
 
-#%%
 path_hot, files_hot = get_filepaths('18/07/2024', 'AM')  # for the hot pure water test: Thursday 18th July AM
 path_CShot = path_hot + '\\' + files_hot[0]
 path_Ophot = path_hot + '\\' + files_hot[2]
-
 
 # To collect the Campbell Scientific thermocouple data
 from read_CampbellSci import read_CampbellSci
@@ -134,13 +133,12 @@ df_water_avgCScold = water_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScol
 df_water_avgCShot = water_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
 # print(df_sand_avgCScold)
 
-    
+#%%    
 # To collect the Optris thermal camera data
 from read_Optris import read_Optris
 dt_objsOpcold, a1cold, a2cold, a3cold, a4cold = read_Optris(path_Opcold)  # giving error now, need to go to line 38 in read_Optris
 dt_objsOphot, a1hot, a2hot, a3hot, a4hot = read_Optris(path_Ophot)
-#%%
-    
+
 from read_Optris import resample_Optris
 resampled_df_a1cold = resample_Optris(dt_objsOpcold, a1cold)
 resampled_df_a3cold = resample_Optris(dt_objsOpcold, a3cold)
@@ -152,13 +150,12 @@ avgOp_dfcold = average_Optris(resampled_df_a1cold, resampled_df_a3cold)
 avgOp_dfhot = average_Optris(resampled_df_a1hot, resampled_df_a3hot)
 # print(avgOp_dfcold)
 
-
 from create_merged_df import create_merged_df
 df_merged_cold = create_merged_df(avgOp_dfcold, df_water_avgCScold)  #df_sand_avgCScold)
 df_merged_hot = create_merged_df(avgOp_dfhot, df_water_avgCShot)     #df_sand_avgCShot)
-print(df_merged_cold)
+#print(df_merged_cold)
 
-#%%
+
 from plot1to1 import plot1to1  # need to add text for title, relevant to what type of experiment was done
 df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, 'Pure Water')  # to give the clipped arrays... do we need these?
 

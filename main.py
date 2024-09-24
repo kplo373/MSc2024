@@ -32,7 +32,7 @@ def main():
     from read_CampbellSci import read_CampbellSci
     dt_objsCScold, temps_arrCScold, stdevs_arrCScold = read_CampbellSci(path_CScold)
     dt_objsCShot, temps_arrCShot, stdevs_arrCShot = read_CampbellSci(path_CShot)
-     
+  
     from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...
     #from read_CampbellSci import water_avgCS
     df_sand_avgCScold = sand_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)  
@@ -40,8 +40,7 @@ def main():
     df_sand_avgCShot = sand_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
     #df_water_avgCShot = water_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
     # print(df_sand_avgCScold)
-        
-        
+      
     # To collect the Optris thermal camera data
     from read_Optris import read_Optris
     dt_objsOpcold, a1cold, a2cold, a3cold, a4cold = read_Optris(path_Opcold)
@@ -52,7 +51,7 @@ def main():
     resampled_df_a3cold = resample_Optris(dt_objsOpcold, a3cold)
     resampled_df_a1hot = resample_Optris(dt_objsOphot, a1hot)
     resampled_df_a3hot = resample_Optris(dt_objsOphot, a3hot)
-        
+       
     from read_Optris import average_Optris
     avgOp_dfcold = average_Optris(resampled_df_a1cold, resampled_df_a3cold)
     avgOp_dfhot = average_Optris(resampled_df_a1hot, resampled_df_a3hot)
@@ -60,17 +59,20 @@ def main():
 
 
     from create_merged_df import create_merged_df
-    df_merged_cold = create_merged_df(avgOp_dfcold, df_water_avgCScold)
-    df_merged_hot = create_merged_df(avgOp_dfhot, df_water_avgCShot)
+    df_merged_cold = create_merged_df(avgOp_dfcold, df_sand_avgCScold)  #df_water_avgCScold)
+    df_merged_hot = create_merged_df(avgOp_dfhot, df_sand_avgCShot)  #df_water_avgCShot)
     #print(df_mergedcold) 
     
     #need to get all the hot/cold files imported above!
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
-    df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot)
+    df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
     #print(df_cold.columns)
+   
+    # then would be the fit_SVR() function, but this is only required once for pure water.
     
-    # add fit_SVR() function next...
+    # then the apply_calibration() function to apply this pure water fit to each mixture.
+    
     
     return
 

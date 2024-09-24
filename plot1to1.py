@@ -110,8 +110,12 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
 
 #df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
 
-
+"""
 #%% to test
+import sys
+#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
+sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
+
 # To get the filepath
 from get_filepaths import get_filepaths
 path_cold, files_cold = get_filepaths('12/08/2024', 'AM')  # for the cold 50% nurdle-sand experiment
@@ -119,6 +123,7 @@ path_cold, files_cold = get_filepaths('12/08/2024', 'AM')  # for the cold 50% nu
 path_CScold = path_cold + '\\' + files_cold[0]
 path_Opcold = path_cold + '\\' + files_cold[2]
 
+#%%
 path_hot, files_hot = get_filepaths('13/08/2024', 'AM')  # for the hot 50% nurdle-sand experiment
 path_CShot = path_hot + '\\' + files_hot[0]
 path_Ophot = path_hot + '\\' + files_hot[2]
@@ -128,13 +133,17 @@ path_Ophot = path_hot + '\\' + files_hot[2]
 from read_CampbellSci import read_CampbellSci
 dt_objsCScold, temps_arrCScold, stdevs_arrCScold = read_CampbellSci(path_CScold)
 dt_objsCShot, temps_arrCShot, stdevs_arrCShot = read_CampbellSci(path_CShot)
- 
+#%%
 from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...
+#from read_CampbellSci import water_avgCS
 df_sand_avgCScold = sand_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)  
 df_sand_avgCShot = sand_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
 # print(df_sand_avgCScold)
-    
-    
+
+#df_water_avgCScold = water_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)
+#df_water_avgCShot = water_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
+
+
 # To collect the Optris thermal camera data
 from read_Optris import read_Optris
 dt_objsOpcold, a1cold, a2cold, a3cold, a4cold = read_Optris(path_Opcold)
@@ -155,11 +164,11 @@ avgOp_dfhot = average_Optris(resampled_df_a1hot, resampled_df_a3hot)
 from create_merged_df import create_merged_df
 df_merged_cold = create_merged_df(avgOp_dfcold, df_sand_avgCScold)
 df_merged_hot = create_merged_df(avgOp_dfhot, df_sand_avgCShot)
-#print(df_mergedcold)
+#print(df_merged_cold)
 
 
 
 #%% Test this actual function
 df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
-
+"""
 

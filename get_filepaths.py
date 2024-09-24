@@ -13,7 +13,7 @@ This function will have to be run separately for each experiment
 import os
 from datetime import datetime
 
-#"D:\MSc Results\August_2024"
+# e.g. "D:\MSc Results\August_2024"
 folder_path = r"D:\MSc Results"  # can either get the files from the USB drive here, or OneDrive below if using MSc computer
 #folder_path = r'C:\Users\kplo373\OneDrive - The University of Auckland\MSc Kate\PlottingMScResults'
 
@@ -47,8 +47,9 @@ def get_filepaths(given_date, given_time):
         print(full_path)
         files = os.listdir(full_path)
         #print(files)
+    sorted_files = sorted(files)  # put them into alphabetical order, so CampbellSci is always first
     
-    return full_path, files
+    return full_path, sorted_files
 
 '''
 #%% Check to see that the function works
