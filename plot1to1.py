@@ -76,7 +76,7 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
     upper_lim = normal_round(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
     print('Limits:', lower_lim, upper_lim)
     
-    plt.figure(figsize=(7, 7))  # make it into a square shape, same axes limits!
+    plt.figure(figsize=(6, 6))  # make it into a square shape, same axes limits!
     plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
     plt.ylim(lower_lim, upper_lim)
 
@@ -110,7 +110,7 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
 
 #df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
 
-
+r'''
 #%% to test
 import sys
 #sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
@@ -171,4 +171,4 @@ df_merged_hot = create_merged_df(avgOp_dfhot, df_sand_avgCShot)
 #%% Test this actual function
 df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
 
-
+'''
