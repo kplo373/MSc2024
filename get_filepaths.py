@@ -31,10 +31,10 @@ def get_filepaths(given_date, given_time):
         path = folder_path + r'\August_2024'
     elif given_datetime.month == 9:
         path = folder_path + r'\September_2024'
-    #print(path)    
+    #print(path)  
     
     # List all files in the directory
-    all_files = os.listdir(path)
+    all_files = os.listdir(path)  
     
     # Filter files that contain both the given_date and given_time
     filtered_folders = [file for file in all_files if given_date[0:2] in file and given_time in file]  # this isn't working.
@@ -46,8 +46,8 @@ def get_filepaths(given_date, given_time):
         full_path = path + "\\" + folder  # adding two slashes as they can cancel the "" after them, causing an error in the code
         print(full_path)
         files = os.listdir(full_path)
-        #print(files)
-    sorted_files = sorted(files)  # put them into alphabetical order, so CampbellSci is always first
+        print(files)
+        sorted_files = sorted(files)  # put them into alphabetical order, so CampbellSci is always first
     
     return full_path, sorted_files
 

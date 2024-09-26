@@ -89,7 +89,7 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
     #can add a plt.errorbar() here too for the hot data - assuming using standard error like Tom said
     plt.plot(tempCShot, tempOphot, 'r', label='Hot Raw Data')
     
-    plt.title('Sensor Comparison For ' + str_expt + ' Experiment')  # have to manually add in what percentage of plastic etc.
+    plt.title('Sensor Comparison For ' + str_expt)  # including what percentage of plastic etc.
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
     plt.grid()
@@ -97,7 +97,7 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
     plt.show()
 
     
-    # can I create new merged dfs here that only have the clipped data? Then won't need to do the percentile limits in any other functions...
+    # Create new merged dfs here that only have the clipped data. Then won't need to do the percentile limits in any other functions...
     #need to clip the stdev and sterr arrays too.. then create new merged df and return them.
     df_clipped_cold = pd.DataFrame({'tempCS': tempCScold, 'stdCS': sdCScold, 'sterrCS': seCScold, 
                                     'tempOp': tempOpcold, 'stdOp': sdOpcold, 'sterrOp': seOpcold})

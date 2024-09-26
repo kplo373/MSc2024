@@ -23,9 +23,9 @@ def apply_calibration(df_cold, df_hot, str_expt):
     tempOphot = np.array(df_hot['tempOp'])   
     
     # Load the saved model and scalers
-    svr_rbf_pure_water = joblib.load(r"C:\Users\kplo373\Documents\GitHub\MSc2024\old_scripts\svr_rbf_pure_water.pkl")
+    svr_rbf_pure_water = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")
         #r"D:\MSc Results\svr_rbf_pure_water.pkl")
-    scaler_y_pure_water = joblib.load(r"C:\Users\kplo373\Documents\GitHub\MSc2024\old_scripts\scaler_y_pure_water.pkl")
+    scaler_y_pure_water = joblib.load(r"D:\MSc Results\scaler_y_pure_water.pkl")
         #r"D:\MSc Results\scaler_y_pure_water.pkl")
     
     # Prepare the plastic-water data
@@ -74,7 +74,7 @@ def apply_calibration(df_cold, df_hot, str_expt):
     
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
-    plt.title('Calibrated Sensor Comparison For ' + str_expt + ' Experiment')
+    plt.title('Calibrated Sensor Comparison For ' + str_expt)
     plt.legend()
     plt.grid()
     plt.show()

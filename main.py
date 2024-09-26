@@ -8,7 +8,8 @@ Main master script to run all the functions within the subroutines.
 """
 # Just in case it can't find the right data folder, use these two lines below
 import sys
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions in the second cell
+#sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions in the second cell
+sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
 
 # can run this main() function within a for loop if possible, would need to automate the date and 'AM'
 #chosen_date = '13/08/2024'  # this test was hot 50% nurdle sand (can check the excel sheet)
@@ -16,14 +17,15 @@ sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to 
 # need to be careful if the sand_avgCS or the water_avgCS function is being used, and to change the title name in plot1to1.py**
 
 def main():
-    # To get the filepath
+    # To get the filepath  # 01/08/24 doesn't seem to exist... is there in actual files!
     from get_filepaths import get_filepaths
-    path_cold, files_cold = get_filepaths('12/08/2024', 'AM')  # for the cold 50% nurdle-sand experiment
+    # must put given_date below in format 'DD/MM/YYYY' (add 0 first if single digit D or M)
+    path_cold, files_cold = get_filepaths('01/08/2024', 'PM')  # for the cold 50% MP-sand experiment
     # path gives a folder, and files are the files in that folder. Need to select specific file from files list
     path_CScold = path_cold + '\\' + files_cold[0]
     path_Opcold = path_cold + '\\' + files_cold[2]
 
-    path_hot, files_hot = get_filepaths('13/08/2024', 'AM')  # for the hot 50% nurdle-sand experiment
+    path_hot, files_hot = get_filepaths('31/07/2024', 'PM')  # for the hot 50% MP-sand experiment
     path_CShot = path_hot + '\\' + files_hot[0]
     path_Ophot = path_hot + '\\' + files_hot[2]
 
@@ -66,7 +68,7 @@ def main():
     #need to get all the hot/cold files imported above!
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
-    text_str = '50% Pellet-Sand'
+    text_str = '50% Microplastic-Sand'
     df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, text_str)
     print(df_cold.columns)
    
