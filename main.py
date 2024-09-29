@@ -8,8 +8,8 @@ Main master script to run all the functions within the subroutines.
 """
 # Just in case it can't find the right data folder, use these two lines below
 import sys
-#sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions in the second cell
-sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
+sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions in the second cell
+#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
 
 # can run this main() function within a for loop if possible, would need to automate the date and 'AM'
 #chosen_date = '13/08/2024'  # this test was hot 50% nurdle sand (can check the excel sheet)
@@ -70,7 +70,7 @@ def main():
     from plot1to1 import plot1to1
     text_str = '25% Microplastic-Water'
     df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, text_str)
-    print(df_cold.columns)
+    #print(df_cold.columns)
    
     # next step is the fit_SVR() function, but this is only required once for pure water (have already run it and saved results.)
     
@@ -80,13 +80,13 @@ def main():
     
     # then calculate deltaT from calibration SVM less the reference 1:1 line - make this a function!!??
     from get_deltaT import get_deltaT
-    deltaT = get_deltaT(y_pred_plastic)
+    deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)
     #print(deltaT)  # don't know if this is reasonable or not until I plot it!
-    
+    # little plotting script included in get_deltaT now
     
     # Next: Temperature Difference Plot
     
-    return
+    return #x_comb, y_pred_plastic
 
 
 
