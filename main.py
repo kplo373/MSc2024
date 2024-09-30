@@ -78,13 +78,10 @@ def main():
     from apply_calibration import apply_calibration
     x_comb, y_pred_plastic = apply_calibration(df_cold, df_hot, text_str)
     
-    # then calculate deltaT from calibration SVM less the reference 1:1 line - make this a function!!??
+    # then calculate deltaT from calibration SVM less the reference 1:1 line
     from get_deltaT import get_deltaT
     deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)
-    #print(deltaT)  # don't know if this is reasonable or not until I plot it!
-    # little plotting script included in get_deltaT now
-    
-    # Next: Temperature Difference Plot
+    print(deltaT)  # including temperature difference plot
     
     return
 
