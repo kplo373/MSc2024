@@ -17,7 +17,7 @@ sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to 
 # need to be careful if the sand_avgCS or the water_avgCS function is being used, and to change the title name in plot1to1.py**
 
 def main():
-    # To get the filepath  # 01/08/24 doesn't seem to exist... is there in actual files!
+    # To get the filepath
     from get_filepaths import get_filepaths
     # must put given_date below in format 'DD/MM/YYYY' (add 0 first if single digit D or M)
     path_cold, files_cold = get_filepaths('06/08/2024', 'PM')  # for the cold 50% MP-sand experiment
@@ -86,7 +86,7 @@ def main():
     
     # Next: Temperature Difference Plot
     
-    return #x_comb, y_pred_plastic
+    return
 
 
 
