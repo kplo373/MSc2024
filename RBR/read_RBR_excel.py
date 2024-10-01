@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # filepath should be a string, including the path and filename at the end
-def read_RBR(filepath):
+def read_RBR_excel(filepath): # reading from an excel RBR
     # create dictionary of dataframes (one df per excel sheet)
     xl_file = pd.ExcelFile(filepath)
     dfs = {sheet_name: xl_file.parse(sheet_name) 
