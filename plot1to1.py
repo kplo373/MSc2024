@@ -32,12 +32,12 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
     # Using 5th Percentile Minimum Value (from ChatGPT) for Cold Array
     # 1. Calculate the 5th percentile value
     percentile_5_value = np.percentile(T_Opcold, 5)
-    # 2. Find the index of the closest value in y_cold to the 95th percentile value
+    # 2. Find the index of the closest value in y_cold to the 5th percentile value
     index_5 = np.argmin(np.abs(T_Opcold - percentile_5_value))
     # Print the result
     print(f"5th percentile value: {percentile_5_value}")
     print(f"Index of 5th percentile value in y_cold: {index_5}")
-    print(f"Corresponding x_cold value: {T_CScold.iloc[index_5]}")  # or else add .iloc[index_95] if tempC1_origcold is a pandas series
+    print(f"Corresponding x_cold value: {T_CScold.iloc[index_5]}")
     print()
 
     # Likewise, using 95th Percentile Max Value for Hot Array
