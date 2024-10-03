@@ -8,7 +8,7 @@ Main master script to run all the functions within the subroutines.
 """
 # Just in case it can't find the right data folder, use these two lines below
 import sys
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions in the second cell
+sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
 #sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
 
 # can run this main() function within a for loop if possible, would need to automate the date and 'AM'
@@ -20,15 +20,8 @@ def main():
     # To get the filepath
     from get_filepaths import get_filepaths
     # must put given_date below in format 'DD/MM/YYYY' (add 0 first if single digit D or M)
-    path_cold, files_cold = get_filepaths('06/08/2024', 'PM')  # for the cold 50% MP-sand experiment
-    # path gives a folder, and files are the files in that folder. Need to select specific file from files list
-    path_CScold = path_cold + '\\' + files_cold[0]
-    path_Opcold = path_cold + '\\' + files_cold[2]
-
-    path_hot, files_hot = get_filepaths('08/08/2024', 'AM')  # for the hot 50% MP-sand experiment
-    path_CShot = path_hot + '\\' + files_hot[0]
-    path_Ophot = path_hot + '\\' + files_hot[2]
-
+    path_CScold, path_Opcold = get_filepaths('06/08/2024', 'PM')  # for the cold 50% MP-water experiment
+    path_CShot, path_Ophot = get_filepaths('08/08/2024', 'AM')  # for the hot 50% MP-water experiment
 
     # To collect the Campbell Scientific thermocouple data
     from read_CampbellSci import read_CampbellSci

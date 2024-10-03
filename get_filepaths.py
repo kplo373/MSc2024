@@ -44,14 +44,17 @@ def get_filepaths(given_date, given_time):
     for folder in filtered_folders:
         #print(folder)
         full_path = path + "\\" + folder  # adding two slashes as they can cancel the "" after them, causing an error in the code
-        print(full_path)
+        #print(full_path)
         files = os.listdir(full_path)
-        print(files)
+        #print(files)
         sorted_files = sorted(files)  # put them into alphabetical order, so CampbellSci is always first
     
-    return full_path, sorted_files
+    path_CS = full_path + '\\' + sorted_files[0]
+    path_Op = full_path + '\\' + sorted_files[2]
+    
+    return path_CS, path_Op
 
 r'''
 #%% Check to see that the function works
-path, files = get_filepaths('13/08/2024', 'AM')  # now I just need to make sure that Friday always has an 'AM' in it when I save it on the USB...
+pathCS, pathOp = get_filepaths('13/08/2024', 'AM')  # now I just need to make sure that Friday always has an 'AM' in it when I save it on the USB...
 '''
