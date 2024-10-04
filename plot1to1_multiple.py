@@ -11,6 +11,8 @@ import numpy as np
 import pandas as pd
 from types import SimpleNamespace
 import matplotlib.pyplot as plt
+from matplotlib.cm import get_cmap  # for creating colour spectrums and legends
+from matplotlib.collections import LineCollection  # or this instead of one above...
 
 # str_expt parameter should be a string of the type of experiment done, e.g. 'Pellet-Sand', or 'Shaved Plastic and Sand'
 def plot1to1_multiple(dict_parameters, str_expt):
@@ -87,14 +89,28 @@ def plot1to1_multiple(dict_parameters, str_expt):
     p95_val5 = np.percentile(T_CSh5, 95)
     i95_5 = np.argmin(np.abs(T_CSh5 - p95_val5))
     
-    '''
     p5_val10 = np.percentile(T_Opc10, 5)  # calculate the 5th percentile value for 10% MP-sand
     i5_10 = np.argmin(np.abs(T_Opc10 - p5_val10))
     p95_val10 = np.percentile(T_CSh10, 95)
     i95_10 = np.argmin(np.abs(T_CSh10 - p95_val10))
-    '''  # and continue like this for 25%, 50%, and 100%...
+    
+    p5_val25 = np.percentile(T_Opc25, 5)  # getting 5th percentile value for 25% MP-sand
+    i5_25 = np.argmin(np.abs(T_Opc25 - p5_val25))
+    p95_val25 = np.percentile(T_CSh25, 95)
+    i95_25 = np.argmin(np.abs(T_CSh25 - p95_val25))
+    
+    p5_val50 = np.percentile(T_Opc50, 5)  # getting 5th percentile value for 50% MP-sand
+    i5_50 = np.argmin(np.abs(T_Opc50 - p5_val50))
+    p95_val50 = np.percentile(T_CSh50, 95)
+    i95_50 = np.argmin(np.abs(T_CSh50 - p95_val50))
+    
+    p5_val100 = np.percentile(T_Opc100, 5)  # calculate the 5th percentile value for 100% MP-sand (pure MP)
+    i5_100 = np.argmin(np.abs(T_Opc100 - p5_val100))
+    p95_val100 = np.percentile(T_CSh100, 95)
+    i95_100 = np.argmin(np.abs(T_CSh100 - p95_val100))
+    
 
-
+    # Trimming off values in each array that are below the 5th percentile or above the 95th percentile
     tempOpc0 = T_Opc0.iloc[i5_0:]  # this needs to start and end at same indices as tempCSc0
     tempCSc0 = T_CSc0.iloc[i5_0:]
     tempOph0 = T_Oph0.iloc[i95_0:]
@@ -108,14 +124,32 @@ def plot1to1_multiple(dict_parameters, str_expt):
     seCScold = sterrCScold.iloc[i5_0:]
     seOphot = sterrOphot.iloc[i95_0:]
     seCShot = sterrCShot.iloc[i95_0:]
-    '''
+    '''  # can add standard dev and standard error trimmings below later
     
-    tempOpc5 = T_Opc5.iloc[i5_0:]  # getting the 5% MP-sand mixture data clipped to 5th and 95th percentiles
-    tempCSc5 = T_CSc5.iloc[i5_0:]
-    tempOph5 = T_Oph5.iloc[i95_0:]
-    tempCSh5 = T_CSh5.iloc[i95_0:]
-    # can add standard dev and standard error trimmings below later
-    # and then also the other percentages: 10, 25, 50, 100% of MP-sand
+    tempOpc5 = T_Opc5.iloc[i5_5:]  # getting the 5% MP-sand mixture data clipped to 5th and 95th percentiles
+    tempCSc5 = T_CSc5.iloc[i5_5:]
+    tempOph5 = T_Oph5.iloc[i95_5:]
+    tempCSh5 = T_CSh5.iloc[i95_5:]
+    
+    tempOpc10 = T_Opc10.iloc[i5_10:]  # trimming the 10% MP-sand mixture data
+    tempCSc10 = T_CSc10.iloc[i5_10:]
+    tempOph10 = T_Oph10.iloc[i95_10:]
+    tempCSh10 = T_CSh10.iloc[i95_10:]
+    
+    tempOpc25 = T_Opc25.iloc[i5_25:]  # trimming the 25% MP-sand mixture data
+    tempCSc25 = T_CSc25.iloc[i5_25:]
+    tempOph25 = T_Oph25.iloc[i95_25:]
+    tempCSh25 = T_CSh25.iloc[i95_25:]
+    
+    tempOpc50 = T_Opc50.iloc[i5_50:]  # trimming the 50% MP-sand mixture data
+    tempCSc50 = T_CSc50.iloc[i5_50:]
+    tempOph50 = T_Oph50.iloc[i95_50:]
+    tempCSh50 = T_CSh50.iloc[i95_50:]
+    
+    tempOpc100 = T_Opc100.iloc[i5_100:]  # trimming the 100% MP-sand mixture data
+    tempCSc100 = T_CSc100.iloc[i5_100:]
+    tempOph100 = T_Oph100.iloc[i95_100:]
+    tempCSh100 = T_CSh100.iloc[i95_100:]
     
     
     
@@ -126,10 +160,12 @@ def plot1to1_multiple(dict_parameters, str_expt):
             return math.floor(n)
         return math.ceil(n)
 
-    lower_limit = min(tempCSc0.iloc[0], tempOpc0.iloc[0], tempCSc5.iloc[0], tempOpc5.iloc[0])  # not really sure how to get limits, as I will have more arrays later...
+    lower_limit = min(tempCSc0.iloc[0], tempOpc0.iloc[0], tempCSc5.iloc[0], tempOpc5.iloc[0], tempCSc10.iloc[0], tempOpc10.iloc[0], tempCSc25.iloc[0],
+                      tempOpc25.iloc[0], tempCSc50.iloc[0], tempOpc50.iloc[0], tempCSc100.iloc[0], tempOpc100.iloc[0])  # is this the right way to get the limits?
     lower_lim = normal_round(lower_limit) - 1
 
-    upper_limit = max(tempCSh0.iloc[0], tempOph0.iloc[0], tempCSh5.iloc[0], tempOph5.iloc[0])  # same here as above, will need to add in more arrays later...
+    upper_limit = max(tempCSh0.iloc[0], tempOph0.iloc[0], tempCSh5.iloc[0], tempOph5.iloc[0], tempCSh10.iloc[0], tempOph10.iloc[0], tempCSh25.iloc[0],
+                      tempOph25.iloc[0], tempCSh50.iloc[0], tempOph50.iloc[0], tempCSh100.iloc[0], tempOph100.iloc[0])
     upper_lim = normal_round(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
     print('Limits:', lower_lim, upper_lim)
     
@@ -144,11 +180,19 @@ def plot1to1_multiple(dict_parameters, str_expt):
     plt.plot(tempCSc0, tempOpc0, 'aqua', label='Cold Raw Data - 0%')  # listing this after errorbars and as dots allow it to show up over black errorbars
     #can add a plt.errorbar() here too for the hot data - assuming using standard error like Tom said
     # see list of colours here: https://matplotlib.org/stable/gallery/color/named_colors.html
-    plt.plot(tempCSc5, tempOpc5, 'darkturquoise', label='Cold Raw Data - 5%') 
+    plt.plot(tempCSc5, tempOpc5, 'powderblue', label='Cold Raw Data - 5%') 
+    plt.plot(tempCSc10, tempOpc10, 'skyblue', label='Cold Raw Data - 10%')
+    plt.plot(tempCSc25, tempOpc25, 'darkturquoise', label='Cold Raw Data - 25%') 
+    plt.plot(tempCSc50, tempOpc50, 'deepskyblue', label='Cold Raw Data - 50%') 
+    plt.plot(tempCSc100, tempOpc100, 'dodgerblue', label='Cold Raw Data - 100%')
     
-    plt.plot(tempCSh0, tempOph0, 'lightcoral', label='Hot Raw Data - 0%')
-    plt.plot(tempCSh5, tempOph5, 'indianred', label='Hot Raw Data - 5%')
-    
+    plt.plot(tempCSh0, tempOph0, 'lightsalmon', label='Hot Raw Data - 0%')
+    plt.plot(tempCSh5, tempOph5, 'coral', label='Hot Raw Data - 5%')
+    plt.plot(tempCSh10, tempOph10, 'orangered', label='Hot Raw Data - 10%')
+    plt.plot(tempCSh25, tempOph25, 'red', label='Hot Raw Data - 25%')
+    plt.plot(tempCSh50, tempOph50, 'chocolate', label='Hot Raw Data - 50%')
+    plt.plot(tempCSh100, tempOph100, 'sienna', label='Hot Raw Data - 100%')
+    # not sure how to make the colour spectrum more uniform... looks a bit messy like this. See list of links in my OneNote page for Supervisor Meetings W33?
     
     plt.title('Sensor Comparison For ' + str_expt)  # including what percentage of plastic etc.
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
@@ -162,10 +206,12 @@ def plot1to1_multiple(dict_parameters, str_expt):
     #need to clip the stdev and sterr arrays too.. then create new merged df and return them.
     df_clipped_cold = pd.DataFrame({'tempCS0': tempCSc0, # 'stdCS0': sdCSc0, 'sterrCS0': seCSc0, 
                                     'tempOp0': tempOpc0, #'stdOp0': sdOpc0, 'sterrOp0': seOpc0})
-                                    'tempCS5': tempCSc5, 'tempOp5': tempOpc5})
+                                    'tempCS5': tempCSc5, 'tempOp5': tempOpc5, 'tempCS10': tempCSc10, 'tempOp10': tempOpc10, 'tempCS25': tempCSc25, 
+                                    'tempOp25': tempOpc25,'tempCS50': tempCSc50, 'tempOp50': tempOpc50, 'tempCS100': tempCSc100, 'tempOp100': tempOpc100})
     df_clipped_hot = pd.DataFrame({'tempCS0': tempCSh0, #'stdCS0': sdCSh0, 'sterrCS0': seCSh0, 
                                     'tempOp0': tempOph0, #'stdOp0': sdOph0, 'sterrOp0': seOph0})
-                                    'tempCS5': tempCSh5, 'tempOp5': tempOph5})
+                                    'tempCS5': tempCSh5, 'tempOp5': tempOph5, 'tempCS10': tempCSh10, 'tempOp10': tempOph10, 'tempCS25': tempCSh25, 
+                                    'tempOp25': tempOph25,'tempCS50': tempCSh50, 'tempOp50': tempOph50, 'tempCS100': tempCSh100, 'tempOp100': tempOph100})
     
     
     
