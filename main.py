@@ -20,15 +20,15 @@ def main():
     # To get the filepath
     from get_filepaths import get_filepaths
     # must put given_date below in format 'DD/MM/YYYY' (add 0 first if single digit D or M)
-    path_CScold, path_Opcold = get_filepaths('06/08/2024', 'PM')  # for the cold 50% MP-water experiment
-    path_CShot, path_Ophot = get_filepaths('08/08/2024', 'AM')  # for the hot 50% MP-water experiment
+    path_CScold, path_Opcold = get_filepaths('24/07/2024', 'PM')  # for the cold % experiment  #('01/08/2024', 'AM') 25% MP sand
+    path_CShot, path_Ophot = get_filepaths('18/07/2024', 'AM')  # for the hot % experiment  #('02/08/2024', 'AM')
 
     # To collect the Campbell Scientific thermocouple data
     from read_CampbellSci import read_CampbellSci
     dt_objsCScold, temps_arrCScold, stdevs_arrCScold = read_CampbellSci(path_CScold)
     dt_objsCShot, temps_arrCShot, stdevs_arrCShot = read_CampbellSci(path_CShot)
   
-    #from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...
+    #from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...***
     from read_CampbellSci import water_avgCS
     #df_sand_avgCScold = sand_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)  
     df_water_avgCScold = water_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)
@@ -54,14 +54,14 @@ def main():
 
 
     from create_merged_df import create_merged_df
-    df_merged_cold = create_merged_df(avgOp_dfcold, df_water_avgCScold)  #df_sand_avgCScold)
+    df_merged_cold = create_merged_df(avgOp_dfcold, df_water_avgCScold)  #df_sand_avgCScold)  ***
     df_merged_hot = create_merged_df(avgOp_dfhot, df_water_avgCShot)  #df_sand_avgCShot) 
     #print(df_mergedcold) 
     
     #need to get all the hot/cold files imported above!
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
-    text_str = '25% Microplastic-Water'
+    text_str = '0% Pellet-Water'  # ***
     df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, text_str)
     #print(df_cold.columns)
    

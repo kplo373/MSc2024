@@ -13,6 +13,7 @@ Pkl files are used to calibrate these plastic experiments.
 import joblib
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 
 def apply_calibration(df_cold, df_hot, str_expt):
@@ -51,16 +52,21 @@ def apply_calibration(df_cold, df_hot, str_expt):
 
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
-    def normal_round(n):  # create a function to round up if .5 or higher, or round down if less than .5
-        if n - math.floor(n) < 0.4:
+    def normal_roundH(n):  # create a hot function to round up if .27 or higher, or round down if less than .27. Calibration makes data flick up.
+        if n - math.floor(n) < 0.27:
+            return math.floor(n)
+        return math.ceil(n)
+    
+    def normal_roundC(n):  # create a function to round up if .5 or higher, or round down if less than .5
+        if n - math.floor(n) < 0.5:
             return math.floor(n)
         return math.ceil(n)
 
     lower_limit = min(x_cold[0,0], y_cold[0,0])
-    lower_lim = normal_round(lower_limit) - 1
+    lower_lim = normal_roundC(lower_limit) - 1
 
     upper_limit = max( max(x_hot_asc), max(y_hot_asc) )
-    upper_lim = normal_round(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
+    upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
     # Plot SVM Results, Add in Reference Line too
     plt.figure(figsize=(7, 7))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
@@ -77,6 +83,25 @@ def apply_calibration(df_cold, df_hot, str_expt):
     plt.title('Calibrated Sensor Comparison For ' + str_expt)
     plt.legend()
     plt.grid()
+    if 'hav' in str_expt:
+        if 'and' in str_expt:
+            final_folder = 'MP_sand'
+        elif 'ater' in str_expt:
+            final_folder = 'MP_water'
+        file_str = r'\Cal_' + str_expt.replace("% Shavings", "_MP") + '.png'  # not sure if I can have % signs in a filename...
+    elif 'ellet' in str_expt:
+        if 'and' in str_expt:
+            final_folder = 'Nurdle_sand'
+        elif 'ater' in str_expt:
+            final_folder = 'Nurdle_water'
+        file_str = r'\Cal_' + str_expt.replace("% ", "_") + '.png'  # this didn't work but that's okay...
+    elif 'hav' and 'ellet' not in str_expt:
+        print('Invalid name given as str_expt parameter. Please use Shaved Plastic or Shavings for MP, and Pellets for Nurdles.')
+        sys.exit()  # want to exit this script and not save the plot
+    file_path = r"D:\MSc Results\SavedPlots\Calibrated_Separate" + '\\' + final_folder
+    
+    print(file_path + file_str)
+    plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
     return x_comb, y_pred_plastic

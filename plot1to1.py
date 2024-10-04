@@ -11,6 +11,7 @@ and thermal camera dataframe.
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import sys
 
 # str_expt parameter should be a string of the type of experiment done, e.g. '50% Pellet-Sand'
 def plot1to1(df_merged_cold, df_merged_hot, str_expt):
@@ -94,6 +95,25 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
     plt.grid()
     plt.legend()
+    if 'hav' in str_expt:
+        if 'and' in str_expt:
+            final_folder = 'MP_sand'
+        elif 'ater' in str_expt:
+            final_folder = 'MP_water'
+        file_str = r'\Raw_' + str_expt.replace("% Shavings", "_MP") + '.png'
+    elif 'ellet' in str_expt:
+        if 'and' in str_expt:
+            final_folder = 'Nurdle_sand'
+        elif 'ater' in str_expt:
+            final_folder = 'Nurdle_water'
+        file_str = r'\Raw_' + str_expt.replace("% Pellets", "_nurd") + '.png'
+    elif 'hav' and 'ellet' not in str_expt:
+        print('Invalid name given as str_expt parameter. Please use Shaved Plastic or Shavings for MP, and Pellets for Nurdles.')
+        sys.exit()  # want to exit this script and not save the plot
+    file_path = r"D:\MSc Results\SavedPlots\Raw_Separate" + '\\' + final_folder
+    
+    print(file_path + file_str)
+    plt.savefig(file_path + file_str, bbox_inches='tight')  # removes the weird whitespace in the file once saved
     plt.show()
 
     
@@ -108,67 +128,3 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
     
     return df_clipped_cold, df_clipped_hot
 
-#df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
-
-r'''
-#%% to test
-import sys
-#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
-
-# To get the filepath
-from get_filepaths import get_filepaths
-path_cold, files_cold = get_filepaths('12/08/2024', 'AM')  # for the cold 50% nurdle-sand experiment
-# path gives a folder, and files are the files in that folder. Need to select specific file from files list
-path_CScold = path_cold + '\\' + files_cold[0]
-path_Opcold = path_cold + '\\' + files_cold[2]
-
-#%%
-path_hot, files_hot = get_filepaths('13/08/2024', 'AM')  # for the hot 50% nurdle-sand experiment
-path_CShot = path_hot + '\\' + files_hot[0]
-path_Ophot = path_hot + '\\' + files_hot[2]
-
-
-# To collect the Campbell Scientific thermocouple data
-from read_CampbellSci import read_CampbellSci
-dt_objsCScold, temps_arrCScold, stdevs_arrCScold = read_CampbellSci(path_CScold)
-dt_objsCShot, temps_arrCShot, stdevs_arrCShot = read_CampbellSci(path_CShot)
-#%%
-from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...
-#from read_CampbellSci import water_avgCS
-df_sand_avgCScold = sand_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)  
-df_sand_avgCShot = sand_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
-# print(df_sand_avgCScold)
-
-#df_water_avgCScold = water_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)
-#df_water_avgCShot = water_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
-
-
-# To collect the Optris thermal camera data
-from read_Optris import read_Optris
-dt_objsOpcold, a1cold, a2cold, a3cold, a4cold = read_Optris(path_Opcold)
-dt_objsOphot, a1hot, a2hot, a3hot, a4hot = read_Optris(path_Ophot)
-    
-from read_Optris import resample_Optris
-resampled_df_a1cold = resample_Optris(dt_objsOpcold, a1cold)
-resampled_df_a3cold = resample_Optris(dt_objsOpcold, a3cold)
-resampled_df_a1hot = resample_Optris(dt_objsOphot, a1hot)
-resampled_df_a3hot = resample_Optris(dt_objsOphot, a3hot)
-    
-from read_Optris import average_Optris
-avgOp_dfcold = average_Optris(resampled_df_a1cold, resampled_df_a3cold)
-avgOp_dfhot = average_Optris(resampled_df_a1hot, resampled_df_a3hot)
-# print(avgOp_dfcold)
-
-
-from create_merged_df import create_merged_df
-df_merged_cold = create_merged_df(avgOp_dfcold, df_sand_avgCScold)
-df_merged_hot = create_merged_df(avgOp_dfhot, df_sand_avgCShot)
-#print(df_merged_cold)
-
-
-
-#%% Test this actual function
-df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, '50% Pellet-Sand')
-
-'''

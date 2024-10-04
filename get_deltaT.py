@@ -14,6 +14,7 @@ the next plot...
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 
 def get_deltaT(x_comb, y_pred_plastic, text_str):
@@ -39,6 +40,22 @@ def get_deltaT(x_comb, y_pred_plastic, text_str):
     plt.ylabel(r'$\Delta T$ (degrees Celsius)')
     plt.title(text_str +' Temperature Difference')
     plt.grid()
+    if 'hav' in text_str:
+        if 'and' in text_str:
+            final_folder = 'MP_sand'
+        elif 'ater' in text_str:
+            final_folder = 'MP_water'
+        file_str = r'\TempDiff_' + text_str.replace("% Shavings", "_MP") + '.png'  # not sure if I can have % signs in a filename, so taking it out to be safe...
+    elif 'ellet' in text_str:
+        if 'and' in text_str:
+            final_folder = 'Nurdle_sand'
+        elif 'ater' in text_str:
+            final_folder = 'Nurdle_water'
+        file_str = r'\TempDiff_' + text_str.replace("% Pellets", "_nurd") + '.png'
+    file_path = r"D:\MSc Results\SavedPlots\TempDiff_Separate" + '\\' + final_folder
+    
+    print(file_path + file_str)
+    plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
     return deltaT
