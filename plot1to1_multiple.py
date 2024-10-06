@@ -11,12 +11,12 @@ import numpy as np
 import pandas as pd
 from types import SimpleNamespace
 import matplotlib.pyplot as plt
-from matplotlib.cm import get_cmap  # for creating colour spectrums and legends
+import matplotlib.cm as cm  # for creating colour spectrums and legends
 from matplotlib.collections import LineCollection  # or this instead of one above...
 
 # str_expt parameter should be a string of the type of experiment done, e.g. 'Pellet-Sand', or 'Shaved Plastic and Sand'
 def plot1to1_multiple(dict_parameters, str_expt):
-    print(dict_parameters.keys())
+    #print(dict_parameters.keys())
     params = SimpleNamespace(**dict_parameters)
     dfc0 = params.c0
     dfh0 = params.h0
@@ -151,7 +151,21 @@ def plot1to1_multiple(dict_parameters, str_expt):
     tempOph100 = T_Oph100.iloc[i95_100:]
     tempCSh100 = T_CSh100.iloc[i95_100:]
     
+    # Combine all x and y arrays into hot and cold lists (for plotting in red and blue spectrums)
+    x_cold_arr = [tempCSc0, tempCSc5, tempCSc10, tempCSc25, tempCSc50, tempCSc100]
+    y_cold_arr = [tempOpc0, tempOpc5, tempOpc10, tempOpc25, tempOpc50, tempOpc100]
+    x_hot_arr = [tempCSh0, tempCSh5, tempCSh10, tempCSh25, tempCSh50, tempCSh100]
+    y_hot_arr = [tempOph0, tempOph5, tempOph10, tempOph25, tempOph50, tempOph100]
     
+    # Specify the percentage labels
+    labels = ['0%', '5%', '10%', '25%', '50%', '100%']
+    
+    # Set the colormap to 'Blues' and get 6 shades of blue
+    cmap1 = cm.get_cmap('Blues', 6)
+    colors1 = cmap1(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker blue - should range the other way for blue, but good for red...
+    cmap2 = cm.get_cmap('Reds', 6)
+    colors2 = cmap2(np.linspace(0.4, 1, 6))
+
     
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
@@ -174,27 +188,33 @@ def plot1to1_multiple(dict_parameters, str_expt):
     plt.ylim(lower_lim, upper_lim)
 
     # To plot the 1:1 reference line
-    plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')
+    plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference')
     #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, xerr=seCSc0, color='k')  # just include one errorbar maybe? Is there a better way to show them separately?
     #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, color='k')
-    plt.plot(tempCSc0, tempOpc0, 'aqua', label='Cold Raw Data - 0%')  # listing this after errorbars and as dots allow it to show up over black errorbars
+    # plt.plot(tempCSc0, tempOpc0, 'aqua', label='Cold Raw Data - 0%')  # listing this after errorbars and as dots allow it to show up over black errorbars
     #can add a plt.errorbar() here too for the hot data - assuming using standard error like Tom said
     # see list of colours here: https://matplotlib.org/stable/gallery/color/named_colors.html
-    plt.plot(tempCSc5, tempOpc5, 'powderblue', label='Cold Raw Data - 5%') 
-    plt.plot(tempCSc10, tempOpc10, 'skyblue', label='Cold Raw Data - 10%')
-    plt.plot(tempCSc25, tempOpc25, 'darkturquoise', label='Cold Raw Data - 25%') 
-    plt.plot(tempCSc50, tempOpc50, 'deepskyblue', label='Cold Raw Data - 50%') 
-    plt.plot(tempCSc100, tempOpc100, 'dodgerblue', label='Cold Raw Data - 100%')
+    # plt.plot(tempCSc5, tempOpc5, 'powderblue', label='Cold Raw Data - 5%') 
+    # plt.plot(tempCSc10, tempOpc10, 'skyblue', label='Cold Raw Data - 10%')
+    # plt.plot(tempCSc25, tempOpc25, 'darkturquoise', label='Cold Raw Data - 25%') 
+    # plt.plot(tempCSc50, tempOpc50, 'deepskyblue', label='Cold Raw Data - 50%') 
+    # plt.plot(tempCSc100, tempOpc100, 'dodgerblue', label='Cold Raw Data - 100%')
     
-    plt.plot(tempCSh0, tempOph0, 'lightsalmon', label='Hot Raw Data - 0%')
-    plt.plot(tempCSh5, tempOph5, 'coral', label='Hot Raw Data - 5%')
-    plt.plot(tempCSh10, tempOph10, 'orangered', label='Hot Raw Data - 10%')
-    plt.plot(tempCSh25, tempOph25, 'red', label='Hot Raw Data - 25%')
-    plt.plot(tempCSh50, tempOph50, 'chocolate', label='Hot Raw Data - 50%')
-    plt.plot(tempCSh100, tempOph100, 'sienna', label='Hot Raw Data - 100%')
-    # not sure how to make the colour spectrum more uniform... looks a bit messy like this. See list of links in my OneNote page for Supervisor Meetings W33?
     
-    plt.title('Sensor Comparison For ' + str_expt)  # including what percentage of plastic etc.
+    for i in range(6):
+        plt.plot(x_cold_arr[i], y_cold_arr[i], color=colors1[i], label=f'Cold {labels[i]}')  # the labelling might be a bit tricky, want to do it in %s...
+    
+    for j in range(6):  # doing a second separate loop so that the legend lists all cold then hot experiments in the plot
+        plt.plot(x_hot_arr[j], y_hot_arr[j], color=colors2[j], label=f'Hot {labels[j]}')
+    
+    # plt.plot(tempCSh0, tempOph0, 'lightsalmon', label='Hot Raw Data - 0%')
+    # plt.plot(tempCSh5, tempOph5, 'coral', label='Hot Raw Data - 5%')
+    #plt.plot(tempCSh10, tempOph10, 'orangered', label='Hot Raw Data - 10%')
+    # plt.plot(tempCSh25, tempOph25, 'red', label='Hot Raw Data - 25%')
+    # plt.plot(tempCSh50, tempOph50, 'chocolate', label='Hot Raw Data - 50%')
+    # plt.plot(tempCSh100, tempOph100, 'sienna', label='Hot Raw Data - 100%')
+    
+    plt.title('Raw Data Comparison For ' + str_expt)  # including what percentage of plastic etc.
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
     plt.grid()
