@@ -26,6 +26,7 @@ def get_deltaT(x_comb, y_pred_plastic, text_str):
     
     # Reference line is y=x, will create a linspace for x
     x_ref = np.linspace(lower_limit, upper_limit, len(y))
+    print(x_ref)
     
     # Time to calculate deltaT
     deltaT = np.zeros(len(y))
