@@ -184,7 +184,11 @@ df_merged_dict = dict(c0=df_merged_c0, h0=df_merged_h0, c5=df_merged_c5, h5=df_m
 # not sure how to do all the text strings for the legend of these lines yet... maybe can just do them in the plotting function itself?
 
 df_cold, df_hot = plot1to1_multiple(df_merged_dict, text_str)
-    
+
+print('Starting apply calibration script now')
+# Next is apply calibration for all of these lines (after this and temp difference I should put these functions within the actual main function!)
+from apply_calibration_multiple import apply_calibration_multiple
+x_comb, y_pred_plastic = apply_calibration_multiple(df_cold, df_hot, text_str)
     
     
     

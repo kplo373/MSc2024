@@ -81,7 +81,7 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
     plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
     plt.ylim(lower_lim, upper_lim)
 
-    # To plot the 1:1 reference line
+    # To plot the 1:1 reference line - can do it x_comb vs. x_comb, but don't have this variable yet...
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')
     #plt.errorbar(tempCScold, tempOpcold, yerr=seOpcold, xerr=seCScold, color='k')  # just include one errorbar maybe? Is there a better way to show them separately?
     #plt.errorbar(tempCScold, tempOpcold, yerr=seOpcold, color='k')

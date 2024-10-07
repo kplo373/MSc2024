@@ -202,10 +202,10 @@ def plot1to1_multiple(dict_parameters, str_expt):
     
     
     for i in range(6):
-        plt.plot(x_cold_arr[i], y_cold_arr[i], color=colors1[i], label=f'Cold {labels[i]}')  # the labelling might be a bit tricky, want to do it in %s...
+        plt.plot(x_cold_arr[i], y_cold_arr[i], lw=1, color=colors1[i], label=f'Cold {labels[i]}', alpha=0.6)  # the labelling might be a bit tricky, want to do it in %s...
     
     for j in range(6):  # doing a second separate loop so that the legend lists all cold then hot experiments in the plot
-        plt.plot(x_hot_arr[j], y_hot_arr[j], color=colors2[j], label=f'Hot {labels[j]}')
+        plt.plot(x_hot_arr[j], y_hot_arr[j], lw=1, color=colors2[j], label=f'Hot {labels[j]}', alpha=0.6)  # alpha parameter sets transparency/opacity
     
     # plt.plot(tempCSh0, tempOph0, 'lightsalmon', label='Hot Raw Data - 0%')
     # plt.plot(tempCSh5, tempOph5, 'coral', label='Hot Raw Data - 5%')

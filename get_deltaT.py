@@ -23,10 +23,17 @@ def get_deltaT(x_comb, y_pred_plastic, text_str):
 
     lower_limit = min(x[0], y[0])
     upper_limit = max( max(x), max(y) )
+    print(lower_limit, upper_limit)  # looks good: 15.716666666666667 29.458437940024325
     
     # Reference line is y=x, will create a linspace for x
-    x_ref = np.linspace(lower_limit, upper_limit, len(y))
-    print(x_ref)
+    #x_ref = np.linspace(lower_limit, upper_limit, len(y))  # maybe I need to get x_ref in a different way?? x=y is its equation. so...
+     # this looks good too, matches limits above (between them)
+    
+    # If I can maybe plot the y=x line here (or get data from previous plot) then can use this for x-axis data
+    
+    #ref_line = plt.plot(x_comb, x_comb)
+    x_ref = x_comb
+    print(np.shape(x_ref))
     
     # Time to calculate deltaT
     deltaT = np.zeros(len(y))
