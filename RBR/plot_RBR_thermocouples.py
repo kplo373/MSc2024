@@ -19,7 +19,8 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # Get RBR data
-filepathR = r"D:\MSc Results\RBR_Test\060728_20241001_1004KateRBR.rsk"
+#filepathR = r"D:\MSc Results\RBR_Test\060728_20241001_1004KateRBR.rsk"
+filepathR = r"D:\MSc Results\RBR_Test\RBRtest2\060728_20241008_1145KateRBR2.rsk"
 timestampsR, tempsR = read_RBR(filepathR)
 
 

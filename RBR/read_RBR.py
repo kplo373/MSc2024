@@ -18,8 +18,8 @@ def read_RBR(filepath):
     t1 = np.datetime64("2024-10-01")  # choosing the rough day when I did the test (Tues 1st Oct 2024)
     t2 = np.datetime64("2024-10-02")
     rsk.readdata(t1, t2)
-    #print(len(rsk.data))
-    #print(rsk)
+    print(len(rsk.data))
+    print(rsk)
     print(rsk.channelNames)
     # ('conductivity', 'temperature', 'pressure')
     #print(rsk.data["timestamp"])  # must be the index maybe?
@@ -33,8 +33,9 @@ def read_RBR(filepath):
     
     return timestamps, temps
 
-r'''
-filepath = r"D:\MSc Results\RBR_Test\060728_20241001_1004KateRBR.rsk"
+
+filepath = r"D:\MSc Results\RBR_Test\060728_20241001_1004KateRBR.rsk"  # this one works! the .print(rsk) says data is populated with 3431 elements
+#filepath = r"D:\MSc Results\RBR_Test\RBRtest2\060728_20241008_1145KateRBR2.rsk"  # this one isn't plotting anything... seems empty?? .data is unpopulated
 timestamps, temps = read_RBR(filepath)
 
 
@@ -46,4 +47,3 @@ plt.show()
 
 # It works!! Will have to play around with what format time should be... datetimes to match the thermocouples?
 
-'''

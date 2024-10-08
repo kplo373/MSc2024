@@ -59,31 +59,89 @@ def apply_calibration_multiple(df_cold, df_hot, str_expt):
     
     
     # Load the saved model and scalers
-    svr_rbf_pure_water = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")
-        #r"D:\MSc Results\svr_rbf_pure_water.pkl")
+    svr_rbf_pure_water = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")  # this is giving an error because there are nans in it?
     scaler_y_pure_water = joblib.load(r"D:\MSc Results\scaler_y_pure_water.pkl")
-        #r"D:\MSc Results\scaler_y_pure_water.pkl")
     
     # Prepare the plastic-water data
-    x_cold = tempCScold.reshape(-1, 1)  # if an error, can do tempC1cold.to_numpy().reshape...
-    x_hot_descending = tempCShot.reshape(-1, 1)  # this series begins with the hottest value... need to reverse it somehow
-    x_hot_asc = x_hot_descending[::-1]
+    x_c0 = tempCSc0.reshape(-1, 1)  # if an error, can do tempC1c0.to_numpy().reshape...
+    x_c5 = tempCSc5.reshape(-1, 1)
+    x_c10 = tempCSc10.reshape(-1, 1)
+    x_c25 = tempCSc25.reshape(-1, 1)
+    x_c50 = tempCSc50.reshape(-1, 1)
+    x_c100 = tempCSc100.reshape(-1, 1)
     
-    y_cold = tempOpcold.reshape(-1, 1)
-    y_hot_descending = tempOphot.reshape(-1, 1)  # same with this series - begins with hottest value
-    y_hot_asc = y_hot_descending[::-1]
+    x_hot_descending0 = tempCSh0.reshape(-1, 1)  # this series begins with the hottest value... need to reverse it somehow
+    x_hot_asc0 = x_hot_descending0[::-1]
+    x_hot_descending5 = tempCSh5.reshape(-1, 1)  # 5%
+    x_hot_asc5 = x_hot_descending5[::-1]
+    x_hot_descending10 = tempCSh10.reshape(-1, 1)  # 10%
+    x_hot_asc10 = x_hot_descending10[::-1]
+    x_hot_descending25 = tempCSh25.reshape(-1, 1)  # 25%
+    x_hot_asc25 = x_hot_descending25[::-1]
+    x_hot_descending50 = tempCSh50.reshape(-1, 1)  # 50%
+    x_hot_asc50 = x_hot_descending50[::-1]
+    x_hot_descending100 = tempCSh100.reshape(-1, 1)  # 100%
+    x_hot_asc100 = x_hot_descending100[::-1]
     
-    x_comb = np.vstack((x_cold, x_hot_asc))
-    y_comb = np.concatenate((y_cold, y_hot_asc))
+    
+    y_c0 = tempOpc0.reshape(-1, 1)
+    y_c5 = tempOpc5.reshape(-1, 1)
+    y_c10 = tempOpc10.reshape(-1, 1)
+    y_c25 = tempOpc25.reshape(-1, 1)
+    y_c50 = tempOpc50.reshape(-1, 1)
+    y_c100 = tempOpc100.reshape(-1, 1)
+    
+    y_hot_descending0 = tempOph0.reshape(-1, 1)  # same with this series - begins with hottest value
+    y_hot_asc0 = y_hot_descending0[::-1]
+    y_hot_descending5 = tempOph5.reshape(-1, 1)  # 5%
+    y_hot_asc5 = y_hot_descending5[::-1]
+    y_hot_descending10 = tempOph10.reshape(-1, 1)  # 10%
+    y_hot_asc10 = y_hot_descending10[::-1]
+    y_hot_descending25 = tempOph25.reshape(-1, 1)  # 25%
+    y_hot_asc25 = y_hot_descending25[::-1]
+    y_hot_descending50 = tempOph50.reshape(-1, 1)  # 50%
+    y_hot_asc50 = y_hot_descending50[::-1]
+    y_hot_descending100 = tempOph100.reshape(-1, 1)  # 100%
+    y_hot_asc100 = y_hot_descending100[::-1]
+    
+    
+    # Combining the hot and cold arrays per plastic proportion
+    x_comb0 = np.vstack((x_c0, x_hot_asc0))  # 0%
+    y_comb0 = np.concatenate((y_c0, y_hot_asc0))
+    x_comb5 = np.vstack((x_c5, x_hot_asc5))  # 5%
+    y_comb5 = np.concatenate((y_c5, y_hot_asc5))
+    x_comb10 = np.vstack((x_c10, x_hot_asc10))  # 10%
+    y_comb10 = np.concatenate((y_c10, y_hot_asc10))
+    x_comb25 = np.vstack((x_c25, x_hot_asc25))  # 25%
+    y_comb25 = np.concatenate((y_c25, y_hot_asc25))
+    x_comb50 = np.vstack((x_c50, x_hot_asc50))  # 50%
+    y_comb50 = np.concatenate((y_c50, y_hot_asc50))
+    x_comb100 = np.vstack((x_c100, x_hot_asc100))  # 100%
+    y_comb100 = np.concatenate((y_c100, y_hot_asc100))
     
     # Scale the y-axis data using the y-scaler from pure water
-    y_comb_scaled = scaler_y_pure_water.transform(y_comb)
+    y_comb_scaled0 = scaler_y_pure_water.transform(y_comb0)
+    y_comb_scaled5 = scaler_y_pure_water.transform(y_comb5)
+    y_comb_scaled10 = scaler_y_pure_water.transform(y_comb10)
+    y_comb_scaled25 = scaler_y_pure_water.transform(y_comb25)
+    y_comb_scaled50 = scaler_y_pure_water.transform(y_comb50)
+    y_comb_scaled100 = scaler_y_pure_water.transform(y_comb100)
     
     # Predict using the SVM model trained on pure water data
-    y_pred_plastic_scaled = svr_rbf_pure_water.predict(y_comb_scaled)
+    y_pred_plastic_scaled0 = svr_rbf_pure_water.predict(y_comb_scaled0)
+    y_pred_plastic_scaled5 = svr_rbf_pure_water.predict(y_comb_scaled5)
+    y_pred_plastic_scaled10 = svr_rbf_pure_water.predict(y_comb_scaled10)
+    y_pred_plastic_scaled25 = svr_rbf_pure_water.predict(y_comb_scaled25)
+    y_pred_plastic_scaled50 = svr_rbf_pure_water.predict(y_comb_scaled50)
+    y_pred_plastic_scaled100 = svr_rbf_pure_water.predict(y_comb_scaled100)
+    
     # Inverse transform the predicted values to get them back to the original scale
-    y_pred_plastic = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
-
+    y_pred_plastic0 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled0.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
+    y_pred_plastic5 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled5.reshape(-1, 1))
+    y_pred_plastic10 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled10.reshape(-1, 1))
+    y_pred_plastic25 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled25.reshape(-1, 1))
+    y_pred_plastic50 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled50.reshape(-1, 1))
+    y_pred_plastic100 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled100.reshape(-1, 1))
 
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
@@ -97,10 +155,15 @@ def apply_calibration_multiple(df_cold, df_hot, str_expt):
             return math.floor(n)
         return math.ceil(n)
 
-    lower_limit = min(x_cold[0,0], y_cold[0,0])
+    # not sure what's going on here... are the limits meant to be determined by x_comb or x_c/x_h arrays??
+    lower_limit = min(x_c0[0,0], y_pred_plastic0[0,0], x_c5[0,0], y_pred_plastic5[0,0], x_c10[0,0], y_pred_plastic10[0,0], x_c25[0,0], y_pred_plastic25[0,0],
+                      x_c50[0,0], y_pred_plastic50[0,0], x_c100[0,0], y_pred_plastic100[0,0])
     lower_lim = normal_roundC(lower_limit) - 1
 
-    upper_limit = max( max(x_hot_asc), max(y_hot_asc) )
+    print(x_comb0[-1,0], x_comb0[-1,-1], x_comb0[0,0], x_comb0[0,-1])
+    # upper_limit = max( max(x_hot_asc), max(y_hot_asc) )
+    upper_limit = max(x_comb0[-1,0], y_h0[0,0], x_comb5[0,0], y_h5[0,0], x_comb10[0,0], y_h10[0,0], x_comb25[0,0], y_h25[0,0], x_comb50[0,0], y_h50[0,0],
+                      x_comb100[0,0], y_h100[0,0])
     upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
     # Plot SVM Results, Add in Reference Line too
