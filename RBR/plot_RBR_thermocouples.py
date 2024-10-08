@@ -9,10 +9,10 @@ for checking the thermocouples' accuracy.
 """
 import sys
 sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024\RBR")
-
-from read_RBR import read_RBR
 from read_CampbellSci import read_CampbellSci
+
+sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024\RBR")
+from read_RBR import read_RBR
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,7 +25,7 @@ timestampsR, tempsR = read_RBR(filepathR)
 
 
 # Get Thermocouple data
-filepathT = r"D:\MSc Results\RBR_Test\CR3000_Table1.dat"
+filepathT = r"D:\MSc Results\RBR_Test\RBRtest2\CR3000_Table1.dat"
 dt_objsT, temps_arrT, stdevsT = read_CampbellSci(filepathT)  # this should give 6x thermocouple arrays of temperature and standard deviation
 print(temps_arrT)  # has shape (6, 794) - will have to split them up into each thermocouple if wanting to plot each of them
 

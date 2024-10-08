@@ -126,9 +126,17 @@ def apply_calibration_multiple(df_cold, df_hot, str_expt):
     y_comb_scaled25 = scaler_y_pure_water.transform(y_comb25)
     y_comb_scaled50 = scaler_y_pure_water.transform(y_comb50)
     y_comb_scaled100 = scaler_y_pure_water.transform(y_comb100)
+    print(y_comb_scaled0)
+    count = 0
+    for i in range(len(y_comb_scaled0)):
+        if np.isnan(y_comb_scaled0[i]):
+            #print(i)
+            count += 1
+    print(count)
+    print(y_comb_scaled0[98535:98547])  # these are all NaNs!! What do we do with them??
     
     # Predict using the SVM model trained on pure water data
-    y_pred_plastic_scaled0 = svr_rbf_pure_water.predict(y_comb_scaled0)
+    #y_pred_plastic_scaled0 = svr_rbf_pure_water.predict(y_comb_scaled0)
     y_pred_plastic_scaled5 = svr_rbf_pure_water.predict(y_comb_scaled5)
     y_pred_plastic_scaled10 = svr_rbf_pure_water.predict(y_comb_scaled10)
     y_pred_plastic_scaled25 = svr_rbf_pure_water.predict(y_comb_scaled25)
@@ -136,7 +144,7 @@ def apply_calibration_multiple(df_cold, df_hot, str_expt):
     y_pred_plastic_scaled100 = svr_rbf_pure_water.predict(y_comb_scaled100)
     
     # Inverse transform the predicted values to get them back to the original scale
-    y_pred_plastic0 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled0.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
+    #y_pred_plastic0 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled0.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
     y_pred_plastic5 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled5.reshape(-1, 1))
     y_pred_plastic10 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled10.reshape(-1, 1))
     y_pred_plastic25 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled25.reshape(-1, 1))

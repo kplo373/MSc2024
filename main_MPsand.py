@@ -185,6 +185,7 @@ df_merged_dict = dict(c0=df_merged_c0, h0=df_merged_h0, c5=df_merged_c5, h5=df_m
 
 df_cold, df_hot = plot1to1_multiple(df_merged_dict, text_str)
 
+#%%
 print('Starting apply calibration script now')
 # Next is apply calibration for all of these lines (after this and temp difference I should put these functions within the actual main function!)
 from apply_calibration_multiple import apply_calibration_multiple

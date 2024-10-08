@@ -34,8 +34,8 @@ def read_RBR(filepath):
     return timestamps, temps
 
 
-filepath = r"D:\MSc Results\RBR_Test\060728_20241001_1004KateRBR.rsk"  # this one works! the .print(rsk) says data is populated with 3431 elements
-#filepath = r"D:\MSc Results\RBR_Test\RBRtest2\060728_20241008_1145KateRBR2.rsk"  # this one isn't plotting anything... seems empty?? .data is unpopulated
+#filepath = r"D:\MSc Results\RBR_Test\060728_20241001_1004KateRBR.rsk"  # this one works! the .print(rsk) says data is populated with 3431 elements
+filepath = r"D:\MSc Results\RBR_Test\RBRtest2\060728_20241008_1145KateRBR2.rsk"  # this one isn't plotting anything... seems empty?? .data is unpopulated
 timestamps, temps = read_RBR(filepath)
 
 
