@@ -12,7 +12,8 @@ sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
 from read_CampbellSci import read_CampbellSci
 
 sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024\RBR")
-from read_RBR import read_RBR
+#from read_RBR import read_RBR
+from read_RBR_excel import read_RBR_excel
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -20,12 +21,13 @@ import matplotlib.dates as mdates
 
 # Get RBR data
 #filepathR = r"D:\MSc Results\RBR_Test\060728_20241001_1004KateRBR.rsk"
-filepathR = r"D:\MSc Results\RBR_Test\RBRtest2\060728_20241008_1145KateRBR2.rsk"
-timestampsR, tempsR = read_RBR(filepathR)
+filepathR = r"D:\MSc Results\RBR_Test\RBRtest3\060728_20241009_1124KateRBR3.xlsx"
+#timestampsR, tempsR = read_RBR(filepathR)
+timestampsR, tempsR = read_RBR_excel(filepathR)
 
-
+#%%
 # Get Thermocouple data
-filepathT = r"D:\MSc Results\RBR_Test\RBRtest2\CR3000_Table1.dat"
+filepathT = r"D:\MSc Results\RBR_Test\RBRtest3\CR3000_Table1.dat"
 dt_objsT, temps_arrT, stdevsT = read_CampbellSci(filepathT)  # this should give 6x thermocouple arrays of temperature and standard deviation
 print(temps_arrT)  # has shape (6, 794) - will have to split them up into each thermocouple if wanting to plot each of them
 

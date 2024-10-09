@@ -35,7 +35,8 @@ def read_RBR(filepath):
 
 
 #filepath = r"D:\MSc Results\RBR_Test\060728_20241001_1004KateRBR.rsk"  # this one works! the .print(rsk) says data is populated with 3431 elements
-filepath = r"D:\MSc Results\RBR_Test\RBRtest2\060728_20241008_1145KateRBR2.rsk"  # this one isn't plotting anything... seems empty?? .data is unpopulated
+# RBR2 isn't plotting anything... seems empty?? .data is unpopulated
+filepath = r"D:\MSc Results\RBR_Test\RBRtest3\060728_20241009_1124KateRBR3.rsk"  # same as RBR3... unpopulated data! The exported excel file is okay though, so use that...
 timestamps, temps = read_RBR(filepath)
 
 
