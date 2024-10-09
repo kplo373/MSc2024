@@ -22,40 +22,40 @@ import matplotlib.pyplot as plt
 import sys
 
 
-def apply_calibration_multiple(df_cold, df_hot, str_expt):
-    #print(df_cold.columns)
-    #print(df_hot.columns)
+def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
+    print(dict_cold.keys())
+    #print(dict_hot.keys)
     
     # get temperature arrays per percentage of plastic from dfs above
-    tempCSc0 = np.array(df_cold['tempCS0'])
-    tempOpc0 = np.array(df_cold['tempOp0'])
-    tempCSh0 = np.array(df_hot['tempCS0'])
-    tempOph0 = np.array(df_hot['tempOp0'])
+    tempCSc0 = np.array(dict_cold['tempCS0'])
+    tempOpc0 = np.array(dict_cold['tempOp0'])
+    tempCSh0 = np.array(dict_hot['tempCS0'])
+    tempOph0 = np.array(dict_hot['tempOp0'])
     
-    tempCSc5 = np.array(df_cold['tempCS5'])
-    tempOpc5 = np.array(df_cold['tempOp5'])
-    tempCSh5 = np.array(df_hot['tempCS5'])
-    tempOph5 = np.array(df_hot['tempOp5']) 
+    tempCSc5 = np.array(dict_cold['tempCS5'])
+    tempOpc5 = np.array(dict_cold['tempOp5'])
+    tempCSh5 = np.array(dict_hot['tempCS5'])
+    tempOph5 = np.array(dict_hot['tempOp5']) 
     
-    tempCSc10 = np.array(df_cold['tempCS10'])
-    tempOpc10 = np.array(df_cold['tempOp10'])
-    tempCSh10 = np.array(df_hot['tempCS10'])
-    tempOph10 = np.array(df_hot['tempOp10']) 
+    tempCSc10 = np.array(dict_cold['tempCS10'])
+    tempOpc10 = np.array(dict_cold['tempOp10'])
+    tempCSh10 = np.array(dict_hot['tempCS10'])
+    tempOph10 = np.array(dict_hot['tempOp10']) 
     
-    tempCSc25 = np.array(df_cold['tempCS25'])
-    tempOpc25 = np.array(df_cold['tempOp25'])
-    tempCSh25 = np.array(df_hot['tempCS25'])
-    tempOph25 = np.array(df_hot['tempOp25']) 
+    tempCSc25 = np.array(dict_cold['tempCS25'])
+    tempOpc25 = np.array(dict_cold['tempOp25'])
+    tempCSh25 = np.array(dict_hot['tempCS25'])
+    tempOph25 = np.array(dict_hot['tempOp25']) 
     
-    tempCSc50 = np.array(df_cold['tempCS50'])
-    tempOpc50 = np.array(df_cold['tempOp50'])
-    tempCSh50 = np.array(df_hot['tempCS50'])
-    tempOph50 = np.array(df_hot['tempOp50']) 
+    tempCSc50 = np.array(dict_cold['tempCS50'])
+    tempOpc50 = np.array(dict_cold['tempOp50'])
+    tempCSh50 = np.array(dict_hot['tempCS50'])
+    tempOph50 = np.array(dict_hot['tempOp50']) 
     
-    tempCSc100 = np.array(df_cold['tempCS100'])
-    tempOpc100 = np.array(df_cold['tempOp100'])
-    tempCSh100 = np.array(df_hot['tempCS100'])
-    tempOph100 = np.array(df_hot['tempOp100'])
+    tempCSc100 = np.array(dict_cold['tempCS100'])
+    tempOpc100 = np.array(dict_cold['tempOp100'])
+    tempCSh100 = np.array(dict_hot['tempCS100'])
+    tempOph100 = np.array(dict_hot['tempOp100'])
     
     
     # Load the saved model and scalers
@@ -83,13 +83,14 @@ def apply_calibration_multiple(df_cold, df_hot, str_expt):
     x_hot_descending100 = tempCSh100.reshape(-1, 1)  # 100%
     x_hot_asc100 = x_hot_descending100[::-1]
     
-    
+
     y_c0 = tempOpc0.reshape(-1, 1)
     y_c5 = tempOpc5.reshape(-1, 1)
     y_c10 = tempOpc10.reshape(-1, 1)
     y_c25 = tempOpc25.reshape(-1, 1)
     y_c50 = tempOpc50.reshape(-1, 1)
     y_c100 = tempOpc100.reshape(-1, 1)
+
     
     y_hot_descending0 = tempOph0.reshape(-1, 1)  # same with this series - begins with hottest value
     y_hot_asc0 = y_hot_descending0[::-1]
@@ -104,7 +105,7 @@ def apply_calibration_multiple(df_cold, df_hot, str_expt):
     y_hot_descending100 = tempOph100.reshape(-1, 1)  # 100%
     y_hot_asc100 = y_hot_descending100[::-1]
     
-    
+
     # Combining the hot and cold arrays per plastic proportion
     x_comb0 = np.vstack((x_c0, x_hot_asc0))  # 0%
     y_comb0 = np.concatenate((y_c0, y_hot_asc0))
@@ -119,6 +120,7 @@ def apply_calibration_multiple(df_cold, df_hot, str_expt):
     x_comb100 = np.vstack((x_c100, x_hot_asc100))  # 100%
     y_comb100 = np.concatenate((y_c100, y_hot_asc100))
     
+
     # Scale the y-axis data using the y-scaler from pure water
     y_comb_scaled0 = scaler_y_pure_water.transform(y_comb0)
     y_comb_scaled5 = scaler_y_pure_water.transform(y_comb5)
@@ -126,17 +128,10 @@ def apply_calibration_multiple(df_cold, df_hot, str_expt):
     y_comb_scaled25 = scaler_y_pure_water.transform(y_comb25)
     y_comb_scaled50 = scaler_y_pure_water.transform(y_comb50)
     y_comb_scaled100 = scaler_y_pure_water.transform(y_comb100)
-    print(y_comb_scaled0)
-    count = 0
-    for i in range(len(y_comb_scaled0)):
-        if np.isnan(y_comb_scaled0[i]):
-            #print(i)
-            count += 1
-    print(count)
-    print(y_comb_scaled0[98535:98547])  # these are all NaNs!! What do we do with them??
+
     
     # Predict using the SVM model trained on pure water data
-    #y_pred_plastic_scaled0 = svr_rbf_pure_water.predict(y_comb_scaled0)
+    y_pred_plastic_scaled0 = svr_rbf_pure_water.predict(y_comb_scaled0)
     y_pred_plastic_scaled5 = svr_rbf_pure_water.predict(y_comb_scaled5)
     y_pred_plastic_scaled10 = svr_rbf_pure_water.predict(y_comb_scaled10)
     y_pred_plastic_scaled25 = svr_rbf_pure_water.predict(y_comb_scaled25)
@@ -144,7 +139,7 @@ def apply_calibration_multiple(df_cold, df_hot, str_expt):
     y_pred_plastic_scaled100 = svr_rbf_pure_water.predict(y_comb_scaled100)
     
     # Inverse transform the predicted values to get them back to the original scale
-    #y_pred_plastic0 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled0.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
+    y_pred_plastic0 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled0.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
     y_pred_plastic5 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled5.reshape(-1, 1))
     y_pred_plastic10 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled10.reshape(-1, 1))
     y_pred_plastic25 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled25.reshape(-1, 1))
@@ -170,14 +165,17 @@ def apply_calibration_multiple(df_cold, df_hot, str_expt):
 
     print(x_comb0[-1,0], x_comb0[-1,-1], x_comb0[0,0], x_comb0[0,-1])
     # upper_limit = max( max(x_hot_asc), max(y_hot_asc) )
-    upper_limit = max(x_comb0[-1,0], y_h0[0,0], x_comb5[0,0], y_h5[0,0], x_comb10[0,0], y_h10[0,0], x_comb25[0,0], y_h25[0,0], x_comb50[0,0], y_h50[0,0],
-                      x_comb100[0,0], y_h100[0,0])
+    upper_limit = max(x_comb0[-1,0], y_pred_plastic0[0,0], x_comb5[0,0], y_pred_plastic5[0,0], x_comb10[0,0], y_pred_plastic10[0,0], x_comb25[0,0], 
+                      y_pred_plastic25[0,0], x_comb50[0,0], y_pred_plastic50[0,0], x_comb100[0,0], y_pred_plastic100[0,0])
     upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
     # Plot SVM Results, Add in Reference Line too
     plt.figure(figsize=(7, 7))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
-    plt.plot(x_comb, y_pred_plastic, 'o', color='lightgreen', label='Calibrated Data (Using Pure Water SVM)')
-    plt.plot(x_comb, y_pred_plastic, color='green', lw=2, label='Calibrated Curve')
+    
+    # wanna do a similar thing here for plotting as I did with the plot1to1_multiple.py - need to get that code so it can be a spectrum of green? 
+    #Just plot middle line too
+    plt.plot(x_comb0, y_pred_plastic0, 'o', color='lightgreen', label='Calibrated Data 0% (Using Pure Water SVM)')
+    plt.plot(x_comb0, y_pred_plastic0, color='green', lw=2, label='Calibrated Curve')
     # Plot the 1:1 line across the entire plot from corner to corner
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')
     

@@ -224,15 +224,14 @@ def plot1to1_multiple(dict_parameters, str_expt):
     
     # Create new merged dfs here that only have the clipped data. Then won't need to do the percentile limits in any other functions...
     #need to clip the stdev and sterr arrays too.. then create new merged df and return them.
-    df_clipped_cold = pd.DataFrame({'tempCS0': tempCSc0, # 'stdCS0': sdCSc0, 'sterrCS0': seCSc0, 
-                                    'tempOp0': tempOpc0, #'stdOp0': sdOpc0, 'sterrOp0': seOpc0})
-                                    'tempCS5': tempCSc5, 'tempOp5': tempOpc5, 'tempCS10': tempCSc10, 'tempOp10': tempOpc10, 'tempCS25': tempCSc25, 
-                                    'tempOp25': tempOpc25,'tempCS50': tempCSc50, 'tempOp50': tempOpc50, 'tempCS100': tempCSc100, 'tempOp100': tempOpc100})
-    df_clipped_hot = pd.DataFrame({'tempCS0': tempCSh0, #'stdCS0': sdCSh0, 'sterrCS0': seCSh0, 
-                                    'tempOp0': tempOph0, #'stdOp0': sdOph0, 'sterrOp0': seOph0})
-                                    'tempCS5': tempCSh5, 'tempOp5': tempOph5, 'tempCS10': tempCSh10, 'tempOp10': tempOph10, 'tempCS25': tempCSh25, 
-                                    'tempOp25': tempOph25,'tempCS50': tempCSh50, 'tempOp50': tempOph50, 'tempCS100': tempCSh100, 'tempOp100': tempOph100})
+    dict_clipped_cold = {'tempCS0': tempCSc0, # 'stdCS0': sdCSc0, 'sterrCS0': seCSc0, 
+                         'tempOp0': tempOpc0, #'stdOp0': sdOpc0, 'sterrOp0': seOpc0})
+                         'tempCS5': tempCSc5, 'tempOp5': tempOpc5, 'tempCS10': tempCSc10, 'tempOp10': tempOpc10, 'tempCS25': tempCSc25, 
+                         'tempOp25': tempOpc25,'tempCS50': tempCSc50, 'tempOp50': tempOpc50, 'tempCS100': tempCSc100, 'tempOp100': tempOpc100}
+    dict_clipped_hot = {'tempCS0': tempCSh0, #'stdCS0': sdCSh0, 'sterrCS0': seCSh0, 
+                        'tempOp0': tempOph0, #'stdOp0': sdOph0, 'sterrOp0': seOph0})
+                        'tempCS5': tempCSh5, 'tempOp5': tempOph5, 'tempCS10': tempCSh10, 'tempOp10': tempOph10, 'tempCS25': tempCSh25, 
+                        'tempOp25': tempOph25,'tempCS50': tempCSh50, 'tempOp50': tempOph50, 'tempCS100': tempCSh100, 'tempOp100': tempOph100}
     
     
-    
-    return df_clipped_cold, df_clipped_hot
+    return dict_clipped_cold, dict_clipped_hot
