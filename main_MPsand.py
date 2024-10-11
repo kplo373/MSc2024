@@ -196,8 +196,8 @@ dict_x, dict_ypred = apply_calibration_multiple(dict_cold, dict_hot, text_str)
 print('Starting deltaT script now')
 # then calculate deltaT from calibration SVM less the reference 1:1 line
 from get_deltaT_multiple import get_deltaT_multiple
-deltaT = get_deltaT_multiple(dict_x, dict_ypred, text_str)
-print(deltaT)  # including temperature difference plot
+dict_xref, dict_deltaT = get_deltaT_multiple(dict_x, dict_ypred, text_str)
+print(dict_deltaT.keys())  # including temperature difference plot
     
     
     

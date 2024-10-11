@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 """
 Created on Fri Oct 11 11:58:29 2024
 
@@ -28,8 +28,6 @@ def get_deltaT_multiple(dict_x, dict_ypred, text_str):
     y25 = dict_ypred['y25'].ravel()
     y50 = dict_ypred['y50'].ravel()
     y100 = dict_ypred['y100'].ravel()
-
-
     
 
     lower_limit = min(x0[0], x5[0], x10[0], x25[0], x50[0], x100[0],
@@ -49,7 +47,6 @@ def get_deltaT_multiple(dict_x, dict_ypred, text_str):
     x_ref50 = x50
     x_ref100 = x100
  
-    #print(np.shape(x_ref0))  # (16787,)
     
     # Time to calculate deltaT per percentage
     deltaT0 = np.zeros(len(y0))
@@ -58,19 +55,24 @@ def get_deltaT_multiple(dict_x, dict_ypred, text_str):
     deltaT25 = np.zeros(len(y25))
     deltaT50 = np.zeros(len(y50))
     deltaT100 = np.zeros(len(y100))
-    for yi in range(len(y0)):
-        delT0 = y0[yi] - x_ref0[yi]
-        deltaT0[yi] = delT0
-        delT5 = y5[yi] - x_ref5[yi]
-        deltaT5[yi] = delT5
-        delT10 = y10[yi] - x_ref10[yi]
-        deltaT10[yi] = delT10
-        delT25 = y25[yi] - x_ref25[yi]
-        deltaT25[yi] = delT25
-        delT50 = y50[yi] - x_ref50[yi]
-        deltaT50[yi] = delT50
-        delT100 = y100[yi] - x_ref100[yi]  # this line is giving an error - something to do with lengths...***
-        deltaT100[yi] = delT100
+    for ya in range(len(y0)):
+        delT0 = y0[ya] - x_ref0[ya]
+        deltaT0[ya] = delT0
+    for yb in range(len(y5)):
+        delT5 = y5[yb] - x_ref5[yb]
+        deltaT5[yb] = delT5
+    for yc in range(len(y10)):
+        delT10 = y10[yc] - x_ref10[yc]
+        deltaT10[yc] = delT10
+    for yd in range(len(y25)):
+        delT25 = y25[yd] - x_ref25[yd]
+        deltaT25[yd] = delT25
+    for ye in range(len(y50)):
+        delT50 = y50[ye] - x_ref50[ye]
+        deltaT50[ye] = delT50
+    for yf in range(len(y100)):
+        delT100 = y100[yf] - x_ref100[yf]
+        deltaT100[yf] = delT100
 
 
     # Plotting deltaT against Environmental Temperature
@@ -90,7 +92,6 @@ def get_deltaT_multiple(dict_x, dict_ypred, text_str):
     for i in range(6):
         plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'$\Delta T {labels[i]}$', alpha=0.6)  # plotting the data in a red spectrum
 
-    #plt.plot(x, deltaT, 'r', label='DeltaT')
     plt.axhline(y=0, color='k', linestyle='--')
     plt.xlabel('Environmental Temperature (degrees Celsius)')
     plt.ylabel(r'$\Delta T$ (degrees Celsius)')
@@ -114,5 +115,8 @@ def get_deltaT_multiple(dict_x, dict_ypred, text_str):
     plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
-    return deltaT
+    dict_xref = {'x_ref0': x_ref0, 'x_ref5': x_ref5, 'x_ref10': x_ref10, 'x_ref25': x_ref25, 'x_ref50': x_ref50, 'x_ref100': x_ref100}
+    dict_deltaT = {'delT0': deltaT0, 'delT5': deltaT5, 'delT10': deltaT10, 'delT25': deltaT25, 'delT50': deltaT50, 'delT100': deltaT100}
+    
+    return dict_xref, dict_deltaT
 
