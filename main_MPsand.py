@@ -189,8 +189,15 @@ dict_cold, dict_hot = plot1to1_multiple(df_merged_dict, text_str)
 print('Starting apply calibration script now')
 # Next is apply calibration for all of these lines (after this and temp difference I should put these functions within the actual main function!)
 from apply_calibration_multiple import apply_calibration_multiple
-x_comb, y_pred_plastic = apply_calibration_multiple(dict_cold, dict_hot, text_str)
-    
+dict_x, dict_ypred = apply_calibration_multiple(dict_cold, dict_hot, text_str)
+
+
+#%% deltaT next!!
+print('Starting deltaT script now')
+# then calculate deltaT from calibration SVM less the reference 1:1 line
+from get_deltaT_multiple import get_deltaT_multiple
+deltaT = get_deltaT_multiple(dict_x, dict_ypred, text_str)
+print(deltaT)  # including temperature difference plot
     
     
     

@@ -12,7 +12,6 @@ import pandas as pd
 from types import SimpleNamespace
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm  # for creating colour spectrums and legends
-from matplotlib.collections import LineCollection  # or this instead of one above...
 
 # str_expt parameter should be a string of the type of experiment done, e.g. 'Pellet-Sand', or 'Shaved Plastic and Sand'
 def plot1to1_multiple(dict_parameters, str_expt):
@@ -73,15 +72,10 @@ def plot1to1_multiple(dict_parameters, str_expt):
     T_CSh100 = dfh100['temperature_CS']
     
     
-    # Get the minimum temperature value for all the arrays and then use the 5th percentile value of that to be the starting index below??
-    # OR do I calculate the 5th percentile minimum limit for all different percentages? Would I also pick the Optris sensor then?
-    # can't just use the same 5th percentile for all proportions of plastic, as they have different shapes and flicks etc. - need to calculate separately!
-    
-    # Using 5th Percentile Minimum Value (from ChatGPT) for Cold Array of 0% MP-sand (pure sand)
-    p5_val0 = np.percentile(T_Opc0, 5)  # calculate the 5th percentile value for 0%
+    # Calculate separate 5th and 95th percentiles for different plastic proportions
+    p5_val0 = np.percentile(T_Opc0, 5)  # calculate the 5th percentile value for cold 0% MP-sand (pure sand)
     i5_0 = np.argmin(np.abs(T_Opc0 - p5_val0))  # find the index of the closest value in y_cold to the 5th percentile value
-    # Likewise, using 95th Percentile Max Value for Hot Array of 0% MP-sand (pure sand)
-    p95_val0 = np.percentile(T_CSh0, 95)
+    p95_val0 = np.percentile(T_CSh0, 95)  # 95th percentile max value for hot array of 0% MP-sand (pure sand)
     i95_0 = np.argmin(np.abs(T_CSh0 - p95_val0))
 
     p5_val5 = np.percentile(T_Opc5, 5)  # getting 5th percentile value for 5% MP-sand
@@ -190,29 +184,13 @@ def plot1to1_multiple(dict_parameters, str_expt):
     # To plot the 1:1 reference line
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference')
     #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, xerr=seCSc0, color='k')  # just include one errorbar maybe? Is there a better way to show them separately?
-    #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, color='k')
-    # plt.plot(tempCSc0, tempOpc0, 'aqua', label='Cold Raw Data - 0%')  # listing this after errorbars and as dots allow it to show up over black errorbars
-    #can add a plt.errorbar() here too for the hot data - assuming using standard error like Tom said
-    # see list of colours here: https://matplotlib.org/stable/gallery/color/named_colors.html
-    # plt.plot(tempCSc5, tempOpc5, 'powderblue', label='Cold Raw Data - 5%') 
-    # plt.plot(tempCSc10, tempOpc10, 'skyblue', label='Cold Raw Data - 10%')
-    # plt.plot(tempCSc25, tempOpc25, 'darkturquoise', label='Cold Raw Data - 25%') 
-    # plt.plot(tempCSc50, tempOpc50, 'deepskyblue', label='Cold Raw Data - 50%') 
-    # plt.plot(tempCSc100, tempOpc100, 'dodgerblue', label='Cold Raw Data - 100%')
-    
+    #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, color='k')   
     
     for i in range(6):
-        plt.plot(x_cold_arr[i], y_cold_arr[i], lw=1, color=colors1[i], label=f'Cold {labels[i]}', alpha=0.6)  # the labelling might be a bit tricky, want to do it in %s...
+        plt.plot(x_cold_arr[i], y_cold_arr[i], lw=1, color=colors1[i], label=f'Cold {labels[i]}', alpha=0.6)
     
     for j in range(6):  # doing a second separate loop so that the legend lists all cold then hot experiments in the plot
         plt.plot(x_hot_arr[j], y_hot_arr[j], lw=1, color=colors2[j], label=f'Hot {labels[j]}', alpha=0.6)  # alpha parameter sets transparency/opacity
-    
-    # plt.plot(tempCSh0, tempOph0, 'lightsalmon', label='Hot Raw Data - 0%')
-    # plt.plot(tempCSh5, tempOph5, 'coral', label='Hot Raw Data - 5%')
-    #plt.plot(tempCSh10, tempOph10, 'orangered', label='Hot Raw Data - 10%')
-    # plt.plot(tempCSh25, tempOph25, 'red', label='Hot Raw Data - 25%')
-    # plt.plot(tempCSh50, tempOph50, 'chocolate', label='Hot Raw Data - 50%')
-    # plt.plot(tempCSh100, tempOph100, 'sienna', label='Hot Raw Data - 100%')
     
     plt.title('Raw Data Comparison For ' + str_expt)  # including what percentage of plastic etc.
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
@@ -222,8 +200,8 @@ def plot1to1_multiple(dict_parameters, str_expt):
     plt.show()
 
     
-    # Create new merged dfs here that only have the clipped data. Then won't need to do the percentile limits in any other functions...
-    #need to clip the stdev and sterr arrays too.. then create new merged df and return them.
+    # Create new dictionaries here that only have the clipped data. Then won't need to do the percentile limits in any other functions...
+    # need to clip the stdev and sterr arrays too.. then create new dictionaries for them and return them.
     dict_clipped_cold = {'tempCS0': tempCSc0, # 'stdCS0': sdCSc0, 'sterrCS0': seCSc0, 
                          'tempOp0': tempOpc0, #'stdOp0': sdOpc0, 'sterrOp0': seOpc0})
                          'tempCS5': tempCSc5, 'tempOp5': tempOpc5, 'tempCS10': tempCSc10, 'tempOp10': tempOpc10, 'tempCS25': tempCSc25, 

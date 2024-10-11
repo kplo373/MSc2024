@@ -20,6 +20,7 @@ import joblib
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import matplotlib.cm as cm
 
 
 def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
@@ -149,7 +150,7 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
     def normal_roundH(n):  # create a hot function to round up if .27 or higher, or round down if less than .27. Calibration makes data flick up.
-        if n - math.floor(n) < 0.27:
+        if n - math.floor(n) < 0.05:
             return math.floor(n)
         return math.ceil(n)
     
@@ -170,21 +171,33 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
     upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
     # Plot SVM Results, Add in Reference Line too
-    plt.figure(figsize=(7, 7))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
+    plt.figure(figsize=(6, 6))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
     
-    # wanna do a similar thing here for plotting as I did with the plot1to1_multiple.py - need to get that code so it can be a spectrum of green? 
-    #Just plot middle line too
-    plt.plot(x_comb0, y_pred_plastic0, 'o', color='lightgreen', label='Calibrated Data 0% (Using Pure Water SVM)')
-    plt.plot(x_comb0, y_pred_plastic0, color='green', lw=2, label='Calibrated Curve')
+    # Combine all x and y arrays into a list (for plotting in a green spectrum)
+    x_list = [x_comb0, x_comb5, x_comb10, x_comb25, x_comb50, x_comb100]
+    y_list = [y_pred_plastic0, y_pred_plastic5, y_pred_plastic10, y_pred_plastic25, y_pred_plastic50, y_pred_plastic100]
+
+    # Specify the percentage labels
+    labels = ['0%', '5%', '10%', '25%', '50%', '100%']
+    
+    # Set the colormap to 'Blues' and get 6 shades of blue
+    cmap = cm.get_cmap('Greens', 6)
+    colors = cmap(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker green
+
+
     # Plot the 1:1 line across the entire plot from corner to corner
-    plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')
-    
+    plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference')
+ 
+    for i in range(6):
+        plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'Calibrated {labels[i]}', alpha=0.6)  # plotting the data in a green spectrum
+        
+    plt.text(23, 11, '(Using Pure Water SVM)')  # adding in text to the plot in the bottom RH corner
     plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
     plt.ylim(lower_lim, upper_lim)
     
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
-    plt.title('Calibrated Sensor Comparison For ' + str_expt)
+    plt.title('Calibrated Comparison For ' + str_expt)
     plt.legend()
     plt.grid()
     if 'hav' in str_expt:
@@ -208,6 +221,11 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
     plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
-    return x_comb, y_pred_plastic  # this will need to be a dataframe maybe... will have x_comb and y_pred_plastic for every percentage!
+    # Create a dictionary for x and for y to return and extract the data from in the next function (deltaT) 
+    dict_x = {'x0': x_comb0, 'x5': x_comb5, 'x10': x_comb10, 'x25': x_comb25, 'x50': x_comb50, 'x100': x_comb100}
+    dict_ypred = {'y0': y_pred_plastic0, 'y5': y_pred_plastic5, 'y10': y_pred_plastic10, 'y25': y_pred_plastic25, 
+                  'y50': y_pred_plastic50, 'y100': y_pred_plastic100}
+    
+    return dict_x, dict_ypred
 
 # run this script through the main() function script
