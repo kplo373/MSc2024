@@ -52,13 +52,11 @@ def main():
     avgOp_dfhot = average_Optris(resampled_df_a1hot, resampled_df_a3hot)  
     # print(avgOp_dfcold)
 
-
     from create_merged_df import create_merged_df
     df_merged_cold = create_merged_df(avgOp_dfcold, df_sand_avgCScold)  # df_water_avgCScold) ***
     df_merged_hot = create_merged_df(avgOp_dfhot, df_sand_avgCShot)   #df_water_avgCShot)
     #print(df_mergedcold) 
     
-    #need to get all the hot/cold files imported above!
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
     text_str = '50% Shavings-Sand'  # ***
@@ -71,20 +69,16 @@ def main():
     from apply_calibration import apply_calibration
     x_comb, y_pred_plastic = apply_calibration(df_cold, df_hot, text_str)
     
-    # # then calculate deltaT from calibration SVM less the reference 1:1 line
-    # from get_deltaT import get_deltaT
-    # deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)
-    # print(deltaT)  # including temperature difference plot
-    
-    return x_comb, y_pred_plastic, text_str
+    # then calculate deltaT from calibration SVM less the reference 1:1 line (which is the same as the x array for y)
+    from get_deltaT import get_deltaT
+    deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)
+    print(deltaT)  # including temperature difference plot
+        
+    return
 
 
 
 if __name__ == '__main__':
-    x_comb, y_pred_plastic, text_str = main()
+    main()
 
-#%%
-# then calculate deltaT from calibration SVM less the reference 1:1 line
-from get_deltaT import get_deltaT
-deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)
-print(deltaT)  # including temperature difference plot
+

@@ -150,7 +150,7 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
     def normal_roundH(n):  # create a hot function to round up if .27 or higher, or round down if less than .27. Calibration makes data flick up.
-        if n - math.floor(n) < 0.05:
+        if n - math.floor(n) < 0.3:
             return math.floor(n)
         return math.ceil(n)
     
@@ -166,8 +166,8 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
 
     print(x_comb0[-1,0], x_comb0[-1,-1], x_comb0[0,0], x_comb0[0,-1])
     # upper_limit = max( max(x_hot_asc), max(y_hot_asc) )
-    upper_limit = max(x_comb0[-1,0], y_pred_plastic0[0,0], x_comb5[0,0], y_pred_plastic5[0,0], x_comb10[0,0], y_pred_plastic10[0,0], x_comb25[0,0], 
-                      y_pred_plastic25[0,0], x_comb50[0,0], y_pred_plastic50[0,0], x_comb100[0,0], y_pred_plastic100[0,0])
+    upper_limit = max(max(x_comb0), max(y_pred_plastic0), max(x_comb5), max(y_pred_plastic5), max(x_comb10), max(y_pred_plastic10), 
+                      max(x_comb25), max(y_pred_plastic25), max(x_comb50), max(y_pred_plastic50), max(x_comb100), max(y_pred_plastic100))
     upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
     # Plot SVM Results, Add in Reference Line too
@@ -191,7 +191,7 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
     for i in range(6):
         plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'Calibrated {labels[i]}', alpha=0.6)  # plotting the data in a green spectrum
         
-    plt.text(23, 11, '(Using Pure Water SVM)')  # adding in text to the plot in the bottom RH corner
+    plt.text(23, 12, '(Using Pure Water SVM)')  # adding in text to the plot in the bottom RH corner
     plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
     plt.ylim(lower_lim, upper_lim)
     

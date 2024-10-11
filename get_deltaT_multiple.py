@@ -38,7 +38,6 @@ def get_deltaT_multiple(dict_x, dict_ypred, text_str):
     
     
     # If I can maybe plot the y=x line here (or get data from previous plot) then can use this for x-axis data
-    
     #ref_line = plt.plot(x_comb, x_comb)
     x_ref0 = x0
     x_ref5 = x5
@@ -90,13 +89,17 @@ def get_deltaT_multiple(dict_x, dict_ypred, text_str):
     colors = cmap(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker green
 
     for i in range(6):
-        plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'$\Delta T {labels[i]}$', alpha=0.6)  # plotting the data in a red spectrum
+        #plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'$\Delta T {labels[i]}$', alpha=0.6)
+        plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=r'\Delta T {labels}'.format(labels=labels[i]), alpha=0.6)  # plotting the data in a red spectrum
 
     plt.axhline(y=0, color='k', linestyle='--')
     plt.xlabel('Environmental Temperature (degrees Celsius)')
     plt.ylabel(r'$\Delta T$ (degrees Celsius)')
     plt.title(text_str +' Temperature Difference')
     plt.grid()
+    plt.legend()
+    
+    # To save the figure in the SavedPlots\TempDiff_Separate folder
     if 'hav' in text_str:
         if 'and' in text_str:
             final_folder = 'MP_sand'
@@ -115,6 +118,7 @@ def get_deltaT_multiple(dict_x, dict_ypred, text_str):
     plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
+    # Creating two dictionaries to transfer/return the data arrays used to make this deltaT plot
     dict_xref = {'x_ref0': x_ref0, 'x_ref5': x_ref5, 'x_ref10': x_ref10, 'x_ref25': x_ref25, 'x_ref50': x_ref50, 'x_ref100': x_ref100}
     dict_deltaT = {'delT0': deltaT0, 'delT5': deltaT5, 'delT10': deltaT10, 'delT25': deltaT25, 'delT50': deltaT50, 'delT100': deltaT100}
     
