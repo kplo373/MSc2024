@@ -90,7 +90,8 @@ def get_deltaT_multiple(dict_x, dict_ypred, text_str):
 
     for i in range(6):
         #plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'$\Delta T {labels[i]}$', alpha=0.6)
-        plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=r'\Delta T {labels}'.format(labels=labels[i]), alpha=0.6)  # plotting the data in a red spectrum
+        label_str = labels[i]
+        plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=rf'$\Delta T$ {label_str}', alpha=0.6)  # plotting the data in a red spectrum
 
     plt.axhline(y=0, color='k', linestyle='--')
     plt.xlabel('Environmental Temperature (degrees Celsius)')

@@ -148,43 +148,32 @@ def main():
     df_merged_c100 = create_merged_df(avgOp_dfc100, df_water_avgCSc100)
     df_merged_h100 = create_merged_df(avgOp_dfh100, df_water_avgCSh100)
     # not easily possible to merge all these dfs together into one, as they have different datetimes along their indices per df...
-    
-    '''
+
+
     # To plot the 1-1 temperature plot
     from plot1to1_multiple import plot1to1_multiple
     text_str = 'Pellets and Water'
     # Create a dictionary of df_merged dataframes made above, to put into function below
     df_merged_dict = dict(c0=df_merged_c0, h0=df_merged_h0, c5=df_merged_c5, h5=df_merged_h5, c10=df_merged_c10, h10=df_merged_h10, c25=df_merged_c25,
                           h25=df_merged_h25, c50=df_merged_c50, h50=df_merged_h50, c100=df_merged_c100, h100=df_merged_h100)
-    # not sure how to do all the text strings for the legend of these lines yet... maybe can just do them in the plotting function itself?
+    dict_cold, dict_hot = plot1to1_multiple(df_merged_dict, text_str)
     
-    df_cold, df_hot = plot1to1_multiple(df_merged_dict, text_str)
-    '''
+    # Next is apply calibration for all of these lines/percentages
+    from apply_calibration_multiple import apply_calibration_multiple
+    dict_x, dict_ypred = apply_calibration_multiple(dict_cold, dict_hot, text_str)
+    
+    # Then calculate deltaT from calibration SVM less the reference 1:1 line
+    from get_deltaT_multiple import get_deltaT_multiple
+    dict_xref, dict_deltaT = get_deltaT_multiple(dict_x, dict_ypred, text_str)
+    print(dict_deltaT.keys())  # including temperature difference plot
     
     
     
-    return df_merged_c0, df_merged_h0, df_merged_c5, df_merged_h5, df_merged_c10, df_merged_h10, df_merged_c25, df_merged_h25, df_merged_c50, df_merged_h50, df_merged_c100, df_merged_h100
+    return 
 
 if __name__ == '__main__':
-    df_merged_c0, df_merged_h0, df_merged_c5, df_merged_h5, df_merged_c10, df_merged_h10, df_merged_c25, df_merged_h25, df_merged_c50, df_merged_h50, df_merged_c100, df_merged_h100 = main()    
+    main()    
     
     
-#%%  
-# To plot the 1-1 temperature plot
-from plot1to1_multiple import plot1to1_multiple
-text_str = 'Pellets and Water'
-# Create a dictionary of df_merged dataframes made above, to put into function below
-df_merged_dict = dict(c0=df_merged_c0, h0=df_merged_h0, c5=df_merged_c5, h5=df_merged_h5, c10=df_merged_c10, h10=df_merged_h10, c25=df_merged_c25,
-                      h25=df_merged_h25, c50=df_merged_c50, h50=df_merged_h50, c100=df_merged_c100, h100=df_merged_h100)
-# not sure how to do all the text strings for the legend of these lines yet... maybe can just do them in the plotting function itself?
-
-df_cold, df_hot = plot1to1_multiple(df_merged_dict, text_str)
-
-#%%
-print('Starting apply calibration script now')
-# Next is apply calibration for all of these lines (after this and temp difference I should put these functions within the actual main function!)
-from apply_calibration_multiple import apply_calibration_multiple
-x_comb, y_pred_plastic = apply_calibration_multiple(df_cold, df_hot, text_str)
-
 
 
