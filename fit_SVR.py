@@ -109,11 +109,11 @@ def fit_SVR(df_merged_cold, df_merged_hot):
     # takes a while to run this function^^
 
 
-#%% Test the actual function
+#%% Run the actual function
 #y_pred_pure_scaled, y_pred_pure = fit_SVR(df_merged_cold, df_merged_hot)  # this should ONLY BE FOR PURE WATER
 
 
-#%% to test
+#%% To run, get background functions/data
 import sys
 #sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
 sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
