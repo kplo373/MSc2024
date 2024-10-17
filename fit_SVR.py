@@ -9,9 +9,9 @@ calibration function, apply_calibration.py.
 
 @author: kplo373
 """
-# need to get the final resampled dataframe from create_merged_df.py***
+
 import numpy as np
-# Fitting SVM curve (using ChatGPT)
+# Support Vector Machine learning: https://scikit-learn.org/1.5/modules/generated/sklearn.svm.SVR.html
 from sklearn.preprocessing import StandardScaler  # used to scale the combined arrays below
 from sklearn.svm import SVR  # used to train the SVM below
 from sklearn.metrics import mean_squared_error
@@ -39,16 +39,23 @@ def fit_SVR(df_merged_cold, df_merged_hot):
     y_comb = np.concatenate((y_cold, y_hot))  # shape is (16702,) so also same column as there only is one
     print(f'x_combined shape: {x_comb.shape}, y_combined shape: {y_comb.shape}')
      
-    # Scale the combined dataset
+    # Scale the combined datasets, as the distance between data points affects the SVM decision boundary chosen
     scaler_x = StandardScaler()  # has type: sklearn.preprocessing._data.StandardScaler
     scaler_y = StandardScaler()
     
     x_comb_scaled = scaler_x.fit_transform(x_comb)                         # shape (16702, 1)
     y_comb_scaled = scaler_y.fit_transform(y_comb.reshape(-1, 1)).ravel()  # shape (16702,)
     # ravel() converts a multi-dimensional array into 1D, flattening the array but not creating a new one
-     
+    
+    #********************************************************************************
+    # start with this tomorrow: https://medium.com/pursuitnotes/support-vector-regression-in-6-steps-with-python-c4569acd062d
+    # and maybe this, but it's for predicting y not x: https://stackoverflow.com/questions/66413133/how-to-predict-y-values-once-svr-model-is-made-in-a-function
+    # and this is the actual docs for Sklearn SVR: https://scikit-learn.org/1.5/modules/generated/sklearn.svm.SVR.html
+    # we're googling this: how to predict x values from y values using svm svr sklearn
+    #********************************************************************************
+    
     # Train the SVR model
-    svr_rbf = SVR(kernel='rbf', C=100, gamma=0.1, epsilon=0.1)  
+    svr_rbf = SVR(kernel='rbf', C=100, gamma=0.1, epsilon=0.1, verbose=True)  
     # Radial Basis Function (rbf kernel), good for nonlinear relationships
     # RBF kernel eqn: K(xi, xj) = exp(-gamma*||xi-xj||^2)
     
@@ -115,23 +122,17 @@ def fit_SVR(df_merged_cold, df_merged_hot):
 
 #%% To run, get background functions/data
 import sys
-#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
+sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
+#sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
 # To get the filepath
 from get_filepaths import get_filepaths
-path_cold, files_cold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
-# path gives a folder, and files are the files in that folder. Need to select specific file from files list
-path_CScold = path_cold + '\\' + files_cold[0]
-path_Opcold = path_cold + '\\' + files_cold[2]
-
-path_hot, files_hot = get_filepaths('18/07/2024', 'AM')  # for the hot pure water test: Thursday 18th July AM
-path_CShot = path_hot + '\\' + files_hot[0]
-path_Ophot = path_hot + '\\' + files_hot[2]
+pathCScold, pathOpcold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
+pathCShot, pathOphot = get_filepaths('18/07/2024', 'AM')  # for the hot pure water test: Thursday 18th July AM
 
 # To collect the Campbell Scientific thermocouple data
 from read_CampbellSci import read_CampbellSci
-dt_objsCScold, temps_arrCScold, stdevs_arrCScold = read_CampbellSci(path_CScold)
-dt_objsCShot, temps_arrCShot, stdevs_arrCShot = read_CampbellSci(path_CShot)
+dt_objsCScold, temps_arrCScold, stdevs_arrCScold = read_CampbellSci(pathCScold)
+dt_objsCShot, temps_arrCShot, stdevs_arrCShot = read_CampbellSci(pathCShot)
 
 #from read_CampbellSci import sand_avgCS  # **this function depends on what type of test is being done...
 from read_CampbellSci import water_avgCS
@@ -144,8 +145,8 @@ df_water_avgCShot = water_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
 #%%    
 # To collect the Optris thermal camera data
 from read_Optris import read_Optris
-dt_objsOpcold, a1cold, a2cold, a3cold, a4cold = read_Optris(path_Opcold)  # giving error now, need to go to line 38 in read_Optris
-dt_objsOphot, a1hot, a2hot, a3hot, a4hot = read_Optris(path_Ophot)
+dt_objsOpcold, a1cold, a2cold, a3cold, a4cold = read_Optris(pathOpcold)  # giving error now, need to go to line 38 in read_Optris
+dt_objsOphot, a1hot, a2hot, a3hot, a4hot = read_Optris(pathOphot)
 
 from read_Optris import resample_Optris
 resampled_df_a1cold = resample_Optris(dt_objsOpcold, a1cold)
@@ -168,4 +169,16 @@ from plot1to1 import plot1to1  # need to add text for title, relevant to what ty
 df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, 'Pure Water')  # to give the clipped arrays... do we need these?
 
 #%% Test the actual function
-scaler_y, svr_rbf, linear_svr, y_pred_linear = fit_SVR(df_merged_cold, df_merged_hot)
+y_pred_pure_scaled, y_pred_pure = fit_SVR(df_merged_cold, df_merged_hot)
+
+
+#%% Plot what the function gives to check if it is lining up to the reference 1:1 line
+import matplotlib.pyplot as plt
+#x = np.linspace(0, len(y_pred_pure_scaled), len(y_pred_pure_scaled))
+#plt.plot(x, y_pred_pure_scaled)  # x is thermocouple temperatures...
+
+x = np.linspace(0, len(y_pred_pure), len(y_pred_pure))
+plt.plot(x, y_pred_pure)  # plots the same as above, same curve but this looks like temperature values!!
+plt.show()
+
+
