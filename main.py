@@ -8,8 +8,8 @@ Main master script to run all the functions within the subroutines.
 """
 # Just in case it can't find the right data folder, use these two lines below
 import sys
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
-#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
+#sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
+sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
 
 # can run this main() function within a for loop if possible, would need to automate the date and 'AM'
 #chosen_date = '13/08/2024'  # this test was hot 50% nurdle sand (can check the excel sheet)

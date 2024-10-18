@@ -154,15 +154,15 @@ plt.show()
 # from prev script... try chatgpt too! Chatgpt gives an option to use joblib (better for larger datasets) or pkl.
 import joblib
 # For calibrating the rest of the experiment mixtures, after fitting the SVR model and scaling the data
-joblib.dump(svr_rbf, r'C:\Users\kplo373\Documents\GitHub\MSc2024\svr_rbf_pure_water.pkl')
-joblib.dump(scaler_x, 'scaler_x_pure_water.pkl')
+joblib.dump(svr_rbf, r"D:\MSc Results\svr_rbf_pure_water.pkl")
+joblib.dump(scaler_x, r"D:\MSc Results\scaler_y_pure_water.pkl")
 
 
 # Save the predictions if needed
 #x_pred_pure_scaled = svr_rbf.predict(y_test_scaled)
 #y_pred_pure = scaler_y.inverse_transform(y_pred_pure_scaled.reshape(-1, 1))
 #np.save('y_pred_pure.npy', y_pred_pure)
-np.save(r'C:\Users\kplo373\Documents\GitHub\MSc2024\x_pred_rbf.npy', x_pred_rbf)
+np.save(r"D:\MSc Results\x_pred_rbf.npy", x_pred_rbf)
 
 # do I save the linear ones too? RBF gives best results so just saved them so far...
 
