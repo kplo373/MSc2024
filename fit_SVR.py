@@ -74,18 +74,26 @@ def fit_SVR(df_merged_cold, df_merged_hot):
     print(svr_rbf)  # SVR(C=100, gamma=0.1)
     
     # Predict using the RBF SVR model
-    x_test = np.linspace(x_comb.min(), x_comb.max(), 100).reshape(-1,1)       # shape (100, 1)
-    x_test_scaled = scaler_x.transform(x_test)  # use this x_array for both the straight and curved fit
-    y_pred_rbf_scaled = svr_rbf.predict(x_test_scaled)
-    y_pred_rbf = scaler_y.inverse_transform(y_pred_rbf_scaled.reshape(-1,1))  # shape (100, 1)
+    #x_test = np.linspace(x_comb.min(), x_comb.max(), 100).reshape(-1,1)
+    #x_test_scaled = scaler_x.transform(x_test)  # use this x_array for both the straight and curved fit
+    #y_pred_rbf_scaled = svr_rbf.predict(x_test_scaled)
+    #y_pred_rbf = scaler_y.inverse_transform(y_pred_rbf_scaled.reshape(-1,1))
+    
+    # We want to predict x from y actually!
+    #y_test = np.linspace(y_comb.min(), y_comb.max(), 100).reshape(-1,1)
+    #y_test_scaled = scaler_y.transform(y_test)  # use this x_array for both the straight and curved fit
+    x_pred_rbf_scaled = svr_rbf.predict(y_comb_scaled)   #(y_test_scaled)
+    x_pred_rbf = scaler_x.inverse_transform(x_pred_rbf_scaled.reshape(-1,1))
        
     # Train the linear SVR model
     linear_svr = SVR(kernel='linear', C=100, epsilon=0.1)
     linear_svr.fit(x_comb_scaled, y_comb_scaled)
     
     # Predict using the linear SVR model
-    y_pred_linear_scaled = linear_svr.predict(x_test_scaled)
-    y_pred_linear = scaler_y.inverse_transform(y_pred_linear_scaled.reshape(-1,1))  # shape (100, 1)
+    #y_pred_linear_scaled = linear_svr.predict(x_test_scaled)
+    #y_pred_linear = scaler_y.inverse_transform(y_pred_linear_scaled.reshape(-1,1))  # shape (100, 1)
+    x_pred_linear_scaled = linear_svr.predict(y_comb_scaled)  #(y_test_scaled)
+    x_pred_linear = scaler_x.inverse_transform(x_pred_linear_scaled.reshape(-1,1))
     
     
     # Calculate RMSE for both models (root mean square error)
