@@ -98,10 +98,10 @@ print(f'x_combined shape: {x_comb.shape}, y_combined shape: {y_comb.shape}')
 from sklearn.preprocessing import StandardScaler
 scaler_x = StandardScaler()
 
-
 # Reshape and scale the x and y arrays to match the format expected by SVR (2D array)
-y = y_comb  #.reshape(-1, 1)  # y needs to be 2D for features
 x = x_comb.ravel()   # flattening the x array to be 1D (needed for fitting SVR)
+y = y_comb  #.reshape(-1, 1)  # y needs to be 2D for features
+
 x_scaled = scaler_x.fit_transform(x.reshape(-1, 1))
 
 # Train SVR model on the scaled x data, without scaling y

@@ -60,8 +60,8 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
     
     
     # Load the saved model and scalers
-    svr_rbf_pure_water = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")  # this is giving an error because there are nans in it?
-    scaler_y_pure_water = joblib.load(r"D:\MSc Results\scaler_y_pure_water.pkl")
+    svr_rbf = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")
+    scaler_x = joblib.load(r"D:\MSc Results\scaler_y_pure_water.pkl")
     
     # Prepare the plastic-water data
     x_c0 = tempCSc0.reshape(-1, 1)  # if an error, can do tempC1c0.to_numpy().reshape...
@@ -121,7 +121,8 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
     x_comb100 = np.vstack((x_c100, x_hot_asc100))  # 100%
     y_comb100 = np.concatenate((y_c100, y_hot_asc100))
     
-
+    '''  Older version of calibration: (but now should be predicting x from y)
+    
     # Scale the y-axis data using the y-scaler from pure water
     y_comb_scaled0 = scaler_y_pure_water.transform(y_comb0)
     y_comb_scaled5 = scaler_y_pure_water.transform(y_comb5)
@@ -146,6 +147,33 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
     y_pred_plastic25 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled25.reshape(-1, 1))
     y_pred_plastic50 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled50.reshape(-1, 1))
     y_pred_plastic100 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled100.reshape(-1, 1))
+    '''
+    # Scale the y-axis data using the y-scaler from pure water
+    x_comb_scaled0 = scaler_x.transform(x_comb0)
+    x_comb_scaled5 = scaler_x.transform(x_comb5)
+    x_comb_scaled10 = scaler_x.transform(x_comb10)
+    x_comb_scaled25 = scaler_x.transform(x_comb25)
+    x_comb_scaled50 = scaler_x.transform(x_comb50)
+    x_comb_scaled100 = scaler_x.transform(x_comb100)
+
+    
+    # Predict using the SVM model trained on pure water data
+    x_pred_scaled0 = svr_rbf.predict(x_comb_scaled0)
+    x_pred_scaled5 = svr_rbf.predict(x_comb_scaled5)
+    x_pred_scaled10 = svr_rbf.predict(x_comb_scaled10)
+    x_pred_scaled25 = svr_rbf.predict(x_comb_scaled25)
+    x_pred_scaled50 = svr_rbf.predict(x_comb_scaled50)
+    x_pred_scaled100 = svr_rbf.predict(x_comb_scaled100)
+    
+    # Inverse transform the predicted values to get them back to the original scale
+    x_pred0 = scaler_x.inverse_transform(x_pred_scaled0.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
+    x_pred5 = scaler_x.inverse_transform(x_pred_scaled5.reshape(-1, 1))
+    x_pred10 = scaler_x.inverse_transform(x_pred_scaled10.reshape(-1, 1))
+    x_pred25 = scaler_x.inverse_transform(x_pred_scaled25.reshape(-1, 1))
+    x_pred50 = scaler_x.inverse_transform(x_pred_scaled50.reshape(-1, 1))
+    x_pred100 = scaler_x.inverse_transform(x_pred_scaled100.reshape(-1, 1))
+    
+    
 
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
@@ -160,28 +188,28 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
         return math.ceil(n)
 
     # not sure what's going on here... are the limits meant to be determined by x_comb or x_c/x_h arrays??
-    lower_limit = min(x_c0[0,0], y_pred_plastic0[0,0], x_c5[0,0], y_pred_plastic5[0,0], x_c10[0,0], y_pred_plastic10[0,0], x_c25[0,0], y_pred_plastic25[0,0],
-                      x_c50[0,0], y_pred_plastic50[0,0], x_c100[0,0], y_pred_plastic100[0,0])
+    lower_limit = min(y_c0[0,0], x_pred0[0,0], y_c5[0,0], x_pred5[0,0], y_c10[0,0], x_pred10[0,0], y_c25[0,0], x_pred25[0,0],
+                      y_c50[0,0], x_pred50[0,0], y_c100[0,0], x_pred100[0,0])
     lower_lim = normal_roundC(lower_limit) - 1
 
     print(x_comb0[-1,0], x_comb0[-1,-1], x_comb0[0,0], x_comb0[0,-1])
     # upper_limit = max( max(x_hot_asc), max(y_hot_asc) )
-    upper_limit = max(max(x_comb0), max(y_pred_plastic0), max(x_comb5), max(y_pred_plastic5), max(x_comb10), max(y_pred_plastic10), 
-                      max(x_comb25), max(y_pred_plastic25), max(x_comb50), max(y_pred_plastic50), max(x_comb100), max(y_pred_plastic100))
+    upper_limit = max(max(y_comb0), max(x_pred0), max(y_comb5), max(x_pred5), max(y_comb10), max(x_pred10), 
+                      max(y_comb25), max(x_pred25), max(y_comb50), max(x_pred50), max(y_comb100), max(x_pred100))
     upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
     # Plot SVM Results, Add in Reference Line too
     plt.figure(figsize=(6, 6))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
     
     # Combine all x and y arrays into a list (for plotting in a green spectrum)
-    x_list = [x_comb0, x_comb5, x_comb10, x_comb25, x_comb50, x_comb100]
-    y_list = [y_pred_plastic0, y_pred_plastic5, y_pred_plastic10, y_pred_plastic25, y_pred_plastic50, y_pred_plastic100]
+    x_list = [x_pred0, x_pred5, x_pred10, x_pred25, x_pred50, x_pred100]
+    y_list = [y_comb0, y_comb5, y_comb10, y_comb25, y_comb50, y_comb100]
 
     # Specify the percentage labels
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
     
-    # Set the colormap to 'Blues' and get 6 shades of blue
-    cmap = cm.get_cmap('Greens', 6)
+    # Set the colormap to 'cool' and get 6 shades of blue, purple, pink
+    cmap = cm.get_cmap('jet', 6)
     colors = cmap(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker green
 
 
@@ -222,9 +250,9 @@ def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
     plt.show()
     
     # Create a dictionary for x and for y to return and extract the data from in the next function (deltaT) 
-    dict_x = {'x0': x_comb0, 'x5': x_comb5, 'x10': x_comb10, 'x25': x_comb25, 'x50': x_comb50, 'x100': x_comb100}
-    dict_ypred = {'y0': y_pred_plastic0, 'y5': y_pred_plastic5, 'y10': y_pred_plastic10, 'y25': y_pred_plastic25, 
-                  'y50': y_pred_plastic50, 'y100': y_pred_plastic100}
+    dict_x = {'x0': x_pred0, 'x5': x_pred5, 'x10': x_pred10, 'x25': x_pred25, 'x50': x_pred50, 'x100': x_pred100}
+    dict_ypred = {'y0': y_comb0, 'y5': y_comb5, 'y10': y_comb10, 'y25': y_comb25, 
+                  'y50': y_comb50, 'y100': y_comb100}
     
     return dict_x, dict_ypred
 

@@ -32,8 +32,9 @@ def read_RBR_excel(filepath): # reading from an excel RBR
     return time, temp
 
 
-
+r'''
 #file_path = r"D:\MSc Results\060728_20240926_1416_KateRBR.xlsx"
 file_path = r"D:\MSc Results\RBR_Test\RBRtest3\060728_20241009_1124KateRBR3.xlsx"
 df = read_RBR_excel(file_path)  # there is stuff in here, YAY!!
 # gives a warning about no default style, but this isn't an issue - can just ignore it
+'''
