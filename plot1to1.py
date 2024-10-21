@@ -14,7 +14,7 @@ import pandas as pd
 import sys
 
 # str_expt parameter should be a string of the type of experiment done, e.g. '50% Pellet-Sand'
-def plot1to1(df_merged_cold, df_merged_hot, str_expt):
+def plot1to1(df_in, str_expt):
     T_Opcold = df_merged_cold['temperature_Op']  # extracting the temperature arrays
     T_CScold = df_merged_cold['temperature_CS']
     T_Ophot = df_merged_hot['temperature_Op']
@@ -30,38 +30,8 @@ def plot1to1(df_merged_cold, df_merged_hot, str_expt):
     sterrOphot = df_merged_hot['sterr_Op']
     sterrCShot = df_merged_hot['sterr_CS']
     
-    # Using 5th Percentile Minimum Value (from ChatGPT) for Cold Array
-    # 1. Calculate the 5th percentile value
-    percentile_5_value = np.percentile(T_Opcold, 5)
-    # 2. Find the index of the closest value in y_cold to the 5th percentile value
-    index_5 = np.argmin(np.abs(T_Opcold - percentile_5_value))
-    # Print the result
-    print(f"5th percentile value: {percentile_5_value}")
-    print(f"Index of 5th percentile value in y_cold: {index_5}")
-    print(f"Corresponding x_cold value: {T_CScold.iloc[index_5]}")
-    print()
 
-    # Likewise, using 95th Percentile Max Value for Hot Array
-    percentile_95_value = np.percentile(T_CShot, 95)
-    index_95 = np.argmin(np.abs(T_CShot - percentile_95_value))
-    print(f"95th percentile value: {percentile_95_value}")
-    print(f"Index of 95th percentile value in x_hot: {index_95}")
-    print(f"Corresponding y_hot value: {T_Ophot.iloc[index_95]}")
-    
-    tempOphot = T_Ophot.iloc[index_95:]  # this needs to start and end at same indices as tempC1hot
-    tempCShot = T_CShot.iloc[index_95:] 
-    tempOpcold = T_Opcold.iloc[index_5:]
-    tempCScold = T_CScold.iloc[index_5:]
-    
-    sdOpcold = stdOpcold.iloc[index_5:]
-    sdCScold = stdCScold.iloc[index_5:]
-    sdOphot = stdOphot.iloc[index_95:]
-    sdCShot = stdCShot.iloc[index_95:]
-    
-    seOpcold = sterrOpcold.iloc[index_5:]
-    seCScold = sterrCScold.iloc[index_5:]
-    seOphot = sterrOphot.iloc[index_95:]
-    seCShot = sterrCShot.iloc[index_95:]
+
     
     # Need to create limits for the plots below so that the plots are square-shaped
     import math

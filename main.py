@@ -10,7 +10,7 @@ Main master script to run all the functions within the subroutines.
 import sys
 #sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
 sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
-
+import pandas as pd
 # can run this main() function within a for loop if possible, would need to automate the date and 'AM'
 #chosen_date = '13/08/2024'  # this test was hot 50% nurdle sand (can check the excel sheet)
 #chosen_period = 'AM'
@@ -58,22 +58,36 @@ def main():
     df_merged_hot = create_merged_df(avgOp_dfhot, df_water_avgCShot)  #df_sand_avgCShot) 
     #print(df_mergedcold) 
     
+    # Removing first 15 minutes of each data record
+    df_ready_cold = df_merged_cold.copy()
+    start_time = df_ready_cold.index.min()
+    cutoff_time = start_time + pd.Timedelta(minutes=15)
+    df_trimmed_cold = df_ready_cold[df_ready_cold.index >= cutoff_time]
+
+    # Removing first 15 minutes of each data record
+    df_ready_hot = df_merged_hot.copy()
+    start_timeh = df_ready_hot.index.min()
+    cutoff_timeh = start_timeh + pd.Timedelta(minutes=20)
+    df_trimmed_hot = df_ready_hot[df_ready_hot.index >= cutoff_timeh]
+    
+    df_full = pd.concat([df_trimmed_cold, df_trimmed_hot])
+    
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
     text_str = '0% Shavings-Water'  # ***
-    df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, text_str)
+    #df_cold, df_hot = plot1to1(df_full, text_str)
     #print(df_cold.columns)
    
     # next step is the fit_SVR() function, but this is only required once for pure water (have already run it and saved results.)
     
     # then the apply_calibration() function to apply this pure water fit to each mixture.
     from apply_calibration import apply_calibration
-    x_comb, y_pred_plastic = apply_calibration(df_cold, df_hot, text_str)
+    apply_calibration(df_full, text_str)
     
     # then calculate deltaT from calibration SVM less the reference 1:1 line (which is the same as the x array for y)
     from get_deltaT import get_deltaT
-    deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)
-    print(deltaT)  # including temperature difference plot
+    #deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)
+    #print(deltaT)  # including temperature difference plot
         
     return
 

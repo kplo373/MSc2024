@@ -13,6 +13,7 @@ import numpy as np
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
+import pandas as pd
 
 # can put this into a function later maybe... it doesn't actually need to be one if I'm saving them as pkl files anyway!
 
@@ -61,18 +62,38 @@ df_merged_cold = create_merged_df(avgOp_dfcold, df_water_avgCScold)  #df_sand_av
 df_merged_hot = create_merged_df(avgOp_dfhot, df_water_avgCShot)     #df_sand_avgCShot)
 #print(df_merged_cold)
 
+#%% Removing first 15 minutes of each data record
+df_ready_cold = df_merged_cold.copy()
+start_time = df_ready_cold.index.min()
+cutoff_time = start_time + pd.Timedelta(minutes=15)
+df_trimmed_cold = df_ready_cold[df_ready_cold.index >= cutoff_time]
+
+# Removing first 15 minutes of each data record
+df_ready_hot = df_merged_hot.copy()
+start_timeh = df_ready_hot.index.min()
+cutoff_timeh = start_timeh + pd.Timedelta(minutes=20)
+df_trimmed_hot = df_ready_hot[df_ready_hot.index >= cutoff_timeh]
 
 from plot1to1 import plot1to1  # need to add text for title, relevant to what type of experiment was done
 df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, 'Pure Water 0% Shavings')  # to give the clipped arrays... do we need these?
 # the name string given in the above function needs to have 'Shavings' or 'Pellets' in it so isn't saving itself as a png but that's okay, is still plotting
 # but I do need to get the df_cold and df_hot extracted from it so have added 0% Shavings in there now...
+#%%
+df_trimmed_cold.plot("temperature_CS", "temperature_Op")
 
 
 #%% Now, our fitting SVR script!!
-tempCScold = df_merged_cold['temperature_CS']   #['tempCS']
-tempCShot = df_merged_hot['temperature_CS']
-tempOpcold = df_merged_cold['temperature_Op']
-tempOphot = df_merged_hot['temperature_Op']
+
+df_full = pd.concat([df_trimmed_cold, df_trimmed_hot])
+
+df_full.plot("temperature_CS", "temperature_Op")
+
+#%%
+
+tempCScold = df_trimmed_cold['temperature_CS']   #['tempCS']
+tempCShot = df_trimmed_hot['temperature_CS']
+tempOpcold = df_trimmed_cold['temperature_Op']
+tempOphot = df_trimmed_hot['temperature_Op']
 
 #tempCScold = df_cold['tempCS']  # try these ones when I have time to run it overnight...************
 #tempCShot = df_hot['tempCS']
@@ -80,9 +101,10 @@ tempOphot = df_merged_hot['temperature_Op']
 #tempOphot = df_hot['tempOp']
 
 
+
 # Initially reshaping the hot and cold x arrays into 2D arrays for x, but keep y 1D
-x_cold = tempCScold.to_numpy().reshape(-1, 1)  # to make the x arrays 2D with a single column: (11518, 1)
-x_hot = tempCShot.to_numpy().reshape(-1, 1)
+x_cold = tempCScold.to_numpy()  #.reshape(-1, 1)  # to make the x arrays 2D with a single column: (11518, 1)
+x_hot = tempCShot.to_numpy()  #.reshape(-1, 1)
 y_cold = tempOpcold.to_numpy()  # y arrays are 1D: (11518,) and aren't pandas series (are np.ndarrays now).
 y_hot = tempOphot.to_numpy()
 
@@ -98,21 +120,24 @@ print(f'x_combined shape: {x_comb.shape}, y_combined shape: {y_comb.shape}')
 from sklearn.preprocessing import StandardScaler
 scaler_x = StandardScaler()
 
-# Reshape and scale the x and y arrays to match the format expected by SVR (2D array)
-x = x_comb.ravel()   # flattening the x array to be 1D (needed for fitting SVR)
-y = y_comb  #.reshape(-1, 1)  # y needs to be 2D for features
+x = df_full['temperature_CS'].to_numpy()
+y = df_full['temperature_Op'].to_numpy()
 
-x_scaled = scaler_x.fit_transform(x.reshape(-1, 1))
+# Reshape and scale the x and y arrays to match the format expected by SVR (2D array)
+#x = x_comb.ravel()   # flattening the x array to be 1D (needed for fitting SVR)
+#y = y_comb  #.reshape(-1, 1)  # y needs to be 2D for features
+
+#x_scaled = scaler_x.fit_transform(x.reshape(-1, 1))
 
 # Train SVR model on the scaled x data, without scaling y
 svr_rbf = SVR(kernel='rbf', verbose=True)  # creating RBF kernel SVR model and fitting it below
-svr_rbf.fit(y.reshape(-1, 1), x_scaled)
+svr_rbf.fit(y.reshape(-1, 1), x)
 
 svr_linear = SVR(kernel='linear', verbose=True)  # and a linear kernel SVR model
 svr_linear.fit(y.reshape(-1, 1), x)
 
 # Predicting x values from y values
-x_pred_rbf = scaler_x.inverse_transform(svr_rbf.predict(y.reshape(-1, 1)).reshape(-1, 1))
+x_pred_rbf = svr_rbf.predict(y.reshape(-1, 1)).reshape(-1, 1)
 x_pred_linear = svr_linear.predict(y.reshape(-1, 1))
 
 
