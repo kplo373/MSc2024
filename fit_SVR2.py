@@ -12,7 +12,7 @@ how to do it properly! Trying with ChatGPT...
 import numpy as np
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVR
+#from sklearn.svm import SVR   # have put this below already
 import pandas as pd
 
 # can put this into a function later maybe... it doesn't actually need to be one if I'm saving them as pkl files anyway!
@@ -20,8 +20,8 @@ import pandas as pd
 
 # Get x and y combined arrays
 import sys
-#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
+sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
+#sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
 # To get the filepath
 from get_filepaths import get_filepaths
 pathCScold, pathOpcold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
@@ -74,48 +74,20 @@ start_timeh = df_ready_hot.index.min()
 cutoff_timeh = start_timeh + pd.Timedelta(minutes=20)
 df_trimmed_hot = df_ready_hot[df_ready_hot.index >= cutoff_timeh]
 
-from plot1to1 import plot1to1  # need to add text for title, relevant to what type of experiment was done
-df_cold, df_hot = plot1to1(df_merged_cold, df_merged_hot, 'Pure Water 0% Shavings')  # to give the clipped arrays... do we need these?
-# the name string given in the above function needs to have 'Shavings' or 'Pellets' in it so isn't saving itself as a png but that's okay, is still plotting
-# but I do need to get the df_cold and df_hot extracted from it so have added 0% Shavings in there now...
-#%%
+# Plotting quickly to visualise
 df_trimmed_cold.plot("temperature_CS", "temperature_Op")
 
 
 #%% Now, our fitting SVR script!!
-
+# Merging the cold and hot dataframes into one full df
 df_full = pd.concat([df_trimmed_cold, df_trimmed_hot])
+df_full.plot("temperature_CS", "temperature_Op")  # again, plotting to visualise
 
-df_full.plot("temperature_CS", "temperature_Op")
-
-#%%
-
-tempCScold = df_trimmed_cold['temperature_CS']   #['tempCS']
-tempCShot = df_trimmed_hot['temperature_CS']
-tempOpcold = df_trimmed_cold['temperature_Op']
-tempOphot = df_trimmed_hot['temperature_Op']
-
-#tempCScold = df_cold['tempCS']  # try these ones when I have time to run it overnight...************
-#tempCShot = df_hot['tempCS']
-#tempOpcold = df_cold['tempOp']
-#tempOphot = df_hot['tempOp']
+from plot1to1 import plot1to1  # need to add text for title, relevant to what type of experiment was done
+plot1to1(df_full, 'Pure Water 0% Shavings')
 
 
-
-# Initially reshaping the hot and cold x arrays into 2D arrays for x, but keep y 1D
-x_cold = tempCScold.to_numpy()  #.reshape(-1, 1)  # to make the x arrays 2D with a single column: (11518, 1)
-x_hot = tempCShot.to_numpy()  #.reshape(-1, 1)
-y_cold = tempOpcold.to_numpy()  # y arrays are 1D: (11518,) and aren't pandas series (are np.ndarrays now).
-y_hot = tempOphot.to_numpy()
-
-print(f'x_cold shape: {x_cold.shape}, y_cold shape: {tempOpcold.shape}')
-print(f'x_hot shape: {x_hot.shape}, y_hot shape: {tempOphot.shape}')
-
-# Combine both the hot and cold x arrays, and the hot and cold y arrays
-x_comb = np.vstack((x_cold, x_hot))  # shape is (16702, 1) so both the x and y arrays are put into the same column
-y_comb = np.concatenate((y_cold, y_hot))  # shape is (16702,) so also same column as there only is one
-print(f'x_combined shape: {x_comb.shape}, y_combined shape: {y_comb.shape}')
-
+r'''
 #%% Use this x_comb and y_comb in the predicting steps - takes a while to run this cell :)
 from sklearn.preprocessing import StandardScaler
 scaler_x = StandardScaler()
@@ -139,9 +111,42 @@ svr_linear.fit(y.reshape(-1, 1), x)
 # Predicting x values from y values
 x_pred_rbf = svr_rbf.predict(y.reshape(-1, 1)).reshape(-1, 1)
 x_pred_linear = svr_linear.predict(y.reshape(-1, 1))
+'''
+#%% Redo Fitting SVR From Tom's Code
+# 1. Train SVR on the control sample, split into x and y
+x_control = df_full['temperature_CS']
+y_control = df_full['temperature_Op']
+
+# Train Support Vector Regressor (SVR) to model relationship between x and y (are independent of each other)
+from sklearn.svm import SVR
+svr = SVR()
+
+# Fit SVR on control data
+svr.fit(x_control.values.reshape(-1, 1), y_control)  # so am not using RBF or linear SVR...
+
+# Save the model using pickle
+import pickle
+with open('svr_model.pkl', 'wb') as f:
+    pickle.dump(svr, f)
+    
+    
+# 2. Apply the correction to control sample, load SVR model first
+with open('svr_model.pkl', 'rb') as f:
+    svr_model = pickle.load(f)
+
+# Predict corrected y values for control sample using x values
+y_control_corrected = svr_model.predict(x_control.values.reshape(-1, 1))
+
+# Save the corrected control sample
+df_full['y_corrected'] = y_control_corrected
+df_full.to_csv('corrected_control_sample.csv')
+# then can apply the correction to non-control samples in my apply calibration script
 
 
 
+# haven't calculated RMSE for this yet...
+
+r'''
 #%% Calculating RMSE for both models to see which is more accurate
 rmse_rbf = np.sqrt(mean_squared_error(x, x_pred_rbf))
 rmse_linear = np.sqrt(mean_squared_error(x, x_pred_linear))
@@ -190,7 +195,7 @@ joblib.dump(scaler_x, r"D:\MSc Results\scaler_y_pure_water.pkl")
 np.save(r"D:\MSc Results\x_pred_rbf.npy", x_pred_rbf)
 
 # do I save the linear ones too? RBF gives best results so just saved them so far...
-
+'''
 
 # now can use these to apply the calibration in the apply_calibration.py script (just do the single one for pure water maybe!)
 
