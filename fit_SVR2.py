@@ -76,11 +76,16 @@ df_trimmed_hot = df_ready_hot[df_ready_hot.index >= cutoff_timeh]
 
 # Plotting quickly to visualise
 df_trimmed_cold.plot("temperature_CS", "temperature_Op")
+df_trimmed_hot.plot("temperature_CS", "temperature_Op")  # can't tell order but it is plotting hot to cold
+
+# Want to reverse the arrays within df_trimmed_hot to allow room temperatures to directly follow room temperatures at end of cold trimmed df
+df_reversed_hot = df_trimmed_hot.iloc[::-1].reset_index(drop=True)
+# this reversed df looks good in the variable explorer! Both temperature arrays have been reversed, use this below!
 
 
 #%% Now, our fitting SVR script!!
 # Merging the cold and hot dataframes into one full df
-df_full = pd.concat([df_trimmed_cold, df_trimmed_hot])
+df_full = pd.concat([df_trimmed_cold, df_reversed_hot])
 df_full.plot("temperature_CS", "temperature_Op")  # again, plotting to visualise
 
 from plot1to1 import plot1to1  # need to add text for title, relevant to what type of experiment was done
@@ -117,6 +122,7 @@ x_pred_linear = svr_linear.predict(y.reshape(-1, 1))
 x_control = df_full['temperature_CS']
 y_control = df_full['temperature_Op']
 
+#%%
 # Train Support Vector Regressor (SVR) to model relationship between x and y (are independent of each other)
 from sklearn.svm import SVR
 svr = SVR()
@@ -126,12 +132,12 @@ svr.fit(x_control.values.reshape(-1, 1), y_control)  # so am not using RBF or li
 
 # Save the model using pickle
 import pickle
-with open('svr_model.pkl', 'wb') as f:
+with open(r'D:\MSc Results\svr_model.pkl', 'wb') as f:
     pickle.dump(svr, f)
     
     
 # 2. Apply the correction to control sample, load SVR model first
-with open('svr_model.pkl', 'rb') as f:
+with open(r'D:\MSc Results\svr_model.pkl', 'rb') as f:
     svr_model = pickle.load(f)
 
 # Predict corrected y values for control sample using x values
@@ -139,7 +145,7 @@ y_control_corrected = svr_model.predict(x_control.values.reshape(-1, 1))
 
 # Save the corrected control sample
 df_full['y_corrected'] = y_control_corrected
-df_full.to_csv('corrected_control_sample.csv')
+df_full.to_csv(r'D:\MSc Results\corrected_control_sample.csv')
 # then can apply the correction to non-control samples in my apply calibration script
 
 

@@ -23,7 +23,7 @@ def apply_calibration(df_in, str_expt):
     #svr_rbf = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")  # for pure water
         #r"D:\MSc Results\svr_rbf_pure_water.pkl")
     # 2. Apply the correction to control sample, load SVR model first
-    with open('svr_model.pkl', 'rb') as f:
+    with open(r'D:\MSc Results\svr_model.pkl', 'rb') as f:
         svr_model = pickle.load(f)  # for pure water
     
     # 3. Apply correction to non-control samples, load non-control sample data (x and y are independent)
