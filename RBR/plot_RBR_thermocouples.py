@@ -42,7 +42,8 @@ tempT5 = temps_arrT[4]
 tempT6 = temps_arrT[5]
 
 #%%
-# Using 5th Percentile Minimum Value (from ChatGPT) for both arrays, using the RBR data
+r'''
+# Using 5th Percentile Minimum Value (from ChatGPT) for both arrays, using the RBR data - skip this for Part 2 onwards, as devices already warmed up!!
 # 1. Calculate the 5th percentile (minimum 5%) value
 percentile_5_value = np.percentile(tempsR, 5)
 # 2. Find the index of the closest value in tempsR to the 5th percentile value
@@ -52,6 +53,7 @@ print(f"5th percentile value: {percentile_5_value}")
 print(f"Index of 5th percentile value in RBR temperatures: {index_5}")
 tempsR = tempsR[index_5:]
 timestampsR = timestampsR[index_5:]   # this ndarray is of datetime64s
+'''
 
 df_R = pd.DataFrame({'temp_RBR': tempsR}, index = timestampsR)
 df_CS = pd.DataFrame({'temp_T1': tempT1, 'temp_T2': tempT2, 'temp_T3': tempT3, 'temp_T4': tempT4, 'temp_T5': tempT5, 'temp_T6': tempT6}, index = dt_objsT)
@@ -60,6 +62,7 @@ df_CS = pd.DataFrame({'temp_T1': tempT1, 'temp_T2': tempT2, 'temp_T3': tempT3, '
 # Step 1: Calculate the time difference
 #correct_time = pd.Timestamp('2024-10-16T11:49:00')  # what I wrote in my book for Part 1, not sure exactly what second it was though...
 correct_time = pd.Timestamp('2024-10-16T13:10:00')  # started Part 2 at 1:10pm
+#correct_time = pd.Timestamp('2024-10-16T15:00:00')  # started Part 2 retry at 3:00pm
 incorrect_time = pd.Timestamp(df_R.index[0])  # the first entry of df_R.index
 time_diff = correct_time - incorrect_time  # use this to correct the time
 
