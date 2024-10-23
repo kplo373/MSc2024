@@ -8,10 +8,12 @@ for checking the thermocouples' accuracy.
 @author: kplo373
 """
 import sys
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
+#sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # for uni MSc room computer
+sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
 from read_CampbellSci import read_CampbellSci
 
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024\RBR")
+#sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024\RBR")
+sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024\RBR")
 #from read_RBR import read_RBR
 from read_RBR_excel import read_RBR_excel
 import numpy as np
@@ -39,7 +41,7 @@ tempT4 = temps_arrT[3]
 tempT5 = temps_arrT[4]
 tempT6 = temps_arrT[5]
 
-
+#%%
 # Using 5th Percentile Minimum Value (from ChatGPT) for both arrays, using the RBR data
 # 1. Calculate the 5th percentile (minimum 5%) value
 percentile_5_value = np.percentile(tempsR, 5)
@@ -54,8 +56,23 @@ timestampsR = timestampsR[index_5:]   # this ndarray is of datetime64s
 df_R = pd.DataFrame({'temp_RBR': tempsR}, index = timestampsR)
 df_CS = pd.DataFrame({'temp_T1': tempT1, 'temp_T2': tempT2, 'temp_T3': tempT3, 'temp_T4': tempT4, 'temp_T5': tempT5, 'temp_T6': tempT6}, index = dt_objsT)
 
+#%%
+# Step 1: Calculate the time difference
+#correct_time = pd.Timestamp('2024-10-16T11:49:00')  # what I wrote in my book for Part 1, not sure exactly what second it was though...
+correct_time = pd.Timestamp('2024-10-16T13:10:00')  # started Part 2 at 1:10pm
+incorrect_time = pd.Timestamp(df_R.index[0])  # the first entry of df_R.index
+time_diff = correct_time - incorrect_time  # use this to correct the time
+
+# Step 2: Shift the timestamps of the incorrect sensor
+df_R['corrected_time'] = df_R.index + time_diff
+
+
+#%%
+# Step 3: Merge the dataframes on the corrected timestamp
+df_merged = pd.merge(df_CS, df_R, left_on=df_CS.index, right_on='corrected_time', suffixes=('_CS', '_R'))
+
 # Merge the resampled Optris data with the C1 data
-df_merged = df_CS.join(df_R, how='inner', lsuffix='_CS', rsuffix='_R')  # this only includes values from both arrays (cutting out any values from only one sensor)
+#df_merged = df_CS.join(df_R, how='inner', lsuffix='_CS', rsuffix='_R')  # this only includes values from both arrays (cutting out any values from only one sensor)
 
 t1 = df_merged['temp_T1']
 t2 = df_merged['temp_T2']
@@ -64,10 +81,12 @@ t4 = df_merged['temp_T4']
 t5 = df_merged['temp_T5']
 t6 = df_merged['temp_T6']
 tR = df_merged['temp_RBR']
-dt = df_merged.index.values  # for the time in datetime objects, but this is empty!!
+dt = np.array(df_merged['corrected_time'])  # for the time in datetime objects, but this is empty!!
 # Now all of these temperatures and datetimes are arrays of the same length!
 
 #%%
+dt_py = pd.to_datetime(dt[0]).to_pydatetime()  # to allow clear x-axis label
+
 # Plotting all 6 thermocouples and the RBR as 7 separate lines
 plt.plot(dt, tR, label='RBR')
 plt.plot(dt, t1, label='Thermocouple 1')
@@ -79,7 +98,7 @@ plt.plot(dt, t6, label='Thermocouple 6')
 plt.xlim(dt[0], dt[-1])
 plt.title('Pure Water RBR vs. Thermocouples')
 plt.ylabel('Temperature (degrees Celsius)')
-plt.xlabel(dt[0].strftime('%d %B %Y'))  # having the actual date on the line below the x-axis time labels for context
+plt.xlabel(dt_py.strftime('%d %B %Y'))  # having the actual date on the line below the x-axis time labels for context
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))  #'%d-%b\n%Y' = %b for month, %Y for year, \n for new line
 plt.legend()
 plt.grid()
@@ -95,7 +114,7 @@ plt.plot(dt, tR, label='RBR')
 plt.plot(dt, avgt, label='Average Thermocouples')
 plt.title('Pure Water RBR vs. Thermocouple Average')
 plt.ylabel('Temperature (degrees Celsius)')
-plt.xlabel(dt[0].strftime('%d %B %Y'))  # having the actual date on the line below the x-axis time labels for context
+plt.xlabel(dt_py.strftime('%d %B %Y'))  # having the actual date on the line below the x-axis time labels for context
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))  #'%d-%b\n%Y' = %b for month, %Y for year, \n for new line
 plt.xlim(dt[0], dt[-1])
 plt.grid()
