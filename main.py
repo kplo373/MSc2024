@@ -75,8 +75,7 @@ def main():
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
     text_str = '0% Shavings-Water'  # ***
-    #df_cold, df_hot = plot1to1(df_full, text_str)
-    #print(df_cold.columns)
+    plot1to1(df_full, text_str)
    
     # next step is the fit_SVR() function, but this is only required once for pure water (have already run it and saved results.)
     
