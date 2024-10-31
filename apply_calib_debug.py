@@ -39,8 +39,8 @@ def apply_calibration(df_in, str_expt):
     y_adj_arr = calTable_df['y_cal_adjustments'].to_numpy(dtype='float64')  # extracting the adjustments array so can apply to this mixture
     print(np.shape(y_adj_arr))  # (16674,) whereas y_nctrl is shape (16674, 1)
     print(type(y_adj_arr), type(y_nctrl))
-    y_nctrl_corrected = y_nctrl - y_adj_arr  # will these have different lengths though for different days???
-    
+    y_nctrl_corrected = y_nctrl[:,0] - y_adj_arr  # will these have different lengths though for different days???
+    print(np.shape(y_nctrl_corrected))
     
     
    
@@ -69,7 +69,7 @@ def apply_calibration(df_in, str_expt):
             return math.floor(n)
         return math.ceil(n)
 
-    lower_limit = min(x_nctrl[0,0], y_nctrl_corrected[0,0])  # not sure about y_nctrl_corrected - shape [16674,16674]
+    lower_limit = min(x_nctrl[0], y_nctrl_corrected[0])  # not sure about y_nctrl_corrected - shape [16674,16674]
     lower_lim = normal_roundC(lower_limit) - 1
 
     upper_limit = max(x_nctrl.max(), y_nctrl_corrected.max())
@@ -89,7 +89,7 @@ def apply_calibration(df_in, str_expt):
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
     plt.title('Calibrated Sensor Comparison For ' + str_expt)
-    plt.legend(loc="lower right")  # setting a general location for legend, or else can take to long to find where is best for it to go
+    plt.legend(loc="upper left")  # setting a general location for legend, or else can take to long to find where is best for it to go
     plt.grid()
     if 'hav' in str_expt:
         if 'and' in str_expt:

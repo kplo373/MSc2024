@@ -23,22 +23,22 @@ def apply_calibration(df_in, str_expt):
     #svr_rbf = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")  # for pure water
         #r"D:\MSc Results\svr_rbf_pure_water.pkl")
     # 2. Apply the correction to control sample, load SVR model first
-    with open(r'D:\MSc Results\svr_model.pkl', 'rb') as f:
-        svr_model = pickle.load(f)  # for pure water
+    #with open(r'D:\MSc Results\svr_model.pkl', 'rb') as f:
+        #svr_model = pickle.load(f)  # for pure water
     
     # 3. Apply correction to non-control samples, load non-control sample data (x and y are independent)
     x_nctrl = np.array(df_in['temperature_CS']).reshape(-1, 1)
     y_nctrl = np.array(df_in['temperature_Op']).reshape(-1, 1)  # not sure if using this!!
     
     # Apply the correction using the model from the control sample
-    y_predict = svr_model.predict(x_nctrl.reshape(-1, 1))  # correcting based on x values (thermocouples)
+    #y_predict = svr_model.predict(x_nctrl.reshape(-1, 1))  # correcting based on x values (thermocouples)
     # not using the y_predict above, shall I remove it and the fit_SVR2.py associated??***
     
     y_cal_vals =  y_nctrl - x_nctrl
     y_nctrl_corrected = y_nctrl - y_cal_vals
     df_in['y_corrected'] = y_nctrl_corrected  # store corrected y values as another column in the non-control sample
     
-    # Create correction look up table - need to do this within fit_SVR2.py, only once... then apply
+    # Create correction look up table
     cal_table_df = pd.DataFrame({'y_val': y_nctrl.ravel(), 'y_cal_adj': y_cal_vals.ravel()})
     cal_table_df.index = np.around(cal_table_df['y_val'], decimals=4)
     cal_table_df = cal_table_df.drop('y_val', axis=1)
@@ -52,7 +52,7 @@ def apply_calibration(df_in, str_expt):
     calTable_unique_df = calTable_unique_df.dropna(subset=['y_val'])  # removing any rows where 'y_val' is NaN after conversion
     calTable_unique_df = calTable_unique_df.set_index('y_val')  # set 'y_val' as the index
     # Save this calibration table!
-    
+    print(calTable_unique_df)
 
     # Get the nearest y value in the cal_table_df.index to the y variables in the different mixtures' data
     sel_cal_vals = np.zeros(len(y_nctrl))  # Preallocate for the nearest_y_vals collected in the for loop
@@ -61,11 +61,21 @@ def apply_calibration(df_in, str_expt):
         nearest_index = calTable_unique_df.index.get_indexer([y], method='nearest')[0]  # get nearest index
         
         # Check if the nearest_index is valid
-        if nearest_index >= 0:  # Valid index
-            nearest_y_val = calTable_unique_df.index[nearest_index]
+        if nearest_index >= 0 and nearest_index < len(calTable_unique_df):
+            nearest_y_val = calTable_unique_df.iloc[nearest_index, 0]  # collecting values from the calibrated column of the lookup table, not the index
             sel_cal_vals[i] = nearest_y_val  # Store the nearest y value
         else:
             print(f"Warning: Nearest index for y={y} is not valid.")
+    
+    # what am I doing with this sel_cal_vals array after all?? Is an array of selected calibration values.
+    #print(sel_cal_vals)  # do I need to plot them? Or are these the adjustments to apply?
+    # put them into the df_in??
+    # my sel_cal_vals are currently the same as y_nctrl. Need to be same as y_nctrl_corrected! Wrong column
+    # tried first column, now they are just the actual differences, ranging 0.66 to 6.4...
+    # the index is y_val = y_nctrl, first column (0) is y_cal_adj, ranging from 5.94 up and down to 1.39
+    # can't use the index, so have to apply the first column to the y_nctrl somehow, like done above, minus??
+    cal_y = y_nctrl[:, 0] - sel_cal_vals  # use these for the actual mixture data
+    print(cal_y)
     
 
          
@@ -73,7 +83,7 @@ def apply_calibration(df_in, str_expt):
     # Save the corrected non-control sample as csv file
     df_in.to_csv(r'D:\MSc Results\corrected_non_control_sample.csv')
 
-    print(y_nctrl)
+    #print(y_nctrl)
     print(y_nctrl_corrected)
    
 
@@ -110,7 +120,8 @@ def apply_calibration(df_in, str_expt):
     # Plot SVM Results, Add in Reference Line too
     plt.figure(figsize=(7, 7))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
     #plt.plot(x_pred, y_comb, 'o', color='lightgreen', label='Calibrated Data (Using Pure Water SVM)')
-    plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Calibrated Curve')
+    #plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Calibrated Curve')
+    plt.plot(x_nctrl, cal_y, color='blue', lw=2, label="Selected calibration values")
     plt.plot(x_nctrl, y_nctrl, 'r', label='Raw Data')
     # Plot the 1:1 line across the entire plot from corner to corner
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')
@@ -144,6 +155,6 @@ def apply_calibration(df_in, str_expt):
     plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
-    return y_nctrl_corrected, y_nctrl, x_nctrl, y_cal_vals
+    return y_nctrl_corrected, y_nctrl, x_nctrl
 
 # run this script through the main() function script
