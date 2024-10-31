@@ -26,7 +26,7 @@ from datetime import datetime, timedelta
 def read_Optris(filepath):
     # To extract the data from the headers of the Optris data, read the first 7 lines
     headers = []
-    with open(filepath, 'r') as file:
+    with open(filepath, 'r', encoding='cp1252') as file:  # added this encoding parameter as was getting an error
         headers = [next(file).strip() for _ in range(7)]
     #print(headers)  # There are 4x different measurement areas
     

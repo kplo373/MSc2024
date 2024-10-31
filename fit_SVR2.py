@@ -119,16 +119,16 @@ x_pred_linear = svr_linear.predict(y.reshape(-1, 1))
 '''
 #%% Redo Fitting SVR From Tom's Code
 # 1. Train SVR on the control sample, split into x and y
-x_control = df_full['temperature_CS']
-y_control = df_full['temperature_Op']
+x_control = df_full['temperature_CS'].to_numpy(dtype='float64')
+y_control = df_full['temperature_Op'].to_numpy(dtype='float64')
 
 #%%
 # Train Support Vector Regressor (SVR) to model relationship between x and y (are independent of each other)
 from sklearn.svm import SVR
 svr = SVR()
 
-# Fit SVR on control data
-svr.fit(x_control.values.reshape(-1, 1), y_control)  # so am not using RBF or linear SVR...
+# Fit SVR on control data - CAN POTENTIALLY GET RID OF THIS ACTUALLY...*** only use look up table??
+svr.fit(x_control.reshape(-1, 1), y_control)  # so am not using RBF or linear SVR...
 
 # Save the model using pickle
 import pickle
@@ -141,12 +141,59 @@ with open(r'D:\MSc Results\svr_model.pkl', 'rb') as f:
     svr_model = pickle.load(f)
 
 # Predict corrected y values for control sample using x values
-y_control_corrected = svr_model.predict(x_control.values.reshape(-1, 1))
+y_ctrl_corrected = svr_model.predict(x_control.reshape(-1, 1))
 
 # Save the corrected control sample
-df_full['y_corrected'] = y_control_corrected
-df_full.to_csv(r'D:\MSc Results\corrected_control_sample.csv')
+df_full['y_corrected_SVR'] = y_ctrl_corrected   # not sure if I need this column?? Have it anyway
+#df_full.to_csv(r'D:\MSc Results\corrected_ctrl_sample.csv')  # I have this below too
 # then can apply the correction to non-control samples in my apply calibration script
+
+y_cal_vals =  y_control - x_control  # getting temperature difference between two sensors
+y_control_corrected = y_control - y_cal_vals
+df_full['y_corrected'] = y_control_corrected  # store corrected y values as another column in the full dataframe, array not series
+df_full['y_cal_adjustments'] = y_cal_vals
+
+# Create correction look up table - need to apply this table adjustment column to raw mixture data in apply_calibration afterwards
+cal_table_df = pd.DataFrame({'y_val': y_control, 'y_cal_adj': y_cal_vals})
+cal_table_df.index = np.around(cal_table_df['y_val'], decimals=4)
+cal_table_df = cal_table_df.drop('y_val', axis=1)
+cal_table_df = cal_table_df.sort_index()
+
+
+# Reset the index and create a new column
+cal_table_df_reset = cal_table_df.reset_index()
+calTable_unique_df = cal_table_df_reset.drop_duplicates(subset='y_val')  # removing duplicates in the y_val column
+calTable_unique_df.loc[:, 'y_val'] = pd.to_numeric(calTable_unique_df['y_val'], errors='coerce')  # ensuring 'y_val' is numeric and checking for invalid values
+calTable_unique_df = calTable_unique_df.dropna(subset=['y_val'])  # removing any rows where 'y_val' is NaN after conversion
+calTable_unique_df = calTable_unique_df.set_index('y_val')  # set 'y_val' as the index
+# Save this calibration table!
+
+
+# Get the nearest y value in the cal_table_df.index to the y variables in the different mixtures' data
+sel_cal_vals = np.zeros(len(y_control))  # Preallocate for the nearest_y_vals collected in the for loop
+for i in range(len(y_control)):
+    y = float(y_control[i])  # add [0] after [i] if extracting the first element from the array, if y_ntrl is 2D
+    nearest_index = calTable_unique_df.index.get_indexer([y], method='nearest')[0]  # get nearest index
+    
+    # Check if the nearest_index is valid
+    if nearest_index >= 0:  # Valid index
+        nearest_y_val = calTable_unique_df.index[nearest_index]
+        sel_cal_vals[i] = nearest_y_val  # Store the nearest y value
+    else:
+        print(f"Warning: Nearest index for y={y} is not valid.")
+
+
+     
+
+# Save the corrected control sample as csv file
+df_full.to_csv(r'D:\MSc Results\corrected_control_sample.csv')
+# then extract this csv file look up table data in apply_calibration.py! (working in apply_calib_debug.py first)
+
+#print(y_control)
+#print(y_control_corrected)
+
+
+
 
 
 
@@ -158,24 +205,25 @@ rmse_rbf = np.sqrt(mean_squared_error(x, x_pred_rbf))
 rmse_linear = np.sqrt(mean_squared_error(x, x_pred_linear))
 print(f"RBF SVR RMSE: {rmse_rbf}")
 print(f"Linear SVR RMSE: {rmse_linear}")
+'''
 
 # Visualise the data to see if it will line up on the line? Or would that be in the apply calibration script...
 import matplotlib.pyplot as plt
-# Scatter plot of actual x vs. predicted x (RBF SVR)
+# Scatter plot of actual y vs. predicted y, using look up table
 plt.subplot(1, 2, 1)
-plt.scatter(x, y, color='blue', label='Actual x', alpha=0.5)
-plt.scatter(x_pred_rbf, y, color='red', label='Predicted x (RBF)', alpha=0.5)
-plt.title('RBF SVR: Actual vs. Predicted x')
+plt.scatter(x_control, y_control, color='blue', label='Actual y', alpha=0.5)
+plt.scatter(x_control, y_control_corrected, color='red', label='Calibrated y', alpha=0.5)
+plt.title('Actual vs. Calibrated y')
 plt.xlabel('Thermocouple Temperature (degrees Celsius)')
 plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
 plt.legend()
 plt.grid()
 
-# Scatter plot of linear SVR actual x vs. predicted x
+# Scatter plot of (RBF?) SVR actual y vs. predicted y
 plt.subplot(1, 2, 2)
-plt.scatter(x, y, color='blue', label='Actual x', alpha=0.5)
-plt.scatter(x_pred_linear, y, color='green', label='Predicted x (Linear)', alpha=0.5)
-plt.title('Linear SVR: Actual vs Predicted x')
+plt.scatter(x_control, y_control, color='blue', label='Actual y', alpha=0.5)
+plt.scatter(x_control, y_ctrl_corrected, color='green', label='Predicted y (SVR)', alpha=0.5)
+plt.title('SVR: Actual vs Predicted y')
 plt.xlabel('Thermocouple Temperature (degrees Celsius)')
 plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
 plt.legend()
@@ -185,6 +233,8 @@ plt.tight_layout()
 plt.show()
 
 
+# maybe delete the section below??
+r'''
 #%% Also need to save this fit/prediction to a pkl file so that I can apply it to the rest of the data
 
 # from prev script... try chatgpt too! Chatgpt gives an option to use joblib (better for larger datasets) or pkl.

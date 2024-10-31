@@ -8,8 +8,8 @@ Main master script to run all the functions within the subroutines.
 """
 # Just in case it can't find the right data folder, use these two lines below
 import sys
-#sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
-sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
+sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
+#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
 import pandas as pd
 # can run this main() function within a for loop if possible, would need to automate the date and 'AM'
 #chosen_date = '13/08/2024'  # this test was hot 50% nurdle sand (can check the excel sheet)
@@ -80,15 +80,16 @@ def main():
     # next step is the fit_SVR() function, but this is only required once for pure water (have already run it and saved results.)
     
     # then the apply_calibration() function to apply this pure water fit to each mixture.
-    from apply_calibration import apply_calibration
-    apply_calibration(df_full, text_str)
+    #from apply_calibration import apply_calibration
+    from apply_calib_debug import apply_calibration
+    #y_nctrl_corrected, y_nctrl, x_nctrl = apply_calibration(df_full, text_str)
     
     # then calculate deltaT from calibration SVM less the reference 1:1 line (which is the same as the x array for y)
     from get_deltaT import get_deltaT
     #deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)
     #print(deltaT)  # including temperature difference plot
         
-    return
+    return #y_nctrl_corrected, y_nctrl, x_nctrl
 
 
 

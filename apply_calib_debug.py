@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Sep 19 10:33:25 2024
+Created on Thu Oct 31 10:41:05 2024
 
-Calibration script for applying the same calibration from the pure water
-hot and cold experiments, to the rest of the experiments being plotted.
-Pkl files are used to calibrate these plastic experiments.
+Debugging trial for apply_calibration.py.
 
 @author: kplo373
 """
-
 # Fitting the Pure Water Calibration SVM to this raw data (using ChatGPT)
 #import joblib
 import pickle
@@ -23,58 +20,29 @@ def apply_calibration(df_in, str_expt):
     #svr_rbf = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")  # for pure water
         #r"D:\MSc Results\svr_rbf_pure_water.pkl")
     # 2. Apply the correction to control sample, load SVR model first
-    with open(r'D:\MSc Results\svr_model.pkl', 'rb') as f:
-        svr_model = pickle.load(f)  # for pure water
+    #with open(r'D:\MSc Results\svr_model.pkl', 'rb') as f:
+        #svr_model = pickle.load(f)  # for pure water
     
     # 3. Apply correction to non-control samples, load non-control sample data (x and y are independent)
-    x_nctrl = np.array(df_in['temperature_CS']).reshape(-1, 1)
-    y_nctrl = np.array(df_in['temperature_Op']).reshape(-1, 1)  # not sure if using this!!
+    x_nctrl = np.array(df_in['temperature_CS']).reshape(-1, 1)  # different mixture data here
+    y_nctrl = np.array(df_in['temperature_Op']).reshape(-1, 1)
     
     # Apply the correction using the model from the control sample
-    y_predict = svr_model.predict(x_nctrl.reshape(-1, 1))  # correcting based on x values (thermocouples)
+    #y_predict = svr_model.predict(x_nctrl.reshape(-1, 1))  # correcting based on x values (thermocouples)
     # not using the y_predict above, shall I remove it and the fit_SVR2.py associated??***
     
-    y_cal_vals =  y_nctrl - x_nctrl
-    y_nctrl_corrected = y_nctrl - y_cal_vals
-    df_in['y_corrected'] = y_nctrl_corrected  # store corrected y values as another column in the non-control sample
-    
-    # Create correction look up table - need to do this within fit_SVR2.py, only once... then apply
-    cal_table_df = pd.DataFrame({'y_val': y_nctrl.ravel(), 'y_cal_adj': y_cal_vals.ravel()})
-    cal_table_df.index = np.around(cal_table_df['y_val'], decimals=4)
-    cal_table_df = cal_table_df.drop('y_val', axis=1)
-    cal_table_df = cal_table_df.sort_index()
     
     
-    # Reset the index and create a new column
-    cal_table_df_reset = cal_table_df.reset_index()
-    calTable_unique_df = cal_table_df_reset.drop_duplicates(subset='y_val')  # removing duplicates in the y_val column
-    calTable_unique_df.loc[:, 'y_val'] = pd.to_numeric(calTable_unique_df['y_val'], errors='coerce')  # ensuring 'y_val' is numeric and checking for invalid values
-    calTable_unique_df = calTable_unique_df.dropna(subset=['y_val'])  # removing any rows where 'y_val' is NaN after conversion
-    calTable_unique_df = calTable_unique_df.set_index('y_val')  # set 'y_val' as the index
-    # Save this calibration table!
+    # put all the stuff here into fit_SVR2.py, now need to extract this calibrated table from there...
+    # Load the correction table
+    calTable_df = pd.read_csv(r'D:\MSc Results\corrected_control_sample.csv')  # also have column 'y_corrected_SVR' in case
+    y_adj_arr = calTable_df['y_cal_adjustments'].to_numpy(dtype='float64')  # extracting the adjustments array so can apply to this mixture
+    print(np.shape(y_adj_arr))  # (16674,) whereas y_nctrl is shape (16674, 1)
+    print(type(y_adj_arr), type(y_nctrl))
+    y_nctrl_corrected = y_nctrl - y_adj_arr  # will these have different lengths though for different days???
     
-
-    # Get the nearest y value in the cal_table_df.index to the y variables in the different mixtures' data
-    sel_cal_vals = np.zeros(len(y_nctrl))  # Preallocate for the nearest_y_vals collected in the for loop
-    for i in range(len(y_nctrl)):
-        y = float(y_nctrl[i][0])  # extract the first element from the array, as y_ntrl is 2D
-        nearest_index = calTable_unique_df.index.get_indexer([y], method='nearest')[0]  # get nearest index
-        
-        # Check if the nearest_index is valid
-        if nearest_index >= 0:  # Valid index
-            nearest_y_val = calTable_unique_df.index[nearest_index]
-            sel_cal_vals[i] = nearest_y_val  # Store the nearest y value
-        else:
-            print(f"Warning: Nearest index for y={y} is not valid.")
     
-
-         
     
-    # Save the corrected non-control sample as csv file
-    df_in.to_csv(r'D:\MSc Results\corrected_non_control_sample.csv')
-
-    print(y_nctrl)
-    print(y_nctrl_corrected)
    
 
     r'''
@@ -101,10 +69,10 @@ def apply_calibration(df_in, str_expt):
             return math.floor(n)
         return math.ceil(n)
 
-    lower_limit = min(x_nctrl[0], y_nctrl_corrected[0])
+    lower_limit = min(x_nctrl[0,0], y_nctrl_corrected[0,0])  # not sure about y_nctrl_corrected - shape [16674,16674]
     lower_lim = normal_roundC(lower_limit) - 1
 
-    upper_limit = max( max(x_nctrl), max(y_nctrl_corrected) )
+    upper_limit = max(x_nctrl.max(), y_nctrl_corrected.max())
     upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
     # Plot SVM Results, Add in Reference Line too
@@ -121,7 +89,7 @@ def apply_calibration(df_in, str_expt):
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
     plt.title('Calibrated Sensor Comparison For ' + str_expt)
-    plt.legend()
+    plt.legend(loc="lower right")  # setting a general location for legend, or else can take to long to find where is best for it to go
     plt.grid()
     if 'hav' in str_expt:
         if 'and' in str_expt:
@@ -144,6 +112,6 @@ def apply_calibration(df_in, str_expt):
     plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
-    return y_nctrl_corrected, y_nctrl, x_nctrl, y_cal_vals
+    return y_nctrl_corrected, y_nctrl, x_nctrl
 
 # run this script through the main() function script
