@@ -82,11 +82,13 @@ def main():
     # then the apply_calibration() function to apply this pure water fit to each mixture.
     from apply_calibration import apply_calibration
     #from apply_calib_debug import apply_calibration
-    y_nctrl_corrected, y_nctrl, x_nctrl = apply_calibration(df_full, text_str)
+    #from apply_calibration_purewater import apply_calibration
+    #y_nctrl_corrected, y_nctrl, x_nctrl = apply_calibration(df_full, text_str)  # use this for debug and purewater versions
+    df_out = apply_calibration(df_full, text_str)
     
     # then calculate deltaT from calibration SVM less the reference 1:1 line (which is the same as the x array for y)
     from get_deltaT import get_deltaT
-    #deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)
+    #deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)  # (df_out, text_str)  And change within function!!
     #print(deltaT)  # including temperature difference plot
         
     return #y_nctrl_corrected, y_nctrl, x_nctrl

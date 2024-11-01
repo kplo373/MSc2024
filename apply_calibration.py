@@ -1,103 +1,48 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Sep 19 10:33:25 2024
+Created on Fri Nov  1 18:09:57 2024
 
-Calibration script for applying the same calibration from the pure water
-hot and cold experiments, to the rest of the experiments being plotted.
-Pkl files are used to calibrate these plastic experiments.
+Retry of applying pure water calibration to all other mixture raw data.
+This function is run through main() after the plot1to1.py.
 
-@author: kplo373
+@author: adamk
 """
 
-# Fitting the Pure Water Calibration SVM to this raw data (using ChatGPT)
-#import joblib
-import pickle
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+from scipy.interpolate import interp1d
 
 
 def apply_calibration(df_in, str_expt):    
-    # Load the saved model and scalers
-    #svr_rbf = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")  # for pure water
-        #r"D:\MSc Results\svr_rbf_pure_water.pkl")
-    # 2. Apply the correction to control sample, load SVR model first
-    #with open(r'D:\MSc Results\svr_model.pkl', 'rb') as f:
-        #svr_model = pickle.load(f)  # for pure water
-    
-    # 3. Apply correction to non-control samples, load non-control sample data (x and y are independent)
+    # Load non-control sample data from df_in (x and y are independent)
     x_nctrl = np.array(df_in['temperature_CS']).reshape(-1, 1)
-    y_nctrl = np.array(df_in['temperature_Op']).reshape(-1, 1)  # not sure if using this!!
+    y_nctrl = np.array(df_in['temperature_Op']).reshape(-1, 1)
     
-    # Apply the correction using the model from the control sample
-    #y_predict = svr_model.predict(x_nctrl.reshape(-1, 1))  # correcting based on x values (thermocouples)
-    # not using the y_predict above, shall I remove it and the fit_SVR2.py associated??***
+    # Load pure water calibration table from saved csv file
+    filepath = r'D:\MSc Results\calTable.csv'  # this has the whole df_in for pure water
+    calTable_df = pd.read_csv(filepath)  #, index_col='y_val')  # just want to read a specific column?
+    print(calTable_df.columns)
     
-    y_cal_vals =  y_nctrl - x_nctrl
-    y_nctrl_corrected = y_nctrl - y_cal_vals
-    df_in['y_corrected'] = y_nctrl_corrected  # store corrected y values as another column in the non-control sample
+    # Interpolate to match y_nctrl values with calibration adjustments (as they will have different lengths)
+    interp_func = interp1d(
+       calTable_df.index,
+       calTable_df['y_cal_adj'],
+       bounds_error=False,
+       fill_value="extrapolate")
     
-    # Create correction look up table
-    cal_table_df = pd.DataFrame({'y_val': y_nctrl.ravel(), 'y_cal_adj': y_cal_vals.ravel()})
-    cal_table_df.index = np.around(cal_table_df['y_val'], decimals=4)
-    cal_table_df = cal_table_df.drop('y_val', axis=1)
-    cal_table_df = cal_table_df.sort_index()
+    y_cal_adj_interpolated = interp_func(y_nctrl.ravel())
     
-    
-    # Reset the index and create a new column
-    cal_table_df_reset = cal_table_df.reset_index()
-    calTable_unique_df = cal_table_df_reset.drop_duplicates(subset='y_val')  # removing duplicates in the y_val column
-    calTable_unique_df.loc[:, 'y_val'] = pd.to_numeric(calTable_unique_df['y_val'], errors='coerce')  # ensuring 'y_val' is numeric and checking for invalid values
-    calTable_unique_df = calTable_unique_df.dropna(subset=['y_val'])  # removing any rows where 'y_val' is NaN after conversion
-    calTable_unique_df = calTable_unique_df.set_index('y_val')  # set 'y_val' as the index
-    # Save this calibration table!
-    print(calTable_unique_df)
+    # Apply the calibration adjustment (e.g., subtraction for correction)
+    y_nctrl_corrected = y_nctrl.ravel() - y_cal_adj_interpolated
 
-    # Get the nearest y value in the cal_table_df.index to the y variables in the different mixtures' data
-    sel_cal_vals = np.zeros(len(y_nctrl))  # Preallocate for the nearest_y_vals collected in the for loop
-    for i in range(len(y_nctrl)):
-        y = float(y_nctrl[i][0])  # extract the first element from the array, as y_ntrl is 2D
-        nearest_index = calTable_unique_df.index.get_indexer([y], method='nearest')[0]  # get nearest index
-        
-        # Check if the nearest_index is valid
-        if nearest_index >= 0 and nearest_index < len(calTable_unique_df):
-            nearest_y_val = calTable_unique_df.iloc[nearest_index, 0]  # collecting values from the calibrated column of the lookup table, not the index
-            sel_cal_vals[i] = nearest_y_val  # Store the nearest y value
-        else:
-            print(f"Warning: Nearest index for y={y} is not valid.")
-    
-    # what am I doing with this sel_cal_vals array after all?? Is an array of selected calibration values.
-    #print(sel_cal_vals)  # do I need to plot them? Or are these the adjustments to apply?
-    # put them into the df_in??
-    # my sel_cal_vals are currently the same as y_nctrl. Need to be same as y_nctrl_corrected! Wrong column
-    # tried first column, now they are just the actual differences, ranging 0.66 to 6.4...
-    # the index is y_val = y_nctrl, first column (0) is y_cal_adj, ranging from 5.94 up and down to 1.39
-    # can't use the index, so have to apply the first column to the y_nctrl somehow, like done above, minus??
-    cal_y = y_nctrl[:, 0] - sel_cal_vals  # use these for the actual mixture data
-    print(cal_y)
-    
+    # Store corrected values in the DataFrame
+    df_in['y_corrected'] = y_nctrl_corrected
 
-         
-    
-    # Save the corrected non-control sample as csv file
-    df_in.to_csv(r'D:\MSc Results\corrected_non_control_sample.csv')
-
-    #print(y_nctrl)
+    #print(y_nctrl)  # to compare them if desired
     print(y_nctrl_corrected)
    
-
-    r'''
-    # Predict using the SVM model trained on pure water data
-    #x_pred_plastic_scaled = svr_rbf.predict(x_comb_scaled)
-    correction_y = svr_rbf.predict(y)  # need to reshape this correction_y from (16674, 16674) to (16674, 1)? Or (16674,)
-    corr_y = correction_y.flatten()
-    cor_y = corr_y.reshape(-1, 1)
-    print(cor_y.shape)
-    corrected_y = y + cor_y  
-    '''
-    # Inverse transform the predicted values to get them back to the original scale
-    #x_pred_plastic = scaler_x.inverse_transform(x_pred_plastic_scaled.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
 
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
@@ -117,11 +62,9 @@ def apply_calibration(df_in, str_expt):
     upper_limit = max( max(x_nctrl), max(y_nctrl_corrected) )
     upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
-    # Plot SVM Results, Add in Reference Line too
+    # Plot Calibration Results, Add in Reference Line too
     plt.figure(figsize=(7, 7))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
-    #plt.plot(x_pred, y_comb, 'o', color='lightgreen', label='Calibrated Data (Using Pure Water SVM)')
-    #plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Calibrated Curve')
-    plt.plot(x_nctrl, cal_y, color='blue', lw=2, label="Selected calibration values")
+    plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Calibrated Curve')
     plt.plot(x_nctrl, y_nctrl, 'r', label='Raw Data')
     # Plot the 1:1 line across the entire plot from corner to corner
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')
@@ -152,9 +95,9 @@ def apply_calibration(df_in, str_expt):
     file_path = r"D:\MSc Results\SavedPlots\Calibrated_Separate" + '\\' + final_folder
     
     print(file_path + file_str)
-    plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
+    #plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
-    return y_nctrl_corrected, y_nctrl, x_nctrl
+    return df_in
 
-# run this script through the main() function script
+
