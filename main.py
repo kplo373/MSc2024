@@ -20,8 +20,12 @@ def main():
     # To get the filepath
     from get_filepaths import get_filepaths
     # must put given_date below in format 'DD/MM/YYYY' (add 0 first if single digit D or M)
-    pathCScold, pathOpcold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
-    pathCShot, pathOphot = get_filepaths('18/07/2024', 'AM')  # for the hot pure water test: Thursday 18th July AM  
+    #pathCScold, pathOpcold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
+    #pathCShot, pathOphot = get_filepaths('18/07/2024', 'AM')  # for the hot pure water test: Thursday 18th July AM  
+    #pathCScold, pathOpcold = get_filepaths('21/08/2024', 'PM')  # cold 5% MP-water
+    #pathCShot, pathOphot = get_filepaths('19/08/2024', 'PM')  # hot 5% MP-water
+    pathCScold, pathOpcold = get_filepaths('02/09/2024', 'AM')  # cold 10% MP-water
+    pathCShot, pathOphot = get_filepaths('20/08/2024', 'AM')  # hot 10% MP-water
     # for the cold and hot % experiments^^
 
     # To collect the Campbell Scientific thermocouple data
@@ -70,11 +74,14 @@ def main():
     cutoff_timeh = start_timeh + pd.Timedelta(minutes=20)
     df_trimmed_hot = df_ready_hot[df_ready_hot.index >= cutoff_timeh]
     
-    df_full = pd.concat([df_trimmed_cold, df_trimmed_hot])
+    # Reverse the hot dataframe so it begins with coldest value
+    df_trim_hot_rev = df_trimmed_hot.iloc[::-1].reset_index(drop=True)
+    
+    df_full = pd.concat([df_trimmed_cold, df_trim_hot_rev ])
     
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
-    text_str = '0% Shavings-Water'  # ***
+    text_str = '10% Shavings-Water'  # ***
     plot1to1(df_full, text_str)
    
     # next step is the fit_SVR() function, but this is only required once for pure water (have already run it and saved results.)

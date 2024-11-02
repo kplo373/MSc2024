@@ -22,13 +22,14 @@ def apply_calibration(df_in, str_expt):
     
     # Load pure water calibration table from saved csv file
     filepath = r'D:\MSc Results\calTable.csv'  # this has the whole df_in for pure water
-    calTable_df = pd.read_csv(filepath)  #, index_col='y_val')  # just want to read a specific column?
+    calTable_df = pd.read_csv(filepath, index_col='y_val')  # just want to read a specific column?
     print(calTable_df.columns)
     
     # Interpolate to match y_nctrl values with calibration adjustments (as they will have different lengths)
     interp_func = interp1d(
        calTable_df.index,
        calTable_df['y_cal_adj'],
+       kind='linear',  # to ensure linear interpolation
        bounds_error=False,
        fill_value="extrapolate")
     
@@ -41,8 +42,12 @@ def apply_calibration(df_in, str_expt):
     df_in['y_corrected'] = y_nctrl_corrected
 
     #print(y_nctrl)  # to compare them if desired
-    print(y_nctrl_corrected)
-   
+    #print(y_nctrl_corrected)
+    
+    # Debugging print statements
+    print("Calibration adjustments applied:")
+    print(df_in[['temperature_Op', 'y_corrected']].head())  # View initial values for verification
+    
 
     # Need to create limits for the plots below so that the plots are square-shaped
     import math

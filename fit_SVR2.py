@@ -117,12 +117,13 @@ svr_linear.fit(y.reshape(-1, 1), x)
 x_pred_rbf = svr_rbf.predict(y.reshape(-1, 1)).reshape(-1, 1)
 x_pred_linear = svr_linear.predict(y.reshape(-1, 1))
 '''
-#%% Redo Fitting SVR From Tom's Code
-# 1. Train SVR on the control sample, split into x and y
+
+
+#%% SVR attempt - didn't work
+r'''
 x_control = df_full['temperature_CS'].to_numpy(dtype='float64')
 y_control = df_full['temperature_Op'].to_numpy(dtype='float64')
 
-#%%
 # Train Support Vector Regressor (SVR) to model relationship between x and y (are independent of each other)
 from sklearn.svm import SVR
 svr = SVR()
@@ -147,6 +148,12 @@ y_ctrl_corrected = svr_model.predict(x_control.reshape(-1, 1))
 df_full['y_corrected_SVR'] = y_ctrl_corrected   # not sure if I need this column?? Have it anyway
 #df_full.to_csv(r'D:\MSc Results\corrected_ctrl_sample.csv')  # I have this below too
 # then can apply the correction to non-control samples in my apply calibration script
+'''
+
+#%% Redo Fitting SVR From Tom's Code
+# 1. Train SVR on the control sample, split into x and y
+x_control = df_full['temperature_CS'].to_numpy(dtype='float64')
+y_control = df_full['temperature_Op'].to_numpy(dtype='float64')
 
 y_cal_vals =  y_control - x_control  # getting temperature difference between two sensors
 y_control_corrected = y_control - y_cal_vals
@@ -183,8 +190,6 @@ for i in range(len(y_control)):
         print(f"Warning: Nearest index for y={y} is not valid.")
 
 
-     
-
 # Save the corrected control sample as csv file
 df_full.to_csv(r'D:\MSc Results\corrected_control_sample.csv')
 # then extract this csv file look up table data in apply_calibration.py! (working in apply_calib_debug.py first)
@@ -210,7 +215,7 @@ print(f"Linear SVR RMSE: {rmse_linear}")
 # Visualise the data to see if it will line up on the line? Or would that be in the apply calibration script...
 import matplotlib.pyplot as plt
 # Scatter plot of actual y vs. predicted y, using look up table
-plt.subplot(1, 2, 1)
+#plt.subplot(1, 2, 1)
 plt.scatter(x_control, y_control, color='blue', label='Actual y', alpha=0.5)
 plt.scatter(x_control, y_control_corrected, color='red', label='Calibrated y', alpha=0.5)
 plt.title('Actual vs. Calibrated y')
@@ -219,6 +224,7 @@ plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
 plt.legend()
 plt.grid()
 
+r'''
 # Scatter plot of (RBF?) SVR actual y vs. predicted y
 plt.subplot(1, 2, 2)
 plt.scatter(x_control, y_control, color='blue', label='Actual y', alpha=0.5)
@@ -228,8 +234,8 @@ plt.xlabel('Thermocouple Temperature (degrees Celsius)')
 plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
 plt.legend()
 plt.grid()
-
-plt.tight_layout()
+'''
+#plt.tight_layout()
 plt.show()
 
 
