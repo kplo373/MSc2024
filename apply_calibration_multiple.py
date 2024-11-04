@@ -11,27 +11,21 @@ Pkl files are used to calibrate these plastic experiments.
 @author: kplo373
 """
 
-
-###adapt this code for multiple percentages!! get output from plot1to1_multiple.py
-
-
-# Fitting the Pure Water Calibration SVM to this raw data (using ChatGPT)
-import joblib
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+from scipy.interpolate import interp1d
 import matplotlib.cm as cm
 
 
-def apply_calibration_multiple(dict_cold, dict_hot, str_expt):
-    print(dict_cold.keys())
-    #print(dict_hot.keys)
+def apply_calibration_multiple(df_in_dict, str_expt):
+    print(df_in_dict.keys())
     
     # get temperature arrays per percentage of plastic from dfs above
-    tempCSc0 = np.array(dict_cold['tempCS0'])
-    tempOpc0 = np.array(dict_cold['tempOp0'])
-    tempCSh0 = np.array(dict_hot['tempCS0'])
-    tempOph0 = np.array(dict_hot['tempOp0'])
+    x0 = np.array(df_in['temperature_CS']).reshape(-1, 1)
+    y0 = np.array(df_in['temperature_Op']).reshape(-1, 1)
+
     
     tempCSc5 = np.array(dict_cold['tempCS5'])
     tempOpc5 = np.array(dict_cold['tempOp5'])

@@ -15,6 +15,8 @@ import sys
 sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
 #sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
 
+import pandas as pd
+
 def main():
     # Get filepaths
     from get_filepaths import get_filepaths
@@ -148,22 +150,95 @@ def main():
     df_merged_h100 = create_merged_df(avgOp_dfh100, df_water_avgCSh100)
     # not easily possible to merge all these dfs together into one, as they have different datetimes along their indices per df...
     
+    
+    # Removing first 15 minutes of each data record/merged dataframe
+    df_ready_c0 = df_merged_c0.copy()  # cold 0% MP-water (pure water)
+    start_t0 = df_ready_c0.index.min()
+    cutoff_t0 = start_t0 + pd.Timedelta(minutes=15)
+    df_trimmed_c0 = df_ready_c0[df_ready_c0.index >= cutoff_t0]
+    df_ready_h0 = df_merged_h0.copy()  # hot 0% MP-water (pure water)
+    start_th0 = df_ready_h0.index.min()
+    cutoff_th0 = start_th0 + pd.Timedelta(minutes=20)
+    df_trimmed_h0 = df_ready_h0[df_ready_h0.index >= cutoff_th0]
+    
+    df_ready_c5 = df_merged_c5.copy()  # cold 5% MP-water
+    start_t5 = df_ready_c5.index.min()
+    cutoff_t5 = start_t5 + pd.Timedelta(minutes=15)
+    df_trimmed_c5 = df_ready_c5[df_ready_c5.index >= cutoff_t5]
+    df_ready_h5 = df_merged_h5.copy()  # hot 5% MP-water
+    start_th5 = df_ready_h5.index.min()
+    cutoff_th5 = start_th5 + pd.Timedelta(minutes=20)
+    df_trimmed_h5 = df_ready_h5[df_ready_h5.index >= cutoff_th5]
+    
+    df_ready_c10 = df_merged_c10.copy()  # cold 10% MP-water
+    start_t10 = df_ready_c10.index.min()
+    cutoff_t10 = start_t10 + pd.Timedelta(minutes=15)
+    df_trimmed_c10 = df_ready_c10[df_ready_c10.index >= cutoff_t10]
+    df_ready_h10 = df_merged_h10.copy()  # hot 10% MP-water
+    start_th10 = df_ready_h10.index.min()
+    cutoff_th10 = start_th10 + pd.Timedelta(minutes=20)
+    df_trimmed_h10 = df_ready_h10[df_ready_h10.index >= cutoff_th10]
+    
+    df_ready_c25 = df_merged_c25.copy()  # cold 25% MP-water
+    start_t25 = df_ready_c25.index.min()
+    cutoff_t25 = start_t25 + pd.Timedelta(minutes=15)
+    df_trimmed_c25 = df_ready_c25[df_ready_c25.index >= cutoff_t25]
+    df_ready_h25 = df_merged_h25.copy()  # hot 25% MP-water
+    start_th25 = df_ready_h25.index.min()
+    cutoff_th25 = start_th25 + pd.Timedelta(minutes=20)
+    df_trimmed_h25 = df_ready_h25[df_ready_h25.index >= cutoff_th25]
+    
+    df_ready_c50 = df_merged_c50.copy()  # cold 50% MP-water
+    start_t50 = df_ready_c50.index.min()
+    cutoff_t50 = start_t50 + pd.Timedelta(minutes=15)
+    df_trimmed_c50 = df_ready_c50[df_ready_c50.index >= cutoff_t50]
+    df_ready_h50 = df_merged_h50.copy()  # hot 50% MP-water
+    start_th50 = df_ready_h50.index.min()
+    cutoff_th50 = start_th50 + pd.Timedelta(minutes=20)
+    df_trimmed_h50 = df_ready_h50[df_ready_h50.index >= cutoff_th50]
+    
+    df_ready_c100 = df_merged_c100.copy()  # cold 100% MP-water
+    start_t100 = df_ready_c100.index.min()
+    cutoff_t100 = start_t100 + pd.Timedelta(minutes=15)
+    df_trimmed_c100 = df_ready_c100[df_ready_c100.index >= cutoff_t100]
+    df_ready_h100 = df_merged_h100.copy()  # hot 100% MP-water
+    start_th100 = df_ready_h100.index.min()
+    cutoff_th100 = start_th100 + pd.Timedelta(minutes=20)
+    df_trimmed_h100 = df_ready_h100[df_ready_h100.index >= cutoff_th100]
+    
+    # Reverse the hot dataframes so they each begin with coldest value
+    df_trim_hot_rev0 = df_trimmed_h0.iloc[::-1].reset_index(drop=True)
+    df_trim_hot_rev5 = df_trimmed_h5.iloc[::-1].reset_index(drop=True)
+    df_trim_hot_rev10 = df_trimmed_h10.iloc[::-1].reset_index(drop=True)
+    df_trim_hot_rev25 = df_trimmed_h25.iloc[::-1].reset_index(drop=True)
+    df_trim_hot_rev50 = df_trimmed_h50.iloc[::-1].reset_index(drop=True)
+    df_trim_hot_rev100 = df_trimmed_h100.iloc[::-1].reset_index(drop=True)
+    
+    # Concatenating the hot and cold dataframes together in the right order
+    df_full0 = pd.concat([df_trimmed_c0, df_trim_hot_rev0])
+    df_full5 = pd.concat([df_trimmed_c5, df_trim_hot_rev5])
+    df_full10 = pd.concat([df_trimmed_c10, df_trim_hot_rev10])
+    df_full25 = pd.concat([df_trimmed_c25, df_trim_hot_rev25])
+    df_full50 = pd.concat([df_trimmed_c50, df_trim_hot_rev50])
+    df_full100 = pd.concat([df_trimmed_c100, df_trim_hot_rev100])
+    
+    
     # To plot the 1-1 temperature plot
     from plot1to1_multiple import plot1to1_multiple
     text_str = 'Shaved Plastic and Water'
     # Create a dictionary of df_merged dataframes made above, to put into function below
-    df_merged_dict = dict(c0=df_merged_c0, h0=df_merged_h0, c5=df_merged_c5, h5=df_merged_h5, c10=df_merged_c10, h10=df_merged_h10, c25=df_merged_c25,
-                          h25=df_merged_h25, c50=df_merged_c50, h50=df_merged_h50, c100=df_merged_c100, h100=df_merged_h100)
-    dict_cold, dict_hot = plot1to1_multiple(df_merged_dict, text_str)
+    df_full_dict = dict(df0=df_full0, df5=df_full5, df10=df_full10, df25=df_full25,
+                          df50=df_full50, df100=df_full100)
+    plot1to1_multiple(df_full_dict, text_str)
     
     # Next is apply calibration for all of these lines/percentages
     from apply_calibration_multiple import apply_calibration_multiple
-    dict_x, dict_ypred = apply_calibration_multiple(dict_cold, dict_hot, text_str)
+    df_out_dict = apply_calibration_multiple(df_full_dict, text_str)
     
     # Then calculate deltaT from calibration SVM less the reference 1:1 line
     from get_deltaT_multiple import get_deltaT_multiple
-    dict_xref, dict_deltaT = get_deltaT_multiple(dict_x, dict_ypred, text_str)
-    print(dict_deltaT.keys())  # including temperature difference plot
+    #dict_xref, dict_deltaT = get_deltaT_multiple(dict_x, dict_ypred, text_str)
+    #print(dict_deltaT.keys())  # including temperature difference plot
        
     
     return

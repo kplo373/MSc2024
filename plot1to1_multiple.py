@@ -17,148 +17,53 @@ import matplotlib.cm as cm  # for creating colour spectrums and legends
 def plot1to1_multiple(dict_parameters, str_expt):
     #print(dict_parameters.keys())
     params = SimpleNamespace(**dict_parameters)
-    dfc0 = params.c0
-    dfh0 = params.h0
-    dfc5 = params.c5
-    dfh5 = params.h5
-    dfc10 = params.c10
-    dfh10 = params.h10
-    dfc25 = params.c25
-    dfh25 = params.h25
-    dfc50 = params.c50
-    dfh50 = params.h50
-    dfc100 = params.c100
-    dfh100 = params.h100
-    print(dfc0.columns)
-    
-    T_Opc0 = dfc0['temperature_Op']  # extracting the temperature arrays from 0% (pure sand)
-    T_CSc0 = dfc0['temperature_CS']
-    T_Oph0 = dfh0['temperature_Op']
-    T_CSh0 = dfh0['temperature_CS']
+    df0 = params.df0
+    df5 = params.df5
+    df10 = params.df10
+    df25 = params.df25
+    df50 = params.df50
+    df100 = params.df100
+
+
+    T_Op0 = df0['temperature_Op']  # extracting the temperature arrays from 0% (pure sand/water)
+    T_CS0 = df0['temperature_CS']
     '''
-    stdOpc0 = dfc0['stdev_Op']  # extracting the standard deviation arrays from 0% (pure sand)
-    stdCSc0 = dfc0['stdev_CS']
-    stdOph0 = dfh0['stdev_Op']
-    stdCSh0 = dfh0['stdev_CS']
-    sterrOpc0 = dfc0['sterr_Op']  # extracting the standard error arrays from 0% MP-sand (pure sand)
-    sterrCSc0 = dfc0['sterr_CS']
-    sterrOph0 = dfh0['sterr_Op']
-    sterrCSh0 = dfh0['sterr_CS']
+    stdOp0 = df0['stdev_Op']  # extracting the standard deviation arrays from 0% (pure sand)
+    stdCS0 = df0['stdev_CS']
+    sterrOp0 = df0['sterr_Op']  # extracting the standard error arrays from 0% MP-sand (pure sand)
+    sterrCS0 = df0['sterr_CS']
     '''
-    T_Opc5 = dfc5['temperature_Op']  # extracting the temperature arrays from 5% MP-sand
-    T_CSc5 = dfc5['temperature_CS']
-    T_Oph5 = dfh5['temperature_Op']
-    T_CSh5 = dfh5['temperature_CS']
+    T_Op5 = df5['temperature_Op']  # extracting the temperature arrays from 5% MP-sand
+    T_CS5 = df5['temperature_CS']
+
     # can get stdev and sterr for 5% after this too...
     # and then the 10, 25, 50, and 100% temperature and uncertainty values!
-    T_Opc10 = dfc10['temperature_Op']  # extracting the temperature arrays from 10%
-    T_CSc10 = dfc10['temperature_CS']
-    T_Oph10 = dfh10['temperature_Op']
-    T_CSh10 = dfh10['temperature_CS']
+    T_Op10 = df10['temperature_Op']  # extracting the temperature arrays from 10%
+    T_CS10 = df10['temperature_CS']
     
-    T_Opc25 = dfc25['temperature_Op']  # extracting the temperature arrays from 25% MP-sand
-    T_CSc25 = dfc25['temperature_CS']
-    T_Oph25 = dfh25['temperature_Op']
-    T_CSh25 = dfh25['temperature_CS']
-    
-    T_Opc50 = dfc50['temperature_Op']  # extracting the temperature arrays from 50% MP-sand
-    T_CSc50 = dfc50['temperature_CS']
-    T_Oph50 = dfh50['temperature_Op']
-    T_CSh50 = dfh50['temperature_CS']
-    
-    T_Opc100 = dfc100['temperature_Op']  # extracting the temperature arrays from 100% MP-sand (pure microplastic shavings!)
-    T_CSc100 = dfc100['temperature_CS']
-    T_Oph100 = dfh100['temperature_Op']
-    T_CSh100 = dfh100['temperature_CS']
-    
-    
-    # Calculate separate 5th and 95th percentiles for different plastic proportions
-    p5_val0 = np.percentile(T_Opc0, 5)  # calculate the 5th percentile value for cold 0% MP-sand (pure sand)
-    i5_0 = np.argmin(np.abs(T_Opc0 - p5_val0))  # find the index of the closest value in y_cold to the 5th percentile value
-    p95_val0 = np.percentile(T_CSh0, 95)  # 95th percentile max value for hot array of 0% MP-sand (pure sand)
-    i95_0 = np.argmin(np.abs(T_CSh0 - p95_val0))
+    T_Op25 = df25['temperature_Op']  # extracting the temperature arrays from 25% MP-sand
+    T_CS25 = df25['temperature_CS']
 
-    p5_val5 = np.percentile(T_Opc5, 5)  # getting 5th percentile value for 5% MP-sand
-    i5_5 = np.argmin(np.abs(T_Opc5 - p5_val5))
-    p95_val5 = np.percentile(T_CSh5, 95)
-    i95_5 = np.argmin(np.abs(T_CSh5 - p95_val5))
-    
-    p5_val10 = np.percentile(T_Opc10, 5)  # calculate the 5th percentile value for 10% MP-sand
-    i5_10 = np.argmin(np.abs(T_Opc10 - p5_val10))
-    p95_val10 = np.percentile(T_CSh10, 95)
-    i95_10 = np.argmin(np.abs(T_CSh10 - p95_val10))
-    
-    p5_val25 = np.percentile(T_Opc25, 5)  # getting 5th percentile value for 25% MP-sand
-    i5_25 = np.argmin(np.abs(T_Opc25 - p5_val25))
-    p95_val25 = np.percentile(T_CSh25, 95)
-    i95_25 = np.argmin(np.abs(T_CSh25 - p95_val25))
-    
-    p5_val50 = np.percentile(T_Opc50, 5)  # getting 5th percentile value for 50% MP-sand
-    i5_50 = np.argmin(np.abs(T_Opc50 - p5_val50))
-    p95_val50 = np.percentile(T_CSh50, 95)
-    i95_50 = np.argmin(np.abs(T_CSh50 - p95_val50))
-    
-    p5_val100 = np.percentile(T_Opc100, 5)  # calculate the 5th percentile value for 100% MP-sand (pure MP)
-    i5_100 = np.argmin(np.abs(T_Opc100 - p5_val100))
-    p95_val100 = np.percentile(T_CSh100, 95)
-    i95_100 = np.argmin(np.abs(T_CSh100 - p95_val100))
-    
+    T_Op50 = df50['temperature_Op']  # extracting the temperature arrays from 50% MP-sand
+    T_CS50 = df50['temperature_CS']
 
-    # Trimming off values in each array that are below the 5th percentile or above the 95th percentile
-    tempOpc0 = T_Opc0.iloc[i5_0:]  # this needs to start and end at same indices as tempCSc0
-    tempCSc0 = T_CSc0.iloc[i5_0:]
-    tempOph0 = T_Oph0.iloc[i95_0:]
-    tempCSh0 = T_CSh0.iloc[i95_0:] 
-    '''
-    sdOpc0 = stdOpc0.iloc[i5_0:]
-    sdCSc0 = stdCSc0.iloc[i5_0:]
-    sdOph0 = stdOph0.iloc[i95_0:]
-    sdCSh0 = stdCSh0.iloc[i95_0:]
-    seOpcold = sterrOpcold.iloc[i5_0:]
-    seCScold = sterrCScold.iloc[i5_0:]
-    seOphot = sterrOphot.iloc[i95_0:]
-    seCShot = sterrCShot.iloc[i95_0:]
-    '''  # can add standard dev and standard error trimmings below later
+    T_Op100 = df100['temperature_Op']  # extracting the temperature arrays from 100% MP-sand (pure microplastic shavings!)
+    T_CS100 = df100['temperature_CS']
     
-    tempOpc5 = T_Opc5.iloc[i5_5:]  # getting the 5% MP-sand mixture data clipped to 5th and 95th percentiles
-    tempCSc5 = T_CSc5.iloc[i5_5:]
-    tempOph5 = T_Oph5.iloc[i95_5:]
-    tempCSh5 = T_CSh5.iloc[i95_5:]
+    # These dataframes are already trimmed, so have removed the 5th and 95th percentile limits
     
-    tempOpc10 = T_Opc10.iloc[i5_10:]  # trimming the 10% MP-sand mixture data
-    tempCSc10 = T_CSc10.iloc[i5_10:]
-    tempOph10 = T_Oph10.iloc[i95_10:]
-    tempCSh10 = T_CSh10.iloc[i95_10:]
-    
-    tempOpc25 = T_Opc25.iloc[i5_25:]  # trimming the 25% MP-sand mixture data
-    tempCSc25 = T_CSc25.iloc[i5_25:]
-    tempOph25 = T_Oph25.iloc[i95_25:]
-    tempCSh25 = T_CSh25.iloc[i95_25:]
-    
-    tempOpc50 = T_Opc50.iloc[i5_50:]  # trimming the 50% MP-sand mixture data
-    tempCSc50 = T_CSc50.iloc[i5_50:]
-    tempOph50 = T_Oph50.iloc[i95_50:]
-    tempCSh50 = T_CSh50.iloc[i95_50:]
-    
-    tempOpc100 = T_Opc100.iloc[i5_100:]  # trimming the 100% MP-sand mixture data
-    tempCSc100 = T_CSc100.iloc[i5_100:]
-    tempOph100 = T_Oph100.iloc[i95_100:]
-    tempCSh100 = T_CSh100.iloc[i95_100:]
-    
-    # Combine all x and y arrays into hot and cold lists (for plotting in red and blue spectrums)
-    x_cold_arr = [tempCSc0, tempCSc5, tempCSc10, tempCSc25, tempCSc50, tempCSc100]
-    y_cold_arr = [tempOpc0, tempOpc5, tempOpc10, tempOpc25, tempOpc50, tempOpc100]
-    x_hot_arr = [tempCSh0, tempCSh5, tempCSh10, tempCSh25, tempCSh50, tempCSh100]
-    y_hot_arr = [tempOph0, tempOph5, tempOph10, tempOph25, tempOph50, tempOph100]
-    
+    # Combine all x and y arrays into lists (for plotting in red and blue spectrums)
+    x_arr = [T_CS0, T_CS5, T_CS10, T_CS25, T_CS50, T_CS100]
+    y_arr = [T_Op0, T_Op5, T_Op10, T_Op25, T_Op50, T_Op100]
+
     # Specify the percentage labels
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
     
     # Set the colormap to 'Blues' and get 6 shades of blue
-    cmap1 = cm.get_cmap('Blues', 6)
+    cmap1 = cm.get_cmap('jet', 6)
     colors1 = cmap1(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker blue - should range the other way for blue, but good for red...
-    cmap2 = cm.get_cmap('Reds', 6)
-    colors2 = cmap2(np.linspace(0.4, 1, 6))
+    #cmap2 = cm.get_cmap('Reds', 6)
+    #colors2 = cmap2(np.linspace(0.4, 1, 6))
 
     
     # Need to create limits for the plots below so that the plots are square-shaped
@@ -168,12 +73,12 @@ def plot1to1_multiple(dict_parameters, str_expt):
             return math.floor(n)
         return math.ceil(n)
 
-    lower_limit = min(tempCSc0.iloc[0], tempOpc0.iloc[0], tempCSc5.iloc[0], tempOpc5.iloc[0], tempCSc10.iloc[0], tempOpc10.iloc[0], tempCSc25.iloc[0],
-                      tempOpc25.iloc[0], tempCSc50.iloc[0], tempOpc50.iloc[0], tempCSc100.iloc[0], tempOpc100.iloc[0])  # is this the right way to get the limits?
+    lower_limit = min(T_CS0.iloc[0], T_Op0.iloc[0], T_CS5.iloc[0], T_Op5.iloc[0], T_CS10.iloc[0], T_Op10.iloc[0], T_CS25.iloc[0],
+                      T_Op25.iloc[0], T_CS50.iloc[0], T_Op50.iloc[0], T_CS100.iloc[0], T_Op100.iloc[0])  # is this the right way to get the limits?
     lower_lim = normal_round(lower_limit) - 1
 
-    upper_limit = max(tempCSh0.iloc[0], tempOph0.iloc[0], tempCSh5.iloc[0], tempOph5.iloc[0], tempCSh10.iloc[0], tempOph10.iloc[0], tempCSh25.iloc[0],
-                      tempOph25.iloc[0], tempCSh50.iloc[0], tempOph50.iloc[0], tempCSh100.iloc[0], tempOph100.iloc[0])
+    upper_limit = max(T_CS0.iloc[-1], T_Op0.iloc[-1], T_CS5.iloc[-1], T_Op5.iloc[-1], T_CS10.iloc[-1], T_Op10.iloc[-1], T_CS25.iloc[-1],
+                      T_Op25.iloc[-1], T_CS50.iloc[-1], T_Op50.iloc[-1], T_CS100.iloc[-1], T_Op100.iloc[-1])
     upper_lim = normal_round(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
     print('Limits:', lower_lim, upper_lim)
     
@@ -187,10 +92,10 @@ def plot1to1_multiple(dict_parameters, str_expt):
     #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, color='k')   
     
     for i in range(6):
-        plt.plot(x_cold_arr[i], y_cold_arr[i], lw=1, color=colors1[i], label=f'Cold {labels[i]}', alpha=0.6)
+        plt.plot(x_arr[i], y_arr[i], lw=1, color=colors1[i], label=f'{labels[i]}', alpha=0.6)
     
-    for j in range(6):  # doing a second separate loop so that the legend lists all cold then hot experiments in the plot
-        plt.plot(x_hot_arr[j], y_hot_arr[j], lw=1, color=colors2[j], label=f'Hot {labels[j]}', alpha=0.6)  # alpha parameter sets transparency/opacity
+    #for j in range(6):  # doing a second separate loop so that the legend lists all cold then hot experiments in the plot
+        #plt.plot(x_hot_arr[j], y_hot_arr[j], lw=1, color=colors2[j], label=f'Hot {labels[j]}', alpha=0.6)  # alpha parameter sets transparency/opacity
     
     plt.title('Raw Data Comparison For ' + str_expt)  # including what percentage of plastic etc.
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
@@ -198,18 +103,7 @@ def plot1to1_multiple(dict_parameters, str_expt):
     plt.grid()
     plt.legend()
     plt.show()
+    
+    
+    return
 
-    
-    # Create new dictionaries here that only have the clipped data. Then won't need to do the percentile limits in any other functions...
-    # need to clip the stdev and sterr arrays too.. then create new dictionaries for them and return them.
-    dict_clipped_cold = {'tempCS0': tempCSc0, # 'stdCS0': sdCSc0, 'sterrCS0': seCSc0, 
-                         'tempOp0': tempOpc0, #'stdOp0': sdOpc0, 'sterrOp0': seOpc0})
-                         'tempCS5': tempCSc5, 'tempOp5': tempOpc5, 'tempCS10': tempCSc10, 'tempOp10': tempOpc10, 'tempCS25': tempCSc25, 
-                         'tempOp25': tempOpc25,'tempCS50': tempCSc50, 'tempOp50': tempOpc50, 'tempCS100': tempCSc100, 'tempOp100': tempOpc100}
-    dict_clipped_hot = {'tempCS0': tempCSh0, #'stdCS0': sdCSh0, 'sterrCS0': seCSh0, 
-                        'tempOp0': tempOph0, #'stdOp0': sdOph0, 'sterrOp0': seOph0})
-                        'tempCS5': tempCSh5, 'tempOp5': tempOph5, 'tempCS10': tempCSh10, 'tempOp10': tempOph10, 'tempCS25': tempCSh25, 
-                        'tempOp25': tempOph25,'tempCS50': tempCSh50, 'tempOp50': tempOph50, 'tempCS100': tempCSh100, 'tempOp100': tempOph100}
-    
-    
-    return dict_clipped_cold, dict_clipped_hot

@@ -62,13 +62,13 @@ def main():
     df_merged_hot = create_merged_df(avgOp_dfhot, df_water_avgCShot)  #df_sand_avgCShot) 
     #print(df_mergedcold) 
     
-    # Removing first 15 minutes of each data record
+    # Removing first 15 minutes of each cold data record
     df_ready_cold = df_merged_cold.copy()
     start_time = df_ready_cold.index.min()
     cutoff_time = start_time + pd.Timedelta(minutes=15)
     df_trimmed_cold = df_ready_cold[df_ready_cold.index >= cutoff_time]
 
-    # Removing first 15 minutes of each data record
+    # Removing first 15 minutes of each hot data record
     df_ready_hot = df_merged_hot.copy()
     start_timeh = df_ready_hot.index.min()
     cutoff_timeh = start_timeh + pd.Timedelta(minutes=20)
