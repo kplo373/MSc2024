@@ -35,7 +35,7 @@ def apply_calibration(df_in, str_expt):
     
     y_cal_adj_interpolated = interp_func(y_nctrl.ravel())
     
-    # Apply the calibration adjustment (e.g., subtraction for correction)
+    # Apply the calibration adjustment (subtraction for correction)
     y_nctrl_corrected = y_nctrl.ravel() - y_cal_adj_interpolated
 
     # Store corrected values in the DataFrame
@@ -51,7 +51,7 @@ def apply_calibration(df_in, str_expt):
 
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
-    def normal_roundH(n):  # create a hot function to round up if .27 or higher, or round down if less than .27. Calibration makes data flick up.
+    def normal_roundH(n):  # create a hot function to round up if .27 or higher, or round down if less than .27.
         if n - math.floor(n) < 0.27:
             return math.floor(n)
         return math.ceil(n)

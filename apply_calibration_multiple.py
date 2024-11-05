@@ -17,161 +17,80 @@ import matplotlib.pyplot as plt
 import sys
 from scipy.interpolate import interp1d
 import matplotlib.cm as cm
+from types import SimpleNamespace
 
 
 def apply_calibration_multiple(df_in_dict, str_expt):
-    print(df_in_dict.keys())
+    print(df_in_dict.keys())  # dict_keys(['df0', 'df5', 'df10', 'df25', 'df50', 'df100'])
+    params = SimpleNamespace(**df_in_dict)
+    df0 = params.df0
+    df5 = params.df5
+    df10 = params.df10
+    df25 = params.df25
+    df50 = params.df50
+    df100 = params.df100
     
     # get temperature arrays per percentage of plastic from dfs above
-    x0 = np.array(df_in['temperature_CS']).reshape(-1, 1)
-    y0 = np.array(df_in['temperature_Op']).reshape(-1, 1)
+    x0 = np.array(df0['temperature_CS']).reshape(-1, 1)
+    y0 = np.array(df0['temperature_Op']).reshape(-1, 1)
+    
+    x5 = np.array(df5['temperature_CS']).reshape(-1, 1)
+    y5 = np.array(df5['temperature_Op']).reshape(-1, 1)
+    
+    x10 = np.array(df10['temperature_CS']).reshape(-1, 1)
+    y10 = np.array(df10['temperature_Op']).reshape(-1, 1)
+    
+    x25 = np.array(df25['temperature_CS']).reshape(-1, 1)
+    y25 = np.array(df25['temperature_Op']).reshape(-1, 1)
+    
+    x50 = np.array(df50['temperature_CS']).reshape(-1, 1)
+    y50 = np.array(df50['temperature_Op']).reshape(-1, 1)
+    
+    x100 = np.array(df100['temperature_CS']).reshape(-1, 1)
+    y100 = np.array(df100['temperature_Op']).reshape(-1, 1)
+    
+    
+    # Load pure water calibration table from saved csv file
+    filepath = r'D:\MSc Results\calTable.csv'  # this has the whole df_in for pure water
+    calTable_df = pd.read_csv(filepath, index_col='y_val')  # just want to read a specific column?
+    print(calTable_df.columns)
+    
+    # Interpolate to match each y % values with calibration adjustments (as they will have different lengths)
+    interp_func = interp1d(
+       calTable_df.index,
+       calTable_df['y_cal_adj'],
+       kind='linear',  # to ensure linear interpolation
+       bounds_error=False,
+       fill_value="extrapolate")
+    
+    # Applying interpolation function to all y arrays
+    y_cal_adj_interp0 = interp_func(y0.ravel())
+    y_cal_adj_interp5 = interp_func(y5.ravel())
+    y_cal_adj_interp10 = interp_func(y10.ravel())
+    y_cal_adj_interp25 = interp_func(y25.ravel())
+    y_cal_adj_interp50 = interp_func(y50.ravel())
+    y_cal_adj_interp100 = interp_func(y100.ravel())
 
+    # Apply the calibration adjustments (subtraction for correction)
+    y_corr0 = y0.ravel() - y_cal_adj_interp0
+    y_corr5 = y5.ravel() - y_cal_adj_interp5
+    y_corr10 = y10.ravel() - y_cal_adj_interp10
+    y_corr25 = y25.ravel() - y_cal_adj_interp25
+    y_corr50 = y50.ravel() - y_cal_adj_interp50
+    y_corr100 = y100.ravel() - y_cal_adj_interp100
     
-    tempCSc5 = np.array(dict_cold['tempCS5'])
-    tempOpc5 = np.array(dict_cold['tempOp5'])
-    tempCSh5 = np.array(dict_hot['tempCS5'])
-    tempOph5 = np.array(dict_hot['tempOp5']) 
-    
-    tempCSc10 = np.array(dict_cold['tempCS10'])
-    tempOpc10 = np.array(dict_cold['tempOp10'])
-    tempCSh10 = np.array(dict_hot['tempCS10'])
-    tempOph10 = np.array(dict_hot['tempOp10']) 
-    
-    tempCSc25 = np.array(dict_cold['tempCS25'])
-    tempOpc25 = np.array(dict_cold['tempOp25'])
-    tempCSh25 = np.array(dict_hot['tempCS25'])
-    tempOph25 = np.array(dict_hot['tempOp25']) 
-    
-    tempCSc50 = np.array(dict_cold['tempCS50'])
-    tempOpc50 = np.array(dict_cold['tempOp50'])
-    tempCSh50 = np.array(dict_hot['tempCS50'])
-    tempOph50 = np.array(dict_hot['tempOp50']) 
-    
-    tempCSc100 = np.array(dict_cold['tempCS100'])
-    tempOpc100 = np.array(dict_cold['tempOp100'])
-    tempCSh100 = np.array(dict_hot['tempCS100'])
-    tempOph100 = np.array(dict_hot['tempOp100'])
-    
-    
-    # Load the saved model and scalers
-    svr_rbf = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")
-    scaler_x = joblib.load(r"D:\MSc Results\scaler_y_pure_water.pkl")
-    
-    # Prepare the plastic-water data
-    x_c0 = tempCSc0.reshape(-1, 1)  # if an error, can do tempC1c0.to_numpy().reshape...
-    x_c5 = tempCSc5.reshape(-1, 1)
-    x_c10 = tempCSc10.reshape(-1, 1)
-    x_c25 = tempCSc25.reshape(-1, 1)
-    x_c50 = tempCSc50.reshape(-1, 1)
-    x_c100 = tempCSc100.reshape(-1, 1)
-    
-    x_hot_descending0 = tempCSh0.reshape(-1, 1)  # this series begins with the hottest value... need to reverse it somehow
-    x_hot_asc0 = x_hot_descending0[::-1]
-    x_hot_descending5 = tempCSh5.reshape(-1, 1)  # 5%
-    x_hot_asc5 = x_hot_descending5[::-1]
-    x_hot_descending10 = tempCSh10.reshape(-1, 1)  # 10%
-    x_hot_asc10 = x_hot_descending10[::-1]
-    x_hot_descending25 = tempCSh25.reshape(-1, 1)  # 25%
-    x_hot_asc25 = x_hot_descending25[::-1]
-    x_hot_descending50 = tempCSh50.reshape(-1, 1)  # 50%
-    x_hot_asc50 = x_hot_descending50[::-1]
-    x_hot_descending100 = tempCSh100.reshape(-1, 1)  # 100%
-    x_hot_asc100 = x_hot_descending100[::-1]
-    
+    # Store corrected values in each DataFrame
+    df0['y_corrected'] = y_corr0
+    df5['y_corrected'] = y_corr5
+    df10['y_corrected'] = y_corr10
+    df25['y_corrected'] = y_corr25
+    df50['y_corrected'] = y_corr50
+    df100['y_corrected'] = y_corr100
 
-    y_c0 = tempOpc0.reshape(-1, 1)
-    y_c5 = tempOpc5.reshape(-1, 1)
-    y_c10 = tempOpc10.reshape(-1, 1)
-    y_c25 = tempOpc25.reshape(-1, 1)
-    y_c50 = tempOpc50.reshape(-1, 1)
-    y_c100 = tempOpc100.reshape(-1, 1)
-
-    
-    y_hot_descending0 = tempOph0.reshape(-1, 1)  # same with this series - begins with hottest value
-    y_hot_asc0 = y_hot_descending0[::-1]
-    y_hot_descending5 = tempOph5.reshape(-1, 1)  # 5%
-    y_hot_asc5 = y_hot_descending5[::-1]
-    y_hot_descending10 = tempOph10.reshape(-1, 1)  # 10%
-    y_hot_asc10 = y_hot_descending10[::-1]
-    y_hot_descending25 = tempOph25.reshape(-1, 1)  # 25%
-    y_hot_asc25 = y_hot_descending25[::-1]
-    y_hot_descending50 = tempOph50.reshape(-1, 1)  # 50%
-    y_hot_asc50 = y_hot_descending50[::-1]
-    y_hot_descending100 = tempOph100.reshape(-1, 1)  # 100%
-    y_hot_asc100 = y_hot_descending100[::-1]
-    
-
-    # Combining the hot and cold arrays per plastic proportion
-    x_comb0 = np.vstack((x_c0, x_hot_asc0))  # 0%
-    y_comb0 = np.concatenate((y_c0, y_hot_asc0))
-    x_comb5 = np.vstack((x_c5, x_hot_asc5))  # 5%
-    y_comb5 = np.concatenate((y_c5, y_hot_asc5))
-    x_comb10 = np.vstack((x_c10, x_hot_asc10))  # 10%
-    y_comb10 = np.concatenate((y_c10, y_hot_asc10))
-    x_comb25 = np.vstack((x_c25, x_hot_asc25))  # 25%
-    y_comb25 = np.concatenate((y_c25, y_hot_asc25))
-    x_comb50 = np.vstack((x_c50, x_hot_asc50))  # 50%
-    y_comb50 = np.concatenate((y_c50, y_hot_asc50))
-    x_comb100 = np.vstack((x_c100, x_hot_asc100))  # 100%
-    y_comb100 = np.concatenate((y_c100, y_hot_asc100))
-    
-    '''  Older version of calibration: (but now should be predicting x from y)
-    
-    # Scale the y-axis data using the y-scaler from pure water
-    y_comb_scaled0 = scaler_y_pure_water.transform(y_comb0)
-    y_comb_scaled5 = scaler_y_pure_water.transform(y_comb5)
-    y_comb_scaled10 = scaler_y_pure_water.transform(y_comb10)
-    y_comb_scaled25 = scaler_y_pure_water.transform(y_comb25)
-    y_comb_scaled50 = scaler_y_pure_water.transform(y_comb50)
-    y_comb_scaled100 = scaler_y_pure_water.transform(y_comb100)
-
-    
-    # Predict using the SVM model trained on pure water data
-    y_pred_plastic_scaled0 = svr_rbf_pure_water.predict(y_comb_scaled0)
-    y_pred_plastic_scaled5 = svr_rbf_pure_water.predict(y_comb_scaled5)
-    y_pred_plastic_scaled10 = svr_rbf_pure_water.predict(y_comb_scaled10)
-    y_pred_plastic_scaled25 = svr_rbf_pure_water.predict(y_comb_scaled25)
-    y_pred_plastic_scaled50 = svr_rbf_pure_water.predict(y_comb_scaled50)
-    y_pred_plastic_scaled100 = svr_rbf_pure_water.predict(y_comb_scaled100)
-    
-    # Inverse transform the predicted values to get them back to the original scale
-    y_pred_plastic0 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled0.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
-    y_pred_plastic5 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled5.reshape(-1, 1))
-    y_pred_plastic10 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled10.reshape(-1, 1))
-    y_pred_plastic25 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled25.reshape(-1, 1))
-    y_pred_plastic50 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled50.reshape(-1, 1))
-    y_pred_plastic100 = scaler_y_pure_water.inverse_transform(y_pred_plastic_scaled100.reshape(-1, 1))
-    '''
-    # Scale the y-axis data using the y-scaler from pure water
-    x_comb_scaled0 = scaler_x.transform(x_comb0)
-    x_comb_scaled5 = scaler_x.transform(x_comb5)
-    x_comb_scaled10 = scaler_x.transform(x_comb10)
-    x_comb_scaled25 = scaler_x.transform(x_comb25)
-    x_comb_scaled50 = scaler_x.transform(x_comb50)
-    x_comb_scaled100 = scaler_x.transform(x_comb100)
-
-    
-    # Predict using the SVM model trained on pure water data
-    x_pred_scaled0 = svr_rbf.predict(x_comb_scaled0)
-    x_pred_scaled5 = svr_rbf.predict(x_comb_scaled5)
-    x_pred_scaled10 = svr_rbf.predict(x_comb_scaled10)
-    x_pred_scaled25 = svr_rbf.predict(x_comb_scaled25)
-    x_pred_scaled50 = svr_rbf.predict(x_comb_scaled50)
-    x_pred_scaled100 = svr_rbf.predict(x_comb_scaled100)
-    
-    # Inverse transform the predicted values to get them back to the original scale
-    x_pred0 = scaler_x.inverse_transform(x_pred_scaled0.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
-    x_pred5 = scaler_x.inverse_transform(x_pred_scaled5.reshape(-1, 1))
-    x_pred10 = scaler_x.inverse_transform(x_pred_scaled10.reshape(-1, 1))
-    x_pred25 = scaler_x.inverse_transform(x_pred_scaled25.reshape(-1, 1))
-    x_pred50 = scaler_x.inverse_transform(x_pred_scaled50.reshape(-1, 1))
-    x_pred100 = scaler_x.inverse_transform(x_pred_scaled100.reshape(-1, 1))
-    
-    
 
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
-    def normal_roundH(n):  # create a hot function to round up if .27 or higher, or round down if less than .27. Calibration makes data flick up.
+    def normal_roundH(n):  # create a hot function to round up if .3 or higher, or round down if less than .3. 
         if n - math.floor(n) < 0.3:
             return math.floor(n)
         return math.ceil(n)
@@ -182,22 +101,20 @@ def apply_calibration_multiple(df_in_dict, str_expt):
         return math.ceil(n)
 
     # not sure what's going on here... are the limits meant to be determined by x_comb or x_c/x_h arrays??
-    lower_limit = min(y_c0[0,0], x_pred0[0,0], y_c5[0,0], x_pred5[0,0], y_c10[0,0], x_pred10[0,0], y_c25[0,0], x_pred25[0,0],
-                      y_c50[0,0], x_pred50[0,0], y_c100[0,0], x_pred100[0,0])
+    lower_limit = min(y_corr0[0], x0[0], y_corr5[0], x5[0], y_corr10[0], x10[0], y_corr25[0], x25[0],
+                      y_corr50[0], x50[0], y_corr100[0], x100[0])
     lower_lim = normal_roundC(lower_limit) - 1
 
-    print(x_comb0[-1,0], x_comb0[-1,-1], x_comb0[0,0], x_comb0[0,-1])
-    # upper_limit = max( max(x_hot_asc), max(y_hot_asc) )
-    upper_limit = max(max(y_comb0), max(x_pred0), max(y_comb5), max(x_pred5), max(y_comb10), max(x_pred10), 
-                      max(y_comb25), max(x_pred25), max(y_comb50), max(x_pred50), max(y_comb100), max(x_pred100))
+    upper_limit = max(max(y_corr0), max(x0), max(y_corr5), max(x5), max(y_corr10), max(x10), 
+                      max(y_corr25), max(x25), max(y_corr50), max(x50), max(y_corr100), max(x100))
     upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
-    # Plot SVM Results, Add in Reference Line too
+    # Plot Calibrated Results, Add in Reference Line too
     plt.figure(figsize=(6, 6))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
     
     # Combine all x and y arrays into a list (for plotting in a green spectrum)
-    x_list = [x_pred0, x_pred5, x_pred10, x_pred25, x_pred50, x_pred100]
-    y_list = [y_comb0, y_comb5, y_comb10, y_comb25, y_comb50, y_comb100]
+    x_list = [x0, x5, x10, x25, x50, x100]
+    y_list = [y_corr0, y_corr5, y_corr10, y_corr25, y_corr50, y_corr100]
 
     # Specify the percentage labels
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
@@ -213,7 +130,7 @@ def apply_calibration_multiple(df_in_dict, str_expt):
     for i in range(6):
         plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'Calibrated {labels[i]}', alpha=0.6)  # plotting the data in a green spectrum
         
-    plt.text(23, 12, '(Using Pure Water SVM)')  # adding in text to the plot in the bottom RH corner
+    #plt.text(23, 12, '(Using Pure Water)')  # adding in text to the plot in the bottom RH corner
     plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
     plt.ylim(lower_lim, upper_lim)
     
@@ -244,10 +161,9 @@ def apply_calibration_multiple(df_in_dict, str_expt):
     plt.show()
     
     # Create a dictionary for x and for y to return and extract the data from in the next function (deltaT) 
-    dict_x = {'x0': x_pred0, 'x5': x_pred5, 'x10': x_pred10, 'x25': x_pred25, 'x50': x_pred50, 'x100': x_pred100}
-    dict_ypred = {'y0': y_comb0, 'y5': y_comb5, 'y10': y_comb10, 'y25': y_comb25, 
-                  'y50': y_comb50, 'y100': y_comb100}
+    df_out_dict = {'df0': df0, 'df5': df5, 'df10': df10, 'df25': df25, 'df50': df50, 'df100': df100}
+
     
-    return dict_x, dict_ypred
+    return df_out_dict
 
 # run this script through the main() function script
