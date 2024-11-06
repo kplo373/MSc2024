@@ -20,7 +20,8 @@ def main():
     # To get the filepath
     from get_filepaths import get_filepaths
     # must put given_date below in format 'DD/MM/YYYY' (add 0 first if single digit D or M)
-    pathCScold, pathOpcold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
+    #pathCScold, pathOpcold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
+    pathCScold, pathOpcold = get_filepaths('06/11/2024', 'PM')  # for the cold pure water test: Wednesday 6th Nov PM
     pathCShot, pathOphot = get_filepaths('18/07/2024', 'AM')  # for the hot pure water test: Thursday 18th July AM  
     #pathCScold, pathOpcold = get_filepaths('21/08/2024', 'PM')  # cold 5% MP-water
     #pathCShot, pathOphot = get_filepaths('19/08/2024', 'PM')  # hot 5% MP-water
@@ -65,7 +66,7 @@ def main():
     # Removing first 15 minutes of each cold data record
     df_ready_cold = df_merged_cold.copy()
     start_time = df_ready_cold.index.min()
-    cutoff_time = start_time + pd.Timedelta(minutes=15)
+    cutoff_time = start_time + pd.Timedelta(minutes=30)
     df_trimmed_cold = df_ready_cold[df_ready_cold.index >= cutoff_time]
 
     # Removing first 15 minutes of each hot data record
@@ -87,11 +88,10 @@ def main():
     # next step is the fit_SVR() function, but this is only required once for pure water (have already run it and saved results.)
     
     # then the apply_calibration() function to apply this pure water fit to each mixture.
-    from apply_calibration import apply_calibration
-    #from apply_calib_debug import apply_calibration
-    #from apply_calibration_purewater import apply_calibration
-    #y_nctrl_corrected, y_nctrl, x_nctrl = apply_calibration(df_full, text_str)  # use this for debug and purewater versions
-    df_out = apply_calibration(df_full, text_str)
+    #from apply_calibration import apply_calibration
+    from apply_calibration_purewater import apply_calibration
+    y_nctrl_corrected, y_nctrl, x_nctrl = apply_calibration(df_full, text_str)  # use this for debug and purewater versions
+    #df_out = apply_calibration(df_full, text_str)
     
     # then calculate deltaT from calibration SVM less the reference 1:1 line (which is the same as the x array for y)
     from get_deltaT import get_deltaT

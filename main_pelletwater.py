@@ -155,7 +155,7 @@ def main():
     # Removing first 15 minutes of each data record/merged dataframe
     df_ready_c0 = df_merged_c0.copy()  # cold 0% pellet-water (pure water)
     start_t0 = df_ready_c0.index.min()
-    cutoff_t0 = start_t0 + pd.Timedelta(minutes=15)
+    cutoff_t0 = start_t0 + pd.Timedelta(minutes=20)
     df_trimmed_c0 = df_ready_c0[df_ready_c0.index >= cutoff_t0]
     df_ready_h0 = df_merged_h0.copy()  # hot 0% pellet-water (pure water)
     start_th0 = df_ready_h0.index.min()

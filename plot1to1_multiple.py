@@ -58,10 +58,11 @@ def plot1to1_multiple(dict_parameters, str_expt):
 
     # Specify the percentage labels
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
+    colors = ['r', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple']  # just using the colours of the rainbow for now
     
     # Set the colormap to 'Blues' and get 6 shades of blue
-    cmap1 = cm.get_cmap('jet', 6)
-    colors1 = cmap1(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker blue - should range the other way for blue, but good for red...
+    #cmap1 = cm.get_cmap('twilight', 6)
+    #colors1 = cmap1(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker blue - should range the other way for blue, but good for red...
     #cmap2 = cm.get_cmap('Reds', 6)
     #colors2 = cmap2(np.linspace(0.4, 1, 6))
 
@@ -92,7 +93,7 @@ def plot1to1_multiple(dict_parameters, str_expt):
     #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, color='k')   
     
     for i in range(6):
-        plt.plot(x_arr[i], y_arr[i], lw=1, color=colors1[i], label=f'{labels[i]}', alpha=0.6)
+        plt.plot(x_arr[i], y_arr[i], lw=1, color=colors[i], label=f'{labels[i]}', alpha=0.6)  #color=colors1[i]
     
     #for j in range(6):  # doing a second separate loop so that the legend lists all cold then hot experiments in the plot
         #plt.plot(x_hot_arr[j], y_hot_arr[j], lw=1, color=colors2[j], label=f'Hot {labels[j]}', alpha=0.6)  # alpha parameter sets transparency/opacity

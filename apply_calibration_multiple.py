@@ -105,8 +105,8 @@ def apply_calibration_multiple(df_in_dict, str_expt):
                       y_corr50[0], x50[0], y_corr100[0], x100[0])
     lower_lim = normal_roundC(lower_limit) - 1
 
-    upper_limit = max(max(y_corr0), max(x0), max(y_corr5), max(x5), max(y_corr10), max(x10), 
-                      max(y_corr25), max(x25), max(y_corr50), max(x50), max(y_corr100), max(x100))
+    upper_limit = max(y_corr0[-1], x0[-1], y_corr5[-1], x5[-1], y_corr10[-1], x10[-1], 
+                      y_corr25[-1], x25[-1], y_corr50[-1], x50[-1], y_corr100[-1], x100[-1])
     upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
     # Plot Calibrated Results, Add in Reference Line too
@@ -118,10 +118,11 @@ def apply_calibration_multiple(df_in_dict, str_expt):
 
     # Specify the percentage labels
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
+    colors = ['r', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple']  # just using the colours of the rainbow for now    
     
     # Set the colormap to 'cool' and get 6 shades of blue, purple, pink
-    cmap = cm.get_cmap('jet', 6)
-    colors = cmap(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker green
+    #cmap = cm.get_cmap('jet', 6)
+    #colors = cmap(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker green
 
 
     # Plot the 1:1 line across the entire plot from corner to corner

@@ -31,18 +31,21 @@ def get_filepaths(given_date, given_time):
         path = folder_path + r'\August_2024'
     elif given_datetime.month == 9:
         path = folder_path + r'\September_2024'
+    elif given_datetime.month == 11:
+        path = folder_path + r'\November_2024'
     #print(path)  
     
     # List all files in the directory
     all_files = os.listdir(path)  
+    #print(all_files)
     
     # Filter files that contain both the given_date and given_time
-    filtered_folders = [file for file in all_files if given_date[0:2] in file and given_time in file]  # this isn't working.
+    filtered_folders = [file for file in all_files if given_date[0:2] in file and given_time in file]
     # given_date is a string like '13/08/2024'. Only want the day, not the month or year string bit
     
     #print(filtered_folders)
     if not filtered_folders:
-        raise ValueError("No folders found matching the given date and time.")
+        raise ValueError("No folders found matching the given date and time.")  # it actually crashes earlier at all_files line anyway
 
     # Print the filtered files and initialize variables
     full_path = None

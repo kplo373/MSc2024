@@ -21,7 +21,7 @@ def main():
     # Get filepaths
     from get_filepaths import get_filepaths
     # must put given_date below in format 'DD/MM/YYYY' (add 0 first if single digit D or M)
-    pathCSc0, pathOpc0 = get_filepaths('24/07/2024', 'PM')  # first, collecting data filepaths from cold 0% MP-water mixture (pure water)
+    pathCSc0, pathOpc0 = get_filepaths('06/11/2024', 'PM')  # first, collecting data filepaths from cold 0% MP-water mixture (pure water)
     pathCSh0, pathOph0 = get_filepaths('18/07/2024', 'AM')  # and then the data filepaths from the hot 0% MP-water mixture
 
     pathCSc5, pathOpc5 = get_filepaths('21/08/2024', 'PM')  # cold 5% MP-water
@@ -154,7 +154,7 @@ def main():
     # Removing first 15 minutes of each data record/merged dataframe
     df_ready_c0 = df_merged_c0.copy()  # cold 0% MP-water (pure water)
     start_t0 = df_ready_c0.index.min()
-    cutoff_t0 = start_t0 + pd.Timedelta(minutes=15)
+    cutoff_t0 = start_t0 + pd.Timedelta(minutes=30)
     df_trimmed_c0 = df_ready_c0[df_ready_c0.index >= cutoff_t0]
     df_ready_h0 = df_merged_h0.copy()  # hot 0% MP-water (pure water)
     start_th0 = df_ready_h0.index.min()
