@@ -22,7 +22,7 @@ def main():
     # Get filepaths
     from get_filepaths import get_filepaths
     # must put given_date below in format 'DD/MM/YYYY' (add 0 first if single digit D or M)
-    pathCSc0, pathOpc0 = get_filepaths('24/07/2024', 'PM')  # first, collecting data filepaths from cold 0% pellet-water mixture (pure water)
+    pathCSc0, pathOpc0 = get_filepaths('06/11/2024', 'PM')  # first, collecting data filepaths from cold 0% pellet-water mixture (pure water)
     pathCSh0, pathOph0 = get_filepaths('18/07/2024', 'AM')  # and then the data filepaths from the hot 0% pellet-water mixture
 
     pathCSc5, pathOpc5 = get_filepaths('20/08/2024', 'PM')  # cold 5% pellet-water
@@ -164,7 +164,7 @@ def main():
     
     df_ready_c5 = df_merged_c5.copy()  # cold 5% pellet-water
     start_t5 = df_ready_c5.index.min()
-    cutoff_t5 = start_t5 + pd.Timedelta(minutes=15)
+    cutoff_t5 = start_t5 + pd.Timedelta(minutes=20)
     df_trimmed_c5 = df_ready_c5[df_ready_c5.index >= cutoff_t5]
     df_ready_h5 = df_merged_h5.copy()  # hot 5% pellet-water
     start_th5 = df_ready_h5.index.min()
@@ -173,7 +173,7 @@ def main():
     
     df_ready_c10 = df_merged_c10.copy()  # cold 10% pellet-water
     start_t10 = df_ready_c10.index.min()
-    cutoff_t10 = start_t10 + pd.Timedelta(minutes=15)
+    cutoff_t10 = start_t10 + pd.Timedelta(minutes=20)
     df_trimmed_c10 = df_ready_c10[df_ready_c10.index >= cutoff_t10]
     df_ready_h10 = df_merged_h10.copy()  # hot 10% pellet-water
     start_th10 = df_ready_h10.index.min()
@@ -182,7 +182,7 @@ def main():
     
     df_ready_c25 = df_merged_c25.copy()  # cold 25% pellet-water
     start_t25 = df_ready_c25.index.min()
-    cutoff_t25 = start_t25 + pd.Timedelta(minutes=15)
+    cutoff_t25 = start_t25 + pd.Timedelta(minutes=20)
     df_trimmed_c25 = df_ready_c25[df_ready_c25.index >= cutoff_t25]
     df_ready_h25 = df_merged_h25.copy()  # hot 25% pellet-water
     start_th25 = df_ready_h25.index.min()
@@ -191,7 +191,7 @@ def main():
     
     df_ready_c50 = df_merged_c50.copy()  # cold 50% pellet-water
     start_t50 = df_ready_c50.index.min()
-    cutoff_t50 = start_t50 + pd.Timedelta(minutes=15)
+    cutoff_t50 = start_t50 + pd.Timedelta(minutes=20)
     df_trimmed_c50 = df_ready_c50[df_ready_c50.index >= cutoff_t50]
     df_ready_h50 = df_merged_h50.copy()  # hot 50% pellet-water
     start_th50 = df_ready_h50.index.min()
@@ -200,7 +200,7 @@ def main():
     
     df_ready_c100 = df_merged_c100.copy()  # cold 100% pellet-water
     start_t100 = df_ready_c100.index.min()
-    cutoff_t100 = start_t100 + pd.Timedelta(minutes=15)
+    cutoff_t100 = start_t100 + pd.Timedelta(minutes=20)
     df_trimmed_c100 = df_ready_c100[df_ready_c100.index >= cutoff_t100]
     df_ready_h100 = df_merged_h100.copy()  # hot 100% pellet-water
     start_th100 = df_ready_h100.index.min()

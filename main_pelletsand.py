@@ -158,7 +158,7 @@ def main():
     # Removing first 15 minutes of each data record/merged dataframe
     df_ready_c0 = df_merged_c0.copy()  # cold 0% pellet-sand (pure sand)
     start_t0 = df_ready_c0.index.min()
-    cutoff_t0 = start_t0 + pd.Timedelta(minutes=15)
+    cutoff_t0 = start_t0 + pd.Timedelta(minutes=20)
     df_trimmed_c0 = df_ready_c0[df_ready_c0.index >= cutoff_t0]
     df_ready_h0 = df_merged_h0.copy()  # hot 0% pellet-sand (pure sand)
     start_th0 = df_ready_h0.index.min()
@@ -167,7 +167,7 @@ def main():
     
     df_ready_c5 = df_merged_c5.copy()  # cold 5% pellet-sand
     start_t5 = df_ready_c5.index.min()
-    cutoff_t5 = start_t5 + pd.Timedelta(minutes=15)
+    cutoff_t5 = start_t5 + pd.Timedelta(minutes=20)
     df_trimmed_c5 = df_ready_c5[df_ready_c5.index >= cutoff_t5]
     df_ready_h5 = df_merged_h5.copy()  # hot 5% pellet-sand
     start_th5 = df_ready_h5.index.min()
@@ -185,7 +185,7 @@ def main():
     
     df_ready_c25 = df_merged_c25.copy()  # cold 25% pellet-sand
     start_t25 = df_ready_c25.index.min()
-    cutoff_t25 = start_t25 + pd.Timedelta(minutes=15)
+    cutoff_t25 = start_t25 + pd.Timedelta(minutes=20)
     df_trimmed_c25 = df_ready_c25[df_ready_c25.index >= cutoff_t25]
     df_ready_h25 = df_merged_h25.copy()  # hot 25% pellet-sand
     start_th25 = df_ready_h25.index.min()
@@ -194,7 +194,7 @@ def main():
     
     df_ready_c50 = df_merged_c50.copy()  # cold 50% pellet-sand
     start_t50 = df_ready_c50.index.min()
-    cutoff_t50 = start_t50 + pd.Timedelta(minutes=15)
+    cutoff_t50 = start_t50 + pd.Timedelta(minutes=20)
     df_trimmed_c50 = df_ready_c50[df_ready_c50.index >= cutoff_t50]
     df_ready_h50 = df_merged_h50.copy()  # hot 50% pellet-sand
     start_th50 = df_ready_h50.index.min()

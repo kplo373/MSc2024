@@ -9,31 +9,41 @@ Script for calculating multiple percentages of plastic's temperature difference
 """
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
+#import sys
 import matplotlib.cm as cm
+from types import SimpleNamespace
 
 
-def get_deltaT_multiple(dict_x, dict_ypred, text_str):
-    #print(dict_x.keys())
-    x0 = dict_x['x0'].ravel()  # extracting and shrinking the ndarrays to arrays
-    x5 = dict_x['x5'].ravel()
-    x10 = dict_x['x10'].ravel()
-    x25 = dict_x['x25'].ravel()
-    x50 = dict_x['x50'].ravel()
-    x100 = dict_x['x100'].ravel()
+def get_deltaT_multiple(dict_in, text_str):
+    #print(dict_in.keys())
+    params = SimpleNamespace(**dict_in)
+    df0 = params.df0
+    df5 = params.df5
+    df10 = params.df10
+    df25 = params.df25
+    df50 = params.df50
+    df100 = params.df100
+    #print(df0.columns)
     
-    y0 = dict_ypred['y0'].ravel()
-    y5 = dict_ypred['y5'].ravel()
-    y10 = dict_ypred['y10'].ravel()
-    y25 = dict_ypred['y25'].ravel()
-    y50 = dict_ypred['y50'].ravel()
-    y100 = dict_ypred['y100'].ravel()
+    x0 = np.array(df0['temperature_CS'].ravel())  # extracting and converting the series to ndarrays, shrinking to arrays
+    x5 = np.array(df5['temperature_CS'].ravel())
+    x10 = np.array(df10['temperature_CS'].ravel())
+    x25 = np.array(df25['temperature_CS'].ravel())
+    x50 = np.array(df50['temperature_CS'].ravel())
+    x100 = np.array(df100['temperature_CS'].ravel())
+    
+    y0 = np.array(df0['y_corrected'].ravel())  # using the corrected/calibrated y values rather than raw Optris data
+    y5 = np.array(df5['y_corrected'].ravel())
+    y10 = np.array(df10['y_corrected'].ravel())
+    y25 = np.array(df25['y_corrected'].ravel())
+    y50 = np.array(df50['y_corrected'].ravel())
+    y100 = np.array(df100['y_corrected'].ravel())
     
 
     lower_limit = min(x0[0], x5[0], x10[0], x25[0], x50[0], x100[0],
                       y0[0], y5[0], y10[0], y25[0], y50[0], y100[0])
-    upper_limit = max( max(x0), max(x5), max(x10), max(x25), max(x50), max(x100),
-                       max(y0), max(y5), max(y10), max(y25), max(y50), max(y100) )
+    upper_limit = max(x0[-1], x5[-1], x10[-1], x25[-1], x50[-1], x100[-1],
+                      y0[-1], y5[-1], y10[-1], y25[-1], y50[-1], y100[-1])
     print(lower_limit, upper_limit)  # looks good: 11.213333333333333 32.632147450277685
     
     

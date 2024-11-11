@@ -11,11 +11,12 @@ which we create in this script.
 """
 
 #import joblib
-import pickle
+#import pickle
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+from scipy.interpolate import interp1d
 
 
 def apply_calibration(df_in, str_expt):    
@@ -51,9 +52,32 @@ def apply_calibration(df_in, str_expt):
     calTable_unique_df.loc[:, 'y_val'] = pd.to_numeric(calTable_unique_df['y_val'], errors='coerce')  # ensuring 'y_val' is numeric and checking for invalid values
     calTable_unique_df = calTable_unique_df.dropna(subset=['y_val'])  # removing any rows where 'y_val' is NaN after conversion
     calTable_unique_df = calTable_unique_df.set_index('y_val')  # set 'y_val' as the index
-    # Save this calibration table!
-    print(calTable_unique_df) 
-    calTable_unique_df.to_csv(r'D:\MSc Results\calTable.csv')
+    
+    
+    # Step 1: Fit a linear model to the lower range of the calibration data
+    lower_bound_data = calTable_unique_df.loc[calTable_unique_df.index <= calTable_unique_df.index.min() + 1]  # selecting points near the minimum
+    X_lower = lower_bound_data.index.values.reshape(-1, 1)  # Reshape for regression
+    y_lower = lower_bound_data['y_cal_adj'].values
+    
+    # Fit a linear model to extrapolate
+    model = LinearRegression()
+    model.fit(X_lower, y_lower)
+    
+    # Step 2: Extend calibration adjustments for temperatures below the minimum
+    min_temp = calTable_unique_df.index.min()
+    extended_temps = np.linspace(min_temp - 1, min_temp - 5, 10).reshape(-1, 1)  # Generate temperatures down to ~5 degrees below min
+    extended_adjustments = model.predict(extended_temps)
+    
+    # Step 3: Create an extended DataFrame and append to original
+    extended_df = pd.DataFrame(extended_adjustments, index=extended_temps.ravel(), columns=['y_cal_adj'])
+    extended_calTable_df = pd.concat([extended_df, calTable_unique_df]).sort_index()
+    
+    
+    
+    # Save the extended calibration table for future use
+    extended_calTable_df.to_csv(r'D:\MSc Results\calTable.csv')
+    
+    
     
     r'''
     # Get the nearest y value in the cal_table_df.index to the y variables in the different mixtures' data
