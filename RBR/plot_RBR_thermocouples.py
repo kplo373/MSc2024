@@ -22,14 +22,14 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # Get RBR data
-#filepathR = r"D:\MSc Results\RBR_Test\060728_20241001_1004KateRBR.rsk"
-filepathR = r"D:\MSc Results\RBR_Test\Part1redo\060728_20241112_1014.xlsx"
-#timestampsR, tempsR = read_RBR(filepathR)
+filepathR = r"D:\MSc Results\RBR_Test\Part1redo\060728_20241112_1014.xlsx"  # Part 1
+#filepathR = r"D:\MSc Results\RBR_Test\Part2redo\060728_20241112_1055.xlsx"  # Part 2
 timestampsR, tempsR = read_RBR_excel(filepathR)
 
 
 # Get Thermocouple data
-filepathT = r"D:\MSc Results\RBR_Test\Part1redo\CR3000_Table1.dat"
+filepathT = r"D:\MSc Results\RBR_Test\Part1redo\CR3000_Table1.dat"  # Part 1
+#filepathT = r"D:\MSc Results\RBR_Test\Part2redo\CR3000_Table1.dat"  # Part 2
 dt_objsT, temps_arrT, stdevsT = read_CampbellSci(filepathT)  # this should give 6x thermocouple arrays of temperature and standard deviation
 print(temps_arrT)  # has shape (6, 794) - will have to split them up into each thermocouple if wanting to plot each of them
 
@@ -58,7 +58,7 @@ timestampsR = timestampsR[index_5:]   # this ndarray is of datetime64s
 df_R = pd.DataFrame({'temp_RBR': tempsR}, index = timestampsR)
 df_CS = pd.DataFrame({'temp_T1': tempT1, 'temp_T2': tempT2, 'temp_T3': tempT3, 'temp_T4': tempT4, 'temp_T5': tempT5, 'temp_T6': tempT6}, index = dt_objsT)
 
-#%% Use this cell if there is a time difference in RBR data file
+#%% Use this bit if there is a time difference in RBR data file
 # Step 1: Calculate the time difference
 #correct_time = pd.Timestamp('2024-10-16T11:49:00')  # what I wrote in my book for Part 1, not sure exactly what second it was though...
 #correct_time = pd.Timestamp('2024-10-16T13:10:00')  # started Part 2 at 1:10pm
@@ -75,15 +75,23 @@ df_CS = pd.DataFrame({'temp_T1': tempT1, 'temp_T2': tempT2, 'temp_T3': tempT3, '
 # Merge the resampled Optris data with the C1 data
 df_merged = df_CS.join(df_R, how='inner', lsuffix='_CS', rsuffix='_R')  # this only includes values from both arrays (cutting out any values from only one sensor)
 
-t1 = df_merged['temp_T1']
-t2 = df_merged['temp_T2']
-t3 = df_merged['temp_T3']
-t4 = df_merged['temp_T4']
-t5 = df_merged['temp_T5']
-t6 = df_merged['temp_T6']
-tR = df_merged['temp_RBR']
-dt = np.array(df_merged.index)  # for the time in datetime objects, but this is empty!!
+
+# Removing first 15 minutes (Part 1 only, otherwise minutes=0) of the whole dataframe
+start_t0 = df_merged.index.min()
+cutoff_t0 = start_t0 + pd.Timedelta(minutes=15)
+df_trimmed = df_merged[df_merged.index >= cutoff_t0]
+
+
+t1 = df_trimmed['temp_T1']
+t2 = df_trimmed['temp_T2']
+t3 = df_trimmed['temp_T3']
+t4 = df_trimmed['temp_T4']
+t5 = df_trimmed['temp_T5']
+t6 = df_trimmed['temp_T6']
+tR = df_trimmed['temp_RBR']
+dt = np.array(df_trimmed.index)  # for the time in datetime objects
 # Now all of these temperatures and datetimes are arrays of the same length!
+
 
 #%%
 dt_py = pd.to_datetime(dt[0]).to_pydatetime()  # to allow clear x-axis label
@@ -121,3 +129,19 @@ plt.xlim(dt[0], dt[-1])
 plt.grid()
 plt.legend()
 plt.show()
+
+#%% Plot the difference between the RBR and average thermocouple temperature
+# Calculate the difference first
+diff_arr = tR - avgt  # looks like RBR has higher temperature than thermocouples for both parts
+print(diff_arr)
+
+plt.plot(dt, diff_arr)
+plt.axhline(y=0, color='k', linestyle='-')
+plt.title('Temperature Differences Between RBR and Average Thermocouples')
+plt.ylabel(r'$\Delta T$ (degrees Celsius)')
+plt.xlabel(dt_py.strftime('%d %B %Y'))
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+plt.grid()
+plt.show()
+
+

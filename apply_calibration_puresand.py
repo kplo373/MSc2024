@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Sep 19 10:33:25 2024
+Created on Fri Nov 15 12:27:25 2024
 
-**Fitting the Pure Water Calibration to this raw data, and setting up the calibration table here.**
-Have left in the SVR stuff just in case we want to go back to it...
-but only using look up table for calibration in apply_calibration.py,
-which we create in this script.
+To calibrate according to the pure sand test (this calibration will only
+be applied to the sand + pellets and sand + microplastic mixtures).
+Setting up calibration table for sand in this function.
 
-@author: kplo373
+@author: adamk
 """
 
-#import joblib
-#import pickle
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,20 +18,9 @@ from sklearn.linear_model import LinearRegression
 
 
 def apply_calibration(df_in, str_expt):    
-    # Load the saved model and scalers
-    #svr_rbf = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")  # for pure water
-        #r"D:\MSc Results\svr_rbf_pure_water.pkl")
-    # 2. Apply the correction to control sample, load SVR model first
-    #with open(r'D:\MSc Results\svr_model.pkl', 'rb') as f:
-        #svr_model = pickle.load(f)  # for pure water
-    
     # 3. Apply correction to non-control samples, load non-control sample data (x and y are independent)
     x_nctrl = np.array(df_in['temperature_CS']).reshape(-1, 1)
     y_nctrl = np.array(df_in['temperature_Op']).reshape(-1, 1)
-    
-    # Apply the correction using the model from the control sample
-    #y_predict = svr_model.predict(x_nctrl.reshape(-1, 1))  # correcting based on x values (thermocouples)
-    # not using the y_predict above, shall I remove it and the fit_SVR2.py associated??***
     
     y_cal_vals =  y_nctrl - x_nctrl
     y_nctrl_corrected = y_nctrl - y_cal_vals
@@ -60,7 +46,7 @@ def apply_calibration(df_in, str_expt):
     X_lower = lower_bound_data.index.values.reshape(-1, 1)  # Reshape for regression
     y_lower = lower_bound_data['y_cal_adj'].values
     
-    # Fit a linear model to extrapolate
+    # Fit a linear model to extrapolate -- might not be linear for sand!! Try for now though...
     model = LinearRegression()
     model.fit(X_lower, y_lower)
     
@@ -76,7 +62,7 @@ def apply_calibration(df_in, str_expt):
     
     
     # Save the extended calibration table for future use
-    extended_calTable_df.to_csv(r'D:\MSc Results\calTable.csv')
+    extended_calTable_df.to_csv(r'D:\MSc Results\calTableSand.csv')
     
     
     
@@ -108,21 +94,13 @@ def apply_calibration(df_in, str_expt):
          
     
     # Save the corrected non-control sample as csv file
-    df_in.to_csv(r'D:\MSc Results\corrected_control_sample.csv')  # this only gives a y_corrected column though. Need adj column!
+    #df_in.to_csv(r'D:\MSc Results\corrected_control_sample.csv')  # this only gives a y_corrected column though. Need adj column!
 
     #print(y_nctrl)
     print(y_nctrl_corrected)
    
 
-    r'''
-    # Predict using the SVM model trained on pure water data
-    #x_pred_plastic_scaled = svr_rbf.predict(x_comb_scaled)
-    correction_y = svr_rbf.predict(y)  # need to reshape this correction_y from (16674, 16674) to (16674, 1)? Or (16674,)
-    corr_y = correction_y.flatten()
-    cor_y = corr_y.reshape(-1, 1)
-    print(cor_y.shape)
-    corrected_y = y + cor_y  
-    '''
+
     # Inverse transform the predicted values to get them back to the original scale
     #x_pred_plastic = scaler_x.inverse_transform(x_pred_plastic_scaled.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
 

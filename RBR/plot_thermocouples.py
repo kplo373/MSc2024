@@ -25,8 +25,8 @@ import matplotlib.dates as mdates
 
 
 # Get Thermocouple data
-#filepathT = r"D:\MSc Results\RBR_Test\RBRPart3\CR3000_Table1.dat"  # for no pump, Part 3
-filepathT = r"D:\MSc Results\RBR_Test\RBRPart4\CR3000_Table1.dat"
+#filepathT = r"D:\MSc Results\RBR_Test\Part3redo\CR3000_Table1.dat"  # for no pump, Part 3
+filepathT = r"D:\MSc Results\RBR_Test\Part4redo\CR3000_Table1.dat"  # for with the pump, Part 4
 dt_objsT, temps_arrT, stdevsT = read_CampbellSci(filepathT)  # this should give 6x thermocouple arrays of temperature and standard deviation
 print(temps_arrT)  # has shape (6, 794) - will have to split them up into each thermocouple if wanting to plot each of them
 
@@ -43,8 +43,7 @@ df_CS = pd.DataFrame({'temp_T1': t1, 'temp_T2': t2, 'temp_T3': t3, 'temp_T4': t4
 # ^don't really need this dataframe anymore then if not merging? It's here anyway!
 
 # skipping the time correction for RBR since the Campbell Sci logger had the right internal time already
-# no need to merge dataframes either as there's only one now!
-
+# not cutting out any time initially either
 
 
 #%%

@@ -2,7 +2,7 @@
 """
 Created on Tue Oct  8 11:12:34 2024
 
-Calibration script for applying the same calibration from the pure water
+Calibration script for applying the same calibration from the pure water (or sand)
 hot and cold experiments, to the rest of the experiments being plotted -
 but now multiple experiments (different percentages) at once.
 Pkl files are used to calibrate these plastic experiments.
@@ -51,8 +51,9 @@ def apply_calibration_multiple(df_in_dict, str_expt):
     
     
     # Load pure water calibration table from saved csv file
-    filepath = r'D:\MSc Results\calTable.csv'  # this has the whole df_in for pure water
-    calTable_df = pd.read_csv(filepath, index_col='y_val')  # just want to read a specific column?
+    #filepath = r'D:\MSc Results\calTable.csv'  # this has the whole df_in for pure water
+    filepath = r'D:\MSc Results\calTableSand.csv'  # trying pure sand calibration out for sand mixtures
+    calTable_df = pd.read_csv(filepath)  # just want to read a specific column?
     print(calTable_df.columns)
     
     # Interpolate to match each y % values with calibration adjustments (as they will have different lengths)
