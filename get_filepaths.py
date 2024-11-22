@@ -16,6 +16,7 @@ from datetime import datetime
 # e.g. "D:\MSc Results\August_2024"
 folder_path = r"D:\MSc Results"  # can either get the files from the USB drive here, or OneDrive below if using MSc computer
 #folder_path = r'C:\Users\kplo373\OneDrive - The University of Auckland\MSc Kate\PlottingMScResults'
+#folder_path = r"D:\MSc Results\Initial_Tests"
 
 # The dates will be input and the Campbell Sci and Optris filepaths will be produced as output
 # given_date should be in string format: 'DD/MM/YYYY' - this will include the month but not in word form
@@ -27,6 +28,7 @@ def get_filepaths(given_date, given_time):
     
     if given_datetime.month == 7:  # navigating to the right folder depending on the month
         path = folder_path + r'\July_2024'  # creating a raw string using 'r', to prevent SyntaxWarnings of invalid escape sequences
+        #the_month = 'July'
     elif given_datetime.month == 8:
         path = folder_path + r'\August_2024'
     elif given_datetime.month == 9:
@@ -40,7 +42,7 @@ def get_filepaths(given_date, given_time):
     #print(all_files)
     
     # Filter files that contain both the given_date and given_time
-    filtered_folders = [file for file in all_files if given_date[0:2] in file and given_time in file]
+    filtered_folders = [file for file in all_files if given_date[0:2] in file and given_time in file]  # the_month in file]
     # given_date is a string like '13/08/2024'. Only want the day, not the month or year string bit
     
     #print(filtered_folders)

@@ -2,7 +2,8 @@
 """
 Created on Mon Sep 16 13:53:49 2024
 
-Main master script to run all the functions within the subroutines.
+Main master script to run all the functions within the subroutines
+(for one hot and cold experiment at a time).
 
 @author: kplo373
 """
@@ -23,8 +24,10 @@ def main():
     #pathCScold, pathOpcold = get_filepaths('24/07/2024', 'PM')  # for the cold pure water test: Wednesday 24th July PM
     pathCScold, pathOpcold = get_filepaths('06/11/2024', 'PM')  # for the cold pure water test: Wednesday 6th Nov PM
     pathCShot, pathOphot = get_filepaths('18/07/2024', 'AM')  # for the hot pure water test: Thursday 18th July AM  
-    #pathCScold, pathOpcold = get_filepaths('21/08/2024', 'PM')  # cold 5% MP-water
-    #pathCShot, pathOphot = get_filepaths('19/08/2024', 'PM')  # hot 5% MP-water
+    
+    # Earlier tests (before the real experiments)
+    #pathCScold, pathOpcold = get_filepaths('03/07/2024', 'AM')  # cold pure water
+    #pathCShot, pathOphot = get_filepaths('01/07/2024', 'AM')  # hot pure water
     #pathCScold, pathOpcold = get_filepaths('02/09/2024', 'AM')  # cold 10% MP-water
     #pathCShot, pathOphot = get_filepaths('20/08/2024', 'AM')  # hot 10% MP-water
     # for the cold and hot % experiments^^
@@ -89,7 +92,7 @@ def main():
     
     # then the apply_calibration() function to apply this pure water fit to each mixture.
     #from apply_calibration import apply_calibration
-    from apply_calibration_purewater import apply_calibration
+    from apply_calibration_purewater import apply_calibration  # use this function to update actual calibration
     y_nctrl_corrected, y_nctrl, x_nctrl = apply_calibration(df_full, text_str)  # use this for debug and purewater versions
     #df_out = apply_calibration(df_full, text_str)
     
