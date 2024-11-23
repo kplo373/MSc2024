@@ -17,22 +17,23 @@ import matplotlib.pyplot as plt
 import sys
 
 
-def get_deltaT(x_comb, y_pred_plastic, text_str):
-    x = x_comb.ravel()  # to shrink the ndarrays to arrays
-    y = y_pred_plastic.ravel() 
+def get_deltaT(df_in, text_str):
+    print(df_in.columns)
+    x = np.array(df_in['temperature_CS']).ravel()
+    
+    if 'ater' in text_str:
+        y = np.array(df_in['y_corrected']).ravel()
+    elif 'and' in text_str:
+        y = np.array(df_in['y_corrected_sand']).ravel()
+    
 
     lower_limit = min(x[0], y[0])
     upper_limit = max( max(x), max(y) )
     print(lower_limit, upper_limit)  # looks good: 15.716666666666667 29.458437940024325
     
-    # Reference line is y=x, will create a linspace for x
-    #x_ref = np.linspace(lower_limit, upper_limit, len(y))  # maybe I need to get x_ref in a different way?? x=y is its equation. so...
-     # this looks good too, matches limits above (between them)
-    
-    # If I can maybe plot the y=x line here (or get data from previous plot) then can use this for x-axis data
-    
+ 
     #ref_line = plt.plot(x_comb, x_comb)
-    x_ref = x_comb
+    x_ref = x
     print(np.shape(x_ref))
     
     # Time to calculate deltaT

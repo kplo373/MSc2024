@@ -75,13 +75,17 @@ def main():
     plot1to1(df_full, text_str)
     
     # then the apply_calibration() function to apply this pure sand fit to each sand mixture.
-    from apply_calibration_puresand import apply_calibration
-    y_nctrl_corrected, y_nctrl, x_nctrl = apply_calibration(df_full, text_str)  # use this for debug and purewater versions
-    #df_out = apply_calibration(df_full, text_str)
+    from apply_calibration import apply_calibration  # apply the base pure water calibration first
+    df_out_water = apply_calibration(df_full, text_str)
+    print(df_out_water.columns)
+    
+    from apply_calibration_puresand import apply_calibration_sand  # then use this to calibrate the y_corrected column for sand itself
+    df_out_sand = apply_calibration_sand(df_out_water, text_str)
+
     
     # then calculate deltaT from calibration SVM less the reference 1:1 line (which is the same as the x array for y)
     from get_deltaT import get_deltaT
-    #deltaT = get_deltaT(x_comb, y_pred_plastic, text_str)  # (df_out, text_str)  And change within function!!
+    deltaT = get_deltaT(df_out_sand, text_str)  # (df_out, text_str)  And change within function!!
     #print(deltaT)  # including temperature difference plot
         
     return #y_nctrl_corrected, y_nctrl, x_nctrl

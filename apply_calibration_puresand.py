@@ -17,20 +17,20 @@ from scipy.interpolate import interp1d
 from sklearn.linear_model import LinearRegression
 
 
-def apply_calibration(df_in, str_expt):    
-    # 3. Apply correction to non-control samples, load non-control sample data (x and y are independent)
+def apply_calibration_sand(df_in, str_expt):   # df_in is the df from after water calibration has been applied   
+    # 3. Apply correction to the y_corrected column now!
     x_nctrl = np.array(df_in['temperature_CS']).reshape(-1, 1)
-    y_nctrl = np.array(df_in['temperature_Op']).reshape(-1, 1)
+    y_nctrl = np.array(df_in['y_corrected']).reshape(-1, 1)  # this was corrected using baseline correction in pure water calibration previously
     
     y_cal_vals =  y_nctrl - x_nctrl
     y_nctrl_corrected = y_nctrl - y_cal_vals
-    df_in['y_corrected'] = y_nctrl_corrected  # store corrected y values as another column in the non-control sample
+    df_in['y_corrected_sand'] = y_nctrl_corrected  # store sand corrected y values as another column in the non-control sample
     
     # Create correction look up table
     cal_table_df = pd.DataFrame({'y_val': y_nctrl.ravel(), 'y_cal_adj': y_cal_vals.ravel()})
     cal_table_df.index = np.around(cal_table_df['y_val'], decimals=4)
     cal_table_df = cal_table_df.drop('y_val', axis=1)
-    cal_table_df = cal_table_df.sort_index()
+    cal_table_df = cal_table_df.sort_index()  # maybe this gets rid of the column header for the index? that's okay though
     
     
     # Reset the index and create a new column
@@ -125,8 +125,8 @@ def apply_calibration(df_in, str_expt):
     # Plot SVM Results, Add in Reference Line too
     plt.figure(figsize=(7, 7))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
     #plt.plot(x_pred, y_comb, 'o', color='lightgreen', label='Calibrated Data (Using Pure Water SVM)')
-    plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Calibrated Curve')
-    plt.plot(x_nctrl, y_nctrl, 'r', label='Raw Data')
+    plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Pure Sand Calibration')
+    plt.plot(x_nctrl, y_nctrl, 'r', label='Pure Water Calibration')
     # Plot the 1:1 line across the entire plot from corner to corner
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')
     
@@ -159,6 +159,6 @@ def apply_calibration(df_in, str_expt):
     plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
-    return y_nctrl_corrected, y_nctrl, x_nctrl
+    return df_in
 
 # run this script through the main() function script

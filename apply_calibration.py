@@ -22,7 +22,7 @@ def apply_calibration(df_in, str_expt):
     
     # Load pure water calibration table from saved csv file
     filepath = r'D:\MSc Results\calTable.csv'  # this has the whole df_in for pure water
-    calTable_df = pd.read_csv(filepath, index_col='y_val')  # just want to read a specific column?
+    calTable_df = pd.read_csv(filepath)  #, index_col='y_val')
     print(calTable_df.columns)
     
     # Interpolate to match y_nctrl values with calibration adjustments (as they will have different lengths)
@@ -69,7 +69,7 @@ def apply_calibration(df_in, str_expt):
 
     # Plot Calibration Results, Add in Reference Line too
     plt.figure(figsize=(7, 7))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
-    plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Calibrated Curve')
+    plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Pure Water Calibration')
     plt.plot(x_nctrl, y_nctrl, 'r', label='Raw Data')
     # Plot the 1:1 line across the entire plot from corner to corner
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')

@@ -25,20 +25,30 @@ def get_deltaT_multiple(dict_in, text_str):
     df100 = params.df100
     #print(df0.columns)
     
-    x0 = np.array(df0['temperature_CS'].ravel())  # extracting and converting the series to ndarrays, shrinking to arrays
-    x5 = np.array(df5['temperature_CS'].ravel())
-    x10 = np.array(df10['temperature_CS'].ravel())
-    x25 = np.array(df25['temperature_CS'].ravel())
-    x50 = np.array(df50['temperature_CS'].ravel())
-    x100 = np.array(df100['temperature_CS'].ravel())
+    x0 = df0['temperature_CS'].to_numpy()  # extracting the series
+    x5 = df5['temperature_CS'].to_numpy()
+    x10 = df10['temperature_CS'].to_numpy()
+    x25 = df25['temperature_CS'].to_numpy()
+    x50 = df50['temperature_CS'].to_numpy()
+    x100 = df100['temperature_CS'].to_numpy()
     
-    y0 = np.array(df0['y_corrected'].ravel())  # using the corrected/calibrated y values rather than raw Optris data
-    y5 = np.array(df5['y_corrected'].ravel())
-    y10 = np.array(df10['y_corrected'].ravel())
-    y25 = np.array(df25['y_corrected'].ravel())
-    y50 = np.array(df50['y_corrected'].ravel())
-    y100 = np.array(df100['y_corrected'].ravel())
+    if 'ater' or 'and' in text_str:
+        y0 = df0['y_corrected'].to_numpy()  # using the corrected/calibrated y values rather than raw Optris data
+        y5 = df5['y_corrected'].to_numpy()
+        y10 = df10['y_corrected'].to_numpy()
+        y25 = df25['y_corrected'].to_numpy()
+        y50 = df50['y_corrected'].to_numpy()
+        y100 = df100['y_corrected'].to_numpy()
     
+    '''
+    elif 'and' in text_str:
+        y0 = df0['y_corrected_sand'].to_numpy()  # using the sand calibration instead of pure water for sand experiments - may have already catered for this in apply_calib_multiple...
+        y5 = df5['y_corrected_sand'].to_numpy()
+        y10 = df10['y_corrected_sand'].to_numpy()
+        y25 = df25['y_corrected_sand'].to_numpy()
+        y50 = df50['y_corrected_sand'].to_numpy()
+        y100 = df100['y_corrected_sand'].to_numpy()
+    '''
 
     lower_limit = min(x0[0], x5[0], x10[0], x25[0], x50[0], x100[0],
                       y0[0], y5[0], y10[0], y25[0], y50[0], y100[0])

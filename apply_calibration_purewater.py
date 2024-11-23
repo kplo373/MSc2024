@@ -147,7 +147,7 @@ def apply_calibration(df_in, str_expt):
     # Plot SVM Results, Add in Reference Line too
     plt.figure(figsize=(7, 7))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
     #plt.plot(x_pred, y_comb, 'o', color='lightgreen', label='Calibrated Data (Using Pure Water SVM)')
-    plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Calibrated Curve')
+    plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Pure Water Calibration')
     plt.plot(x_nctrl, y_nctrl, 'r', label='Raw Data')
     # Plot the 1:1 line across the entire plot from corner to corner
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')
@@ -181,6 +181,6 @@ def apply_calibration(df_in, str_expt):
     plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
-    return y_nctrl_corrected, y_nctrl, x_nctrl
+    return df_in    #y_nctrl_corrected, y_nctrl, x_nctrl
 
 # run this script through the main() function script
