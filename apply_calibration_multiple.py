@@ -45,53 +45,55 @@ def apply_calibration_multiple(df_in_dict, str_expt):
     y50 = np.array(df50['temperature_Op']).reshape(-1, 1)
     y100 = np.array(df100['temperature_Op']).reshape(-1, 1)
     
+    if 'ater' in str_expt:
+        print('PICKED WATER CALIBRATION OPTION')
+        # Load pure water calibration table from saved csv file
+        filepath = r'D:\MSc Results\calTable.csv'  # this has the whole df_in for pure water
+        calTable_df = pd.read_csv(filepath)
+        print(calTable_df.columns)
+        
+        # Interpolate to match each y % values with calibration adjustments (as they will have different lengths)
+        interp_func = interp1d(
+           calTable_df.index,
+           calTable_df['y_cal_adj'],
+           kind='linear',  # to ensure linear interpolation
+           bounds_error=False,
+           fill_value="extrapolate")
+        
+        # Applying interpolation function to all y arrays
+        y_cal_adj_interp0 = interp_func(y0.ravel())
+        y_cal_adj_interp5 = interp_func(y5.ravel())
+        y_cal_adj_interp10 = interp_func(y10.ravel())
+        y_cal_adj_interp25 = interp_func(y25.ravel())
+        y_cal_adj_interp50 = interp_func(y50.ravel())
+        y_cal_adj_interp100 = interp_func(y100.ravel())
     
-    # Load pure water calibration table from saved csv file
-    filepath = r'D:\MSc Results\calTable.csv'  # this has the whole df_in for pure water
-    calTable_df = pd.read_csv(filepath)
-    print(calTable_df.columns)
-    
-    # Interpolate to match each y % values with calibration adjustments (as they will have different lengths)
-    interp_func = interp1d(
-       calTable_df.index,
-       calTable_df['y_cal_adj'],
-       kind='linear',  # to ensure linear interpolation
-       bounds_error=False,
-       fill_value="extrapolate")
-    
-    # Applying interpolation function to all y arrays
-    y_cal_adj_interp0 = interp_func(y0.ravel())
-    y_cal_adj_interp5 = interp_func(y5.ravel())
-    y_cal_adj_interp10 = interp_func(y10.ravel())
-    y_cal_adj_interp25 = interp_func(y25.ravel())
-    y_cal_adj_interp50 = interp_func(y50.ravel())
-    y_cal_adj_interp100 = interp_func(y100.ravel())
-
-    # Apply the calibration adjustments (subtraction for correction)
-    y_corr0 = y0.ravel() - y_cal_adj_interp0
-    y_corr5 = y5.ravel() - y_cal_adj_interp5
-    y_corr10 = y10.ravel() - y_cal_adj_interp10
-    y_corr25 = y25.ravel() - y_cal_adj_interp25
-    y_corr50 = y50.ravel() - y_cal_adj_interp50
-    y_corr100 = y100.ravel() - y_cal_adj_interp100
-    
-    # Store corrected values in each DataFrame
-    df0['y_corrected'] = y_corr0
-    df5['y_corrected'] = y_corr5
-    df10['y_corrected'] = y_corr10
-    df25['y_corrected'] = y_corr25
-    df50['y_corrected'] = y_corr50
-    df100['y_corrected'] = y_corr100
+        # Apply the calibration adjustments (subtraction for correction)
+        y_corr0 = y0.ravel() - y_cal_adj_interp0
+        y_corr5 = y5.ravel() - y_cal_adj_interp5
+        y_corr10 = y10.ravel() - y_cal_adj_interp10
+        y_corr25 = y25.ravel() - y_cal_adj_interp25
+        y_corr50 = y50.ravel() - y_cal_adj_interp50
+        y_corr100 = y100.ravel() - y_cal_adj_interp100
+        
+        # Store corrected values in each DataFrame
+        df0['y_corrected'] = y_corr0
+        df5['y_corrected'] = y_corr5
+        df10['y_corrected'] = y_corr10
+        df25['y_corrected'] = y_corr25
+        df50['y_corrected'] = y_corr50
+        df100['y_corrected'] = y_corr100
     
 
     # Load pure sand calibration table for sand experiments as a second step
-    if 'and' in str_expt:
+    elif 'and' in str_expt:
+        print('PICKED SAND CALIBRATION OPTION')
         filepathSand = r'D:\MSc Results\calTableSand.csv'
         calTable_dfSand = pd.read_csv(filepathSand)
         print(calTable_dfSand.columns)
          
         # Interpolate to match each y % values with calibration adjustments (as they will have different lengths)
-        interp_funcSand = interp1d(
+        interp_func = interp1d(
            calTable_dfSand.index,
            calTable_dfSand['y_cal_adj'],
            kind='linear',  # to ensure linear interpolation
@@ -99,28 +101,28 @@ def apply_calibration_multiple(df_in_dict, str_expt):
            fill_value="extrapolate")
          
         # Applying interpolation function to all y arrays
-        y_cal_adj_interp0s = interp_funcSand(y_corr0.ravel())
-        y_cal_adj_interp5s = interp_funcSand(y_corr5.ravel())
-        y_cal_adj_interp10s = interp_funcSand(y_corr10.ravel())
-        y_cal_adj_interp25s = interp_funcSand(y_corr25.ravel())
-        y_cal_adj_interp50s = interp_funcSand(y_corr50.ravel())
-        y_cal_adj_interp100s = interp_funcSand(y_corr100.ravel())
-
+        y_cal_adj_interp0 = interp_func(y0.ravel())
+        y_cal_adj_interp5 = interp_func(y5.ravel())
+        y_cal_adj_interp10 = interp_func(y10.ravel())
+        y_cal_adj_interp25 = interp_func(y25.ravel())
+        y_cal_adj_interp50 = interp_func(y50.ravel())
+        y_cal_adj_interp100 = interp_func(y100.ravel())
+    
         # Apply the calibration adjustments (subtraction for correction)
-        y_corr0s = y_corr0.ravel() - y_cal_adj_interp0s
-        y_corr5s = y_corr5.ravel() - y_cal_adj_interp5s
-        y_corr10s = y_corr10.ravel() - y_cal_adj_interp10s
-        y_corr25s = y_corr25.ravel() - y_cal_adj_interp25s
-        y_corr50s = y_corr50.ravel() - y_cal_adj_interp50s
-        y_corr100s = y_corr100.ravel() - y_cal_adj_interp100s
-         
+        y_corr0 = y0.ravel() - y_cal_adj_interp0
+        y_corr5 = y5.ravel() - y_cal_adj_interp5
+        y_corr10 = y10.ravel() - y_cal_adj_interp10
+        y_corr25 = y25.ravel() - y_cal_adj_interp25
+        y_corr50 = y50.ravel() - y_cal_adj_interp50
+        y_corr100 = y100.ravel() - y_cal_adj_interp100
+        
         # Store corrected values in each DataFrame
-        df0['y_corr_sand'] = y_corr0s
-        df5['y_corr_sand'] = y_corr5s
-        df10['y_corr_sand'] = y_corr10s
-        df25['y_corr_sand'] = y_corr25s
-        df50['y_corr_sand'] = y_corr50s
-        df100['y_corr_sand'] = y_corr100s
+        df0['y_corrected'] = y_corr0
+        df5['y_corrected'] = y_corr5
+        df10['y_corrected'] = y_corr10
+        df25['y_corrected'] = y_corr25
+        df50['y_corrected'] = y_corr50
+        df100['y_corrected'] = y_corr100
 
 
     # Need to create limits for the plots below so that the plots are square-shaped
@@ -135,34 +137,20 @@ def apply_calibration_multiple(df_in_dict, str_expt):
             return math.floor(n)
         return math.ceil(n)
 
-    # For water experiments, setting the limits
-    if 'ater' in str_expt:
-        lower_limit = min(y_corr0[0], x0[0], y_corr5[0], x5[0], y_corr10[0], x10[0], y_corr25[0], x25[0],
+    # Setting the limits for the plot
+    lower_limit = min(y_corr0[0], x0[0], y_corr5[0], x5[0], y_corr10[0], x10[0], y_corr25[0], x25[0],
                       y_corr50[0], x50[0], y_corr100[0], x100[0])
-        lower_lim = normal_roundC(lower_limit) - 1
+    lower_lim = normal_roundC(lower_limit) - 1
     
-        upper_limit = max(y_corr0[-1], x0[-1], y_corr5[-1], x5[-1], y_corr10[-1], x10[-1], 
+    upper_limit = max(y_corr0[-1], x0[-1], y_corr5[-1], x5[-1], y_corr10[-1], x10[-1], 
                           y_corr25[-1], x25[-1], y_corr50[-1], x50[-1], y_corr100[-1], x100[-1])
-        upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
+    upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
 
-        y_list = [y_corr0, y_corr5, y_corr10, y_corr25, y_corr50, y_corr100]
-        
-
-    # For sand experiments, setting the limits
-    elif 'and' in str_expt:
-        lower_limit = min(y_corr0s[0], x0[0], y_corr5s[0], x5[0], y_corr10s[0], x10[0], y_corr25s[0], x25[0],
-                      y_corr50s[0], x50[0], y_corr100s[0], x100[0])
-        lower_lim = normal_roundC(lower_limit) - 1
-    
-        upper_limit = max(y_corr0s[-1], x0[-1], y_corr5s[-1], x5[-1], y_corr10s[-1], x10[-1], 
-                          y_corr25s[-1], x25[-1], y_corr50s[-1], x50[-1], y_corr100s[-1], x100[-1])
-        upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
-
-        y_list = [y_corr0s, y_corr5s, y_corr10s, y_corr25s, y_corr50s, y_corr100s]
+    y_list = [y_corr0, y_corr5, y_corr10, y_corr25, y_corr50, y_corr100]
         
 
     # Plot Calibrated Results, Add in Reference Line too
-    plt.figure(figsize=(6, 6))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
+    plt.figure(figsize=(5, 5))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
     
     # Combine all x and y arrays into a list (for plotting in a green spectrum)
     x_list = [x0, x5, x10, x25, x50, x100]
@@ -184,6 +172,7 @@ def apply_calibration_multiple(df_in_dict, str_expt):
         plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'Calibrated {labels[i]}', alpha=0.6)  # plotting the data in a green spectrum
         
     #plt.text(23, 12, '(Using Pure Water)')  # adding in text to the plot in the bottom RH corner
+    plt.axvline(x=21, color='k', linestyle='dotted')
     plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
     plt.ylim(lower_lim, upper_lim)
     

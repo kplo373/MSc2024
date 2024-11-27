@@ -39,16 +39,7 @@ def get_deltaT_multiple(dict_in, text_str):
         y25 = df25['y_corrected'].to_numpy()
         y50 = df50['y_corrected'].to_numpy()
         y100 = df100['y_corrected'].to_numpy()
-    
-    '''
-    elif 'and' in text_str:
-        y0 = df0['y_corrected_sand'].to_numpy()  # using the sand calibration instead of pure water for sand experiments - may have already catered for this in apply_calib_multiple...
-        y5 = df5['y_corrected_sand'].to_numpy()
-        y10 = df10['y_corrected_sand'].to_numpy()
-        y25 = df25['y_corrected_sand'].to_numpy()
-        y50 = df50['y_corrected_sand'].to_numpy()
-        y100 = df100['y_corrected_sand'].to_numpy()
-    '''
+
 
     lower_limit = min(x0[0], x5[0], x10[0], x25[0], x50[0], x100[0],
                       y0[0], y5[0], y10[0], y25[0], y50[0], y100[0])
@@ -59,7 +50,7 @@ def get_deltaT_multiple(dict_in, text_str):
     
     # If I can maybe plot the y=x line here (or get data from previous plot) then can use this for x-axis data
     #ref_line = plt.plot(x_comb, x_comb)
-    x_ref0 = x0
+    x_ref0 = x0  # not sure why I made these separate actually, could have just used x0 etc. below in deltaT calculations
     x_ref5 = x5
     x_ref10 = x10
     x_ref25 = x25
@@ -95,7 +86,7 @@ def get_deltaT_multiple(dict_in, text_str):
 
 
     # Plotting deltaT against Environmental Temperature
-    plt.figure(figsize=(6, 6))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
+    plt.figure(figsize=(6, 4))  # controlling size of font used by making it bigger or smaller. This plot doesn't need to be square!
     
     # Combine all x and y arrays into a list (for plotting in a green spectrum)
     x_list = [x0, x5, x10, x25, x50, x100]
@@ -103,10 +94,11 @@ def get_deltaT_multiple(dict_in, text_str):
 
     # Specify the percentage labels
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
+    colors = ['r', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple']  # just using the colours of the rainbow for now  
     
     # Set the colormap to 'Blues' and get 6 shades of blue
-    cmap = cm.get_cmap('Reds', 6)
-    colors = cmap(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker green
+    #cmap = cm.get_cmap('Reds', 6)
+    #colors = cmap(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker green
 
     for i in range(6):
         #plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'$\Delta T {labels[i]}$', alpha=0.6)
@@ -114,6 +106,7 @@ def get_deltaT_multiple(dict_in, text_str):
         plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=rf'$\Delta T$ {label_str}', alpha=0.6)  # plotting the data in a red spectrum
 
     plt.axhline(y=0, color='k', linestyle='--')
+    plt.axvline(x=21, color='k', linestyle='dotted')
     plt.xlabel('Environmental Temperature (degrees Celsius)')
     plt.ylabel(r'$\Delta T$ (degrees Celsius)')
     plt.title(text_str +' Temperature Difference')
@@ -140,8 +133,57 @@ def get_deltaT_multiple(dict_in, text_str):
     plt.show()
     
     # Creating two dictionaries to transfer/return the data arrays used to make this deltaT plot
-    dict_xref = {'x_ref0': x_ref0, 'x_ref5': x_ref5, 'x_ref10': x_ref10, 'x_ref25': x_ref25, 'x_ref50': x_ref50, 'x_ref100': x_ref100}
+    dict_x = {'x0': x0, 'x5': x5, 'x10': x10, 'x25': x25, 'x50': x50, 'x100': x100}
     dict_deltaT = {'delT0': deltaT0, 'delT5': deltaT5, 'delT10': deltaT10, 'delT25': deltaT25, 'delT50': deltaT50, 'delT100': deltaT100}
     
-    return dict_xref, dict_deltaT
+    # Using ChatGPT to try the moving average to smooth these deltaT lines
+    window_size = 50  # window for the moving average
+    window = np.ones(window_size) / window_size  # moving average filter
+
+    # Apply the filters using convolution
+    y_smooth0 = np.convolve(deltaT0, window, mode='valid')
+    y_smooth5 = np.convolve(deltaT5, window, mode='valid')
+    y_smooth10 = np.convolve(deltaT10, window, mode='valid')
+    y_smooth25 = np.convolve(deltaT25, window, mode='valid')
+    y_smooth50 = np.convolve(deltaT50, window, mode='valid')
+    y_smooth100 = np.convolve(deltaT100, window, mode='valid')
+
+    # Adjust x to match the length of y_smooth - or else the data extrapolates at both ends and this data isn't there
+    offset = (window_size - 1) // 2  # offset for odd or even window size
+    x_smooth0 = x0[offset : -offset] if window_size % 2 == 1 else x0[offset + 1 : -offset]
+
+
+    # Adjust x to match the length of y_smooth - or else the data extrapolates at both ends and this data isn't there
+    offset = (window_size - 1) // 2  # offset for odd or even window size
+    x_smooth0 = x0[offset : -offset] if window_size % 2 == 1 else x0[offset + 1 : -offset]
+    x_smooth5 = x5[offset : -offset] if window_size % 2 == 1 else x5[offset + 1 : -offset]
+    x_smooth10 = x10[offset : -offset] if window_size % 2 == 1 else x10[offset + 1 : -offset]
+    x_smooth25 = x25[offset : -offset] if window_size % 2 == 1 else x25[offset + 1 : -offset]
+    x_smooth50 = x50[offset : -offset] if window_size % 2 == 1 else x50[offset + 1 : -offset]
+    x_smooth100 = x100[offset : -offset] if window_size % 2 == 1 else x100[offset + 1 : -offset]
+
+    x_smooth_list = [x_smooth0, x_smooth5, x_smooth10, x_smooth25, x_smooth50, x_smooth100]  # need to plot these all now
+    y_smooth_list = [y_smooth0, y_smooth5, y_smooth10, y_smooth25, y_smooth50, y_smooth100]
+
+    x_list = [x0, x5, x10, x25, x50, x100]
+    y_list = [deltaT0, deltaT5, deltaT10, deltaT25, deltaT50, deltaT100]
+    labels = ['0%', '5%', '10%', '25%', '50%', '100%']
+    colors_list = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']  # just using the colours of the rainbow for now 
+
+    for i in range(6):
+        label_str = labels[i]  # using the same labels as the plot above (0, 5, 10% etc.)
+        plt.plot(x_smooth_list[i], y_smooth_list[i], lw=2, color=colors_list[i], label=rf'$\Delta T$ {label_str}', alpha=1.0)
+        plt.plot(x_list[i], y_list[i], lw=1, color=colors_list[i], alpha=0.5)  # for the noisy data
+
+    plt.axhline(y=0, color='k', linestyle='--')
+    plt.axvline(x=21, color='k', linestyle='dotted')
+    plt.xlabel('Environmental Temperature (degrees Celsius)')
+    plt.ylabel(r'$\Delta T$ (degrees Celsius)')
+    plt.title(text_str +' Temperature Difference')
+    plt.legend()
+    plt.grid()
+    plt.show()
+    
+    
+    return dict_x, dict_deltaT
 

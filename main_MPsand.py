@@ -73,6 +73,7 @@ def main():
     dt_CSh100, temps_arrCSh100, stdevs_arrCSh100 = read_CampbellSci(pathCSh100)
     df_sand_avgCSh100 = sand_avgCS(dt_CSh100, temps_arrCSh100, stdevs_arrCSh100)
     
+    print(df_sand_avgCSh100.columns)  #******************
     
     # Collect the Optris thermal camera data
     from read_Optris import read_Optris, resample_Optris, average_Optris
@@ -130,6 +131,7 @@ def main():
     resampled_df_a3h100 = resample_Optris(dt_Oph100, a3h100)
     avgOp_dfh100 = average_Optris(resampled_df_a1h100, resampled_df_a3h100)
     
+    print(avgOp_dfh100.columns)  #***** does this have stdev/sterr in it??
     
     # Merge these different sensors together into a cold and hot dataframe per percentage of plastic
     from create_merged_df import create_merged_df
@@ -152,6 +154,7 @@ def main():
     df_merged_h100 = create_merged_df(avgOp_dfh100, df_sand_avgCSh100)
     # not easily possible to merge all these dfs together into one, as they have different datetimes along their indices per df...
     
+    print(df_merged_c100.columns)  # does this have stdev/sterr??
     
     # Removing first 15 minutes of each data record/merged dataframe
     df_ready_c0 = df_merged_c0.copy()  # cold 0% MP-sand (pure sand)
@@ -239,20 +242,87 @@ def main():
     
     # Then calculate deltaT from calibration SVM less the reference 1:1 line
     from get_deltaT_multiple import get_deltaT_multiple
-    dict_xref, dict_deltaT = get_deltaT_multiple(df_calib_dict, text_str)
+    dict_x, dict_deltaT = get_deltaT_multiple(df_calib_dict, text_str)
     #print(dict_deltaT.keys())  # including temperature difference plot
     
     
-    return 
+    return dict_x, dict_deltaT
 
 if __name__ == '__main__':
-    main()    
+    dict_x, dict_deltaT = main()    
     
     
+#%% Checking smoothing with deltaT plot comparison - works here!! Just need to get it working within the get_deltaT_multiple.py function...
+from types import SimpleNamespace
+params_x = SimpleNamespace(**dict_x)
+x0 = params_x.x0
+x5 = params_x.x5
+x10 = params_x.x10
+x25 = params_x.x25
+x50 = params_x.x50
+x100 = params_x.x100
 
-    
-    
-    
+params_delT = SimpleNamespace(**dict_deltaT)
+delT0 = params_delT.delT0 
+delT5 = params_delT.delT5 
+delT10 = params_delT.delT10 
+delT25 = params_delT.delT25
+delT50 = params_delT.delT50
+delT100 = params_delT.delT100 
+   
+   
+import numpy as np
+import matplotlib.pyplot as plt
+# Using ChatGPT to try the moving average to smooth these deltaT lines
+window_size = 50  # window for the moving average
+window = np.ones(window_size) / window_size  # moving average filter
+
+# Apply the filters using convolution
+y_smooth0 = np.convolve(delT0, window, mode='valid')
+y_smooth5 = np.convolve(delT5, window, mode='valid')
+y_smooth10 = np.convolve(delT10, window, mode='valid')
+y_smooth25 = np.convolve(delT25, window, mode='valid')
+y_smooth50 = np.convolve(delT50, window, mode='valid')
+y_smooth100 = np.convolve(delT100, window, mode='valid')
+
+# Adjust x to match the length of y_smooth - or else the data extrapolates at both ends and this data isn't there
+offset = (window_size - 1) // 2  # offset for odd or even window size
+x_smooth0 = x0[offset : -offset] if window_size % 2 == 1 else x0[offset + 1 : -offset]
+
+
+# Adjust x to match the length of y_smooth - or else the data extrapolates at both ends and this data isn't there
+offset = (window_size - 1) // 2  # offset for odd or even window size
+x_smooth0 = x0[offset : -offset] if window_size % 2 == 1 else x0[offset + 1 : -offset]
+x_smooth5 = x5[offset : -offset] if window_size % 2 == 1 else x5[offset + 1 : -offset]
+x_smooth10 = x10[offset : -offset] if window_size % 2 == 1 else x10[offset + 1 : -offset]
+x_smooth25 = x25[offset : -offset] if window_size % 2 == 1 else x25[offset + 1 : -offset]
+x_smooth50 = x50[offset : -offset] if window_size % 2 == 1 else x50[offset + 1 : -offset]
+x_smooth100 = x100[offset : -offset] if window_size % 2 == 1 else x100[offset + 1 : -offset]
+
+x_smooth_list = [x_smooth0, x_smooth5, x_smooth10, x_smooth25, x_smooth50, x_smooth100]  # need to plot these all now
+y_smooth_list = [y_smooth0, y_smooth5, y_smooth10, y_smooth25, y_smooth50, y_smooth100]
+print(np.shape(x_smooth_list[0]), np.shape(y_smooth_list[0]))  #(17215,) (17215,) shape here which is good! why is it different in deltaT??
+
+x_list = [x0, x5, x10, x25, x50, x100]
+y_list = [delT0, delT5, delT10, delT25, delT50, delT100]
+labels = ['0%', '5%', '10%', '25%', '50%', '100%']
+colors_list = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']  # just using the colours of the rainbow for now 
+
+for i in range(6):
+    print(colors_list[i])
+    label_str = labels[i]  # using the same labels as the plot above (0, 5, 10% etc.)
+    plt.plot(x_smooth_list[i], y_smooth_list[i], lw=1, color=colors_list[i], label=rf'$\Delta T$ {label_str}', alpha=1.0)
+    plt.plot(x_list[i], y_list[i], lw=2, color=colors_list[i], alpha=0.5)  # for the noisy data
+
+text_str = 'Shaved Plastic and Sand'
+
+plt.axhline(y=0, color='k', linestyle='--')
+plt.axvline(x=21, color='k', linestyle='dotted')
+plt.xlabel('Environmental Temperature (degrees Celsius)')
+plt.ylabel(r'$\Delta T$ (degrees Celsius)')
+plt.title(text_str +' Temperature Difference')
+plt.legend()
+plt.show()
     
     
     

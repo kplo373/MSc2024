@@ -83,7 +83,7 @@ def plot1to1_multiple(dict_parameters, str_expt):
     upper_lim = normal_round(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
     print('Limits:', lower_lim, upper_lim)
     
-    plt.figure(figsize=(6, 6))  # make it into a square shape, same axes limits!
+    plt.figure(figsize=(5, 5))  # make it into a square shape, same axes limits!
     plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
     plt.ylim(lower_lim, upper_lim)
 
@@ -91,6 +91,7 @@ def plot1to1_multiple(dict_parameters, str_expt):
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference')
     #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, xerr=seCSc0, color='k')  # just include one errorbar maybe? Is there a better way to show them separately?
     #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, color='k')   
+    plt.axvline(x=21, color='k', linestyle='dotted')  # for approximate ambient temperature
     
     for i in range(6):
         plt.plot(x_arr[i], y_arr[i], lw=1, color=colors[i], label=f'{labels[i]}', alpha=0.6)  #color=colors1[i]
@@ -98,7 +99,7 @@ def plot1to1_multiple(dict_parameters, str_expt):
     #for j in range(6):  # doing a second separate loop so that the legend lists all cold then hot experiments in the plot
         #plt.plot(x_hot_arr[j], y_hot_arr[j], lw=1, color=colors2[j], label=f'Hot {labels[j]}', alpha=0.6)  # alpha parameter sets transparency/opacity
     
-    plt.title('Raw Data Comparison For ' + str_expt)  # including what percentage of plastic etc.
+    plt.title('Raw Comparison For ' + str_expt)  # including what percentage of plastic etc.
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
     plt.grid()
