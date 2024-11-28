@@ -23,7 +23,7 @@ def get_deltaT_multiple(dict_in, text_str):
     df25 = params.df25
     df50 = params.df50
     df100 = params.df100
-    #print(df0.columns)
+    print(df0.columns)  # need to include the standard error arrays in the background noise data - maybe just the vertical (y) direction?
     
     x0 = df0['temperature_CS'].to_numpy()  # extracting the series
     x5 = df5['temperature_CS'].to_numpy()

@@ -30,6 +30,7 @@ def apply_calibration_multiple(df_in_dict, str_expt):
     df50 = params.df50
     df100 = params.df100
     
+    print(df0.columns)  # Index(['temperature_CS', 'stdev_CS', 'sterr_CS', 'temperature_Op', 'stdev_Op','sterr_Op'])
     # get temperature arrays per percentage of plastic from dfs above, all are raw data
     x0 = np.array(df0['temperature_CS']).reshape(-1, 1)
     x5 = np.array(df5['temperature_CS']).reshape(-1, 1)
@@ -69,7 +70,7 @@ def apply_calibration_multiple(df_in_dict, str_expt):
         y_cal_adj_interp100 = interp_func(y100.ravel())
     
         # Apply the calibration adjustments (subtraction for correction)
-        y_corr0 = y0.ravel() - y_cal_adj_interp0
+        y_corr0 = y0.ravel() - y_cal_adj_interp0  # after this calibration, the y_sterr (and y_stdev) needs to include the y_cal_adj_interp sterr.
         y_corr5 = y5.ravel() - y_cal_adj_interp5
         y_corr10 = y10.ravel() - y_cal_adj_interp10
         y_corr25 = y25.ravel() - y_cal_adj_interp25
@@ -83,7 +84,33 @@ def apply_calibration_multiple(df_in_dict, str_expt):
         df25['y_corrected'] = y_corr25
         df50['y_corrected'] = y_corr50
         df100['y_corrected'] = y_corr100
-    
+        
+        # Calculate the y_sterr for all calibrated/corrected y percentages, and store in each df
+        df0['y_corr_sterr'] = np.sqrt( (df0['sterr_Op'])**2 + ( np.sqrt(df0['sterr_Op']**2 + df0['sterr_CS']**2) )**2 )  # =sqrt(y_se^2 + (sqrt(y_se^2 + x_se^2))^2)
+        df5['y_corr_sterr'] = np.sqrt( (df5['sterr_Op'])**2 + ( np.sqrt(df5['sterr_Op']**2 + df5['sterr_CS']**2) )**2 )
+        df10['y_corr_sterr'] = np.sqrt( (df10['sterr_Op'])**2 + ( np.sqrt(df10['sterr_Op']**2 + df10['sterr_CS']**2) )**2 )
+        df25['y_corr_sterr'] = np.sqrt( (df25['sterr_Op'])**2 + ( np.sqrt(df25['sterr_Op']**2 + df25['sterr_CS']**2) )**2 )
+        df50['y_corr_sterr'] = np.sqrt( (df50['sterr_Op'])**2 + ( np.sqrt(df50['sterr_Op']**2 + df50['sterr_CS']**2) )**2 )
+        df100['y_corr_sterr'] = np.sqrt( (df100['sterr_Op'])**2 + ( np.sqrt(df100['sterr_Op']**2 + df100['sterr_CS']**2) )**2 )
+        
+        # Calculate the mean standard errors for both x (thermocouples) and y_corrected (Optris) data
+        xSE0 = np.mean(df0['sterr_CS'])
+        xSE5 = np.mean(df5['sterr_CS'])
+        xSE10 = np.mean(df10['sterr_CS'])
+        xSE25 = np.mean(df25['sterr_CS'])
+        xSE50 = np.mean(df50['sterr_CS'])
+        xSE100 = np.mean(df100['sterr_CS'])
+        print(xSE0, xSE5, xSE10, xSE25, xSE50, xSE100)
+        
+        
+        ycSE0 = np.mean(df0['y_corr_sterr'])
+        ycSE5 = np.mean(df5['y_corr_sterr'])
+        ycSE10 = np.mean(df10['y_corr_sterr'])
+        ycSE25 = np.mean(df25['y_corr_sterr'])
+        ycSE50 = np.mean(df50['y_corr_sterr'])
+        ycSE100 = np.mean(df100['y_corr_sterr'])
+        print(ycSE0, ycSE5, ycSE10, ycSE25, ycSE50, ycSE100)
+        
 
     # Load pure sand calibration table for sand experiments as a second step
     elif 'and' in str_expt:
@@ -124,6 +151,34 @@ def apply_calibration_multiple(df_in_dict, str_expt):
         df50['y_corrected'] = y_corr50
         df100['y_corrected'] = y_corr100
 
+        # Calculate the y_sterr for all calibrated/corrected y percentages, and store in each df
+        df0['y_corr_sterr'] = np.sqrt( (df0['sterr_Op'])**2 + ( np.sqrt(df0['sterr_Op']**2 + df0['sterr_CS']**2) )**2 )  # =sqrt(y_se^2 + (sqrt(y_se^2 + x_se^2))^2)
+        df5['y_corr_sterr'] = np.sqrt( (df5['sterr_Op'])**2 + ( np.sqrt(df5['sterr_Op']**2 + df5['sterr_CS']**2) )**2 )
+        df10['y_corr_sterr'] = np.sqrt( (df10['sterr_Op'])**2 + ( np.sqrt(df10['sterr_Op']**2 + df10['sterr_CS']**2) )**2 )
+        df25['y_corr_sterr'] = np.sqrt( (df25['sterr_Op'])**2 + ( np.sqrt(df25['sterr_Op']**2 + df25['sterr_CS']**2) )**2 )
+        df50['y_corr_sterr'] = np.sqrt( (df50['sterr_Op'])**2 + ( np.sqrt(df50['sterr_Op']**2 + df50['sterr_CS']**2) )**2 )
+        df100['y_corr_sterr'] = np.sqrt( (df100['sterr_Op'])**2 + ( np.sqrt(df100['sterr_Op']**2 + df100['sterr_CS']**2) )**2 )
+        
+        #print(df0['y_corr_sterr'])
+        #print(df0.columns)
+        
+        # Calculate the mean standard errors for both x (thermocouples) and y_corrected (Optris) data
+        xSE0 = np.mean(df0['sterr_CS'])
+        xSE5 = np.mean(df5['sterr_CS'])
+        xSE10 = np.mean(df10['sterr_CS'])
+        xSE25 = np.mean(df25['sterr_CS'])
+        xSE50 = np.mean(df50['sterr_CS'])
+        xSE100 = np.mean(df100['sterr_CS'])
+        print(xSE0, xSE5, xSE10, xSE25, xSE50, xSE100)
+        
+        
+        ycSE0 = np.mean(df0['y_corr_sterr'])
+        ycSE5 = np.mean(df5['y_corr_sterr'])
+        ycSE10 = np.mean(df10['y_corr_sterr'])
+        ycSE25 = np.mean(df25['y_corr_sterr'])
+        ycSE50 = np.mean(df50['y_corr_sterr'])
+        ycSE100 = np.mean(df100['y_corr_sterr'])
+        print(ycSE0, ycSE5, ycSE10, ycSE25, ycSE50, ycSE100)
 
     # Need to create limits for the plots below so that the plots are square-shaped
     import math

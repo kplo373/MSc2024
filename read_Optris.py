@@ -47,8 +47,7 @@ def read_Optris(filepath):
     date_val = date_line.split(delim)[1]
     time_val = time_line.split(delim)[1]    
     
-    print(f"Date: {date_val}")
-    print(f"Time: {time_val}")
+    print(f"Date: {date_val}, Time: {time_val}")  # to show that the code is still running when used in a main script
     
     # Combine date and time to a single string
     datetime_str = date_val + ' ' + time_val   # f"{date_value} {time_value}"  is chatGPT's method
@@ -80,7 +79,7 @@ def read_Optris(filepath):
 
     # Now get the other columns!!
     # Assign new names to the data columns
-    print(df_Optris.columns)   # has 11 columns
+    #print(df_Optris.columns)   # has 11 columns
     
     new_column_names = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']  # not sure what 'Unnamed: 5' column is for? so made it 'nan'
 
@@ -150,7 +149,7 @@ resampled_df_a3 = resample_Optris(datetimes, a3)
 #%% Averaging and Uncertainties Function
     
 def average_Optris(resampled_dfa1, resampled_dfa2):  # resampled_dfa1 and resampled_dfa2 represent 2 like areas: area1 & area3 for half the surface, or area2 & area4 for thermocouple surface
-    std_specs = 2.4  # deg C, the accuracy for the Optris thermal PI450 camera
+    std_specs = 0.04 # K=degC. Initially thought it was 2.4 deg C but checked optics, this is accuracy/thermal sensitivity for the Optris thermal PI450 camera
     stdev_arr = np.zeros(len(resampled_dfa1.index))
     sterr_arr = np.zeros(len(resampled_dfa1.index))
     

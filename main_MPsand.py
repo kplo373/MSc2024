@@ -14,8 +14,8 @@ and: nurdles = pellets
 """
 
 import sys
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
-#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
+#sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
+sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
 
 import pandas as pd
 
@@ -73,7 +73,7 @@ def main():
     dt_CSh100, temps_arrCSh100, stdevs_arrCSh100 = read_CampbellSci(pathCSh100)
     df_sand_avgCSh100 = sand_avgCS(dt_CSh100, temps_arrCSh100, stdevs_arrCSh100)
     
-    print(df_sand_avgCSh100.columns)  #******************
+    #print(df_sand_avgCSh100.columns)  #******************this has standard deviation and error.
     
     # Collect the Optris thermal camera data
     from read_Optris import read_Optris, resample_Optris, average_Optris
@@ -131,7 +131,7 @@ def main():
     resampled_df_a3h100 = resample_Optris(dt_Oph100, a3h100)
     avgOp_dfh100 = average_Optris(resampled_df_a1h100, resampled_df_a3h100)
     
-    print(avgOp_dfh100.columns)  #***** does this have stdev/sterr in it??
+    #print(avgOp_dfh100.columns)  #***** This has stdev/sterr too!
     
     # Merge these different sensors together into a cold and hot dataframe per percentage of plastic
     from create_merged_df import create_merged_df
@@ -154,7 +154,7 @@ def main():
     df_merged_h100 = create_merged_df(avgOp_dfh100, df_sand_avgCSh100)
     # not easily possible to merge all these dfs together into one, as they have different datetimes along their indices per df...
     
-    print(df_merged_c100.columns)  # does this have stdev/sterr??
+    #print(df_merged_c100.columns)  # does this have stdev/sterr?? YES, has both for both sensors
     
     # Removing first 15 minutes of each data record/merged dataframe
     df_ready_c0 = df_merged_c0.copy()  # cold 0% MP-sand (pure sand)
@@ -226,7 +226,7 @@ def main():
     df_full25 = pd.concat([df_trimmed_c25, df_trim_hot_rev25])
     df_full50 = pd.concat([df_trimmed_c50, df_trim_hot_rev50])
     df_full100 = pd.concat([df_trimmed_c100, df_trim_hot_rev100])
-    
+    print(df_full100.columns)  # think this has standard deviation too yay! 
     
     # To plot the 1-1 temperature plot
     from plot1to1_multiple import plot1to1_multiple
