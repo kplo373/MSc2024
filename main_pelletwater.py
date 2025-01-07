@@ -236,7 +236,7 @@ def main():
     from apply_calibration_multiple import apply_calibration_multiple
     df_calib_dict = apply_calibration_multiple(df_full_dict, text_str)
     
-    # Then calculate deltaT from calibration SVM less the reference 1:1 line
+    # Then calculate deltaT from calibration less the reference 1:1 line
     from get_deltaT_multiple import get_deltaT_multiple
     dict_x, dict_deltaT = get_deltaT_multiple(df_calib_dict, text_str)
     #print(dict_deltaT.keys())  # including temperature difference plot

@@ -109,7 +109,7 @@ the_filepath = r"D:\MSc Results\August_2024\Tuesday13AugAM\CR3000_Table1.dat"
 dt_objs, temps_arr, stdevs_arr = read_CampbellSci(the_filepath)
 '''
 
-#%% Averaging Function for Sand and Pure Experiments
+#%% Averaging Function for Sand and Pure Experiments (used different thermocouples to Water Experiments)
 def sand_avgCS(dt_objs, temps_arr, prev_std_arr):
     # Take the mean/average of all consistent thermocouples (only H1-3 for sand experiments, starting Wed 31 July PM and onwards)
     ref_dt = np.datetime64('2024-07-31T15:00:00')  # the 31 July PM experiment started at 15:09:30 PM and the AM test had the faulty computer so didn't work

@@ -40,7 +40,38 @@ def get_deltaT_multiple(dict_in, text_str):
         y50 = df50['y_corrected'].to_numpy()
         y100 = df100['y_corrected'].to_numpy()
 
-
+    # Just to check how 0% plastic is aligned to reference line (should be on it)
+    # Need to create limits for the plots below so that the plots are square-shaped
+    import math
+    def normal_roundH(n):  # create a hot function to round up if .3 or higher, or round down if less than .3. 
+        if n - math.floor(n) < 0.3:
+            return math.floor(n)
+        return math.ceil(n)
+    
+    def normal_roundC(n):  # create a function to round up if .5 or higher, or round down if less than .5
+        if n - math.floor(n) < 0.5:
+            return math.floor(n)
+        return math.ceil(n)
+    
+    lower_limit = min(y0[0], x0[0])
+    lower_lim = normal_roundC(lower_limit) - 1
+    upper_limit = max(y0[-1], x0[-1])
+    upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
+    
+    plt.figure(figsize=(5, 5))
+    plt.plot(x0, y0, label='Calibrated Data')
+    plt.plot(x0, x0, label='Reference')
+    plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
+    plt.ylim(lower_lim, upper_lim)
+    plt.title('0% '+ text_str)
+    plt.xlabel('Thermocouple Temperature (degrees Celsius)')
+    plt.ylabel('Calibrated Camera Temperature (degrees Celsius)')
+    plt.legend()
+    plt.grid()
+    plt.show()
+    
+    
+    # For actual plot:
     lower_limit = min(x0[0], x5[0], x10[0], x25[0], x50[0], x100[0],
                       y0[0], y5[0], y10[0], y25[0], y50[0], y100[0])
     upper_limit = max(x0[-1], x5[-1], x10[-1], x25[-1], x50[-1], x100[-1],
@@ -137,6 +168,7 @@ def get_deltaT_multiple(dict_in, text_str):
     dict_deltaT = {'delT0': deltaT0, 'delT5': deltaT5, 'delT10': deltaT10, 'delT25': deltaT25, 'delT50': deltaT50, 'delT100': deltaT100}
       
     
+    # SMOOTHING / MOVING AVERAGE
     # Using ChatGPT to try the moving average to smooth these deltaT lines
     window_size = 50  # window for the moving average
     window = np.ones(window_size) / window_size  # moving average filter
@@ -211,12 +243,12 @@ def get_deltaT_multiple(dict_in, text_str):
     y_lower100 = deltaT100 - delT_sterr100
     
     # Plot the error envelope
-    plt.fill_between(x0, y_lower0, y_upper0, color='red', alpha=0.5)  #, label='Error envelope')
-    plt.fill_between(x5, y_lower5, y_upper5, color='orange', alpha=0.5) 
-    plt.fill_between(x10, y_lower10, y_upper10, color='yellow', alpha=0.5) 
-    plt.fill_between(x25, y_lower25, y_upper25, color='green', alpha=0.5) 
-    plt.fill_between(x50, y_lower50, y_upper50, color='blue', alpha=0.5) 
-    plt.fill_between(x100, y_lower100, y_upper100, color='purple', alpha=0.5) 
+    plt.fill_between(x0, y_lower0, y_upper0, color='red', alpha=0.2)  #, label='Error envelope')
+    plt.fill_between(x5, y_lower5, y_upper5, color='orange', alpha=0.2) 
+    plt.fill_between(x10, y_lower10, y_upper10, color='yellow', alpha=0.2) 
+    plt.fill_between(x25, y_lower25, y_upper25, color='green', alpha=0.2) 
+    plt.fill_between(x50, y_lower50, y_upper50, color='blue', alpha=0.2) 
+    plt.fill_between(x100, y_lower100, y_upper100, color='purple', alpha=0.2) 
     
     x_smooth_list = [x_smooth0, x_smooth5, x_smooth10, x_smooth25, x_smooth50, x_smooth100]  # need to plot these all now
     y_smooth_list = [y_smooth0, y_smooth5, y_smooth10, y_smooth25, y_smooth50, y_smooth100]
