@@ -116,7 +116,8 @@ def sand_avgCS(dt_objs, temps_arr, prev_std_arr):
     avg_temps = np.zeros(len(temps_arr[0,:]))  # preallocating the new average temperatures array to have same length as temp1
     stdev_arr = np.zeros(len(temps_arr[0,:]))
     sterr_arr = np.zeros(len(temps_arr[0,:]))
-    therm_std = 1.75  # deg C, this is standard deviation uncertainty per thermocouple, from the manual specifications - used below to calculate mean stdev
+    therm_std = 0.45  # was 1.75 deg C, this is standard deviation uncertainty per thermocouple, from the manual specifications - used below to calculate mean stdev
+    # 0.45 deg C is after comparing to RBR sensors (thermocouple's largest difference was 0.44 deg C + 0.01 deg C for RBR uncertainty = 0.45 deg C!)
     
     
     if dt_objs[0] < ref_dt:
@@ -170,7 +171,7 @@ def water_avgCS(dt_objs, temps_arr, prev_std_arr):
     avg_temps = np.zeros(len(temps_arr[0,:]))  # preallocating the new average temperatures array to have same length as temp1
     stdev_arr = np.zeros(len(temps_arr[0,:]))
     sterr_arr = np.zeros(len(temps_arr[0,:]))
-    therm_std = 1.75  # deg C, this is standard deviation uncertainty per thermocouple, from the manual specifications - used below to calculate mean stdev
+    therm_std = 0.45  # was 1.75 deg C, this is standard deviation uncertainty per thermocouple, from the manual specifications - used below to calculate mean stdev
     
     
     if dt_objs[0] < ref_dt:

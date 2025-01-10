@@ -22,14 +22,14 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # Get RBR data
-filepathR = r"D:\MSc Results\RBR_Test\Part1redo\060728_20241112_1014.xlsx"  # Part 1
-#filepathR = r"D:\MSc Results\RBR_Test\Part2redo\060728_20241112_1055.xlsx"  # Part 2
+#filepathR = r"D:\MSc Results\RBR_Test\Part1redo\060728_20241112_1014.xlsx"  # Part 1
+filepathR = r"D:\MSc Results\RBR_Test\Part2redo\060728_20241112_1055.xlsx"  # Part 2
 timestampsR, tempsR = read_RBR_excel(filepathR)
 
 
 # Get Thermocouple data
-filepathT = r"D:\MSc Results\RBR_Test\Part1redo\CR3000_Table1.dat"  # Part 1
-#filepathT = r"D:\MSc Results\RBR_Test\Part2redo\CR3000_Table1.dat"  # Part 2
+#filepathT = r"D:\MSc Results\RBR_Test\Part1redo\CR3000_Table1.dat"  # Part 1
+filepathT = r"D:\MSc Results\RBR_Test\Part2redo\CR3000_Table1.dat"  # Part 2
 dt_objsT, temps_arrT, stdevsT = read_CampbellSci(filepathT)  # this should give 6x thermocouple arrays of temperature and standard deviation
 print(temps_arrT)  # has shape (6, 794) - will have to split them up into each thermocouple if wanting to plot each of them
 
@@ -78,7 +78,7 @@ df_merged = df_CS.join(df_R, how='inner', lsuffix='_CS', rsuffix='_R')  # this o
 
 # Removing first 15 minutes (Part 1 only, otherwise minutes=0) of the whole dataframe
 start_t0 = df_merged.index.min()
-cutoff_t0 = start_t0 + pd.Timedelta(minutes=15)
+cutoff_t0 = start_t0 + pd.Timedelta(minutes=0)
 df_trimmed = df_merged[df_merged.index >= cutoff_t0]
 
 
@@ -105,7 +105,7 @@ plt.plot(dt, t4, label='Thermocouple 4')
 plt.plot(dt, t5, label='Thermocouple 5')
 plt.plot(dt, t6, label='Thermocouple 6')
 plt.xlim(dt[0], dt[-1])
-plt.title('Pure Water RBR vs. Thermocouples')
+plt.title('RBR and Thermocouple Comparison - Pump off')
 plt.ylabel('Temperature (degrees Celsius)')
 plt.xlabel(dt_py.strftime('%d %B %Y'))  # having the actual date on the line below the x-axis time labels for context
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))  #'%d-%b\n%Y' = %b for month, %Y for year, \n for new line
@@ -121,7 +121,7 @@ avgt = (t1 + t2 + t3 + t4 + t5 + t6) / 6
 
 plt.plot(dt, tR, label='RBR')
 plt.plot(dt, avgt, label='Average Thermocouples')
-plt.title('Pure Water RBR vs. Thermocouple Average')
+plt.title('RBR and Thermocouple Average Comparison - Pump off')
 plt.ylabel('Temperature (degrees Celsius)')
 plt.xlabel(dt_py.strftime('%d %B %Y'))  # having the actual date on the line below the x-axis time labels for context
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))  #'%d-%b\n%Y' = %b for month, %Y for year, \n for new line
@@ -137,11 +137,15 @@ print(diff_arr)
 
 plt.plot(dt, diff_arr)
 plt.axhline(y=0, color='k', linestyle='-')
-plt.title('Temperature Differences Between RBR and Average Thermocouples')
+plt.title('Average Temperature Differences - Pump off')
 plt.ylabel(r'$\Delta T$ (degrees Celsius)')
 plt.xlabel(dt_py.strftime('%d %B %Y'))
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+plt.xlim(dt[0], dt[-1])
+plt.ylim(-0.05, 0.45)
 plt.grid()
 plt.show()
 
-
+# To show range of temperature differences
+print(max(diff_arr))  # now can use this value, 0.442 deg C, as the thermocouples' uncertainty - do I need to add it to the RBR's uncertainty?? That is 0.01, making 0.45 deg C uncertainty.
+print(min(diff_arr))

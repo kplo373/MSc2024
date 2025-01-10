@@ -184,11 +184,6 @@ def get_deltaT_multiple(dict_in, text_str):
     # Adjust x to match the length of y_smooth - or else the data extrapolates at both ends and this data isn't there
     offset = (window_size - 1) // 2  # offset for odd or even window size
     x_smooth0 = x0[offset : -offset] if window_size % 2 == 1 else x0[offset + 1 : -offset]
-
-
-    # Adjust x to match the length of y_smooth - or else the data extrapolates at both ends and this data isn't there
-    offset = (window_size - 1) // 2  # offset for odd or even window size
-    x_smooth0 = x0[offset : -offset] if window_size % 2 == 1 else x0[offset + 1 : -offset]
     x_smooth5 = x5[offset : -offset] if window_size % 2 == 1 else x5[offset + 1 : -offset]
     x_smooth10 = x10[offset : -offset] if window_size % 2 == 1 else x10[offset + 1 : -offset]
     x_smooth25 = x25[offset : -offset] if window_size % 2 == 1 else x25[offset + 1 : -offset]
@@ -242,6 +237,22 @@ def get_deltaT_multiple(dict_in, text_str):
     y_upper100 = deltaT100 + delT_sterr100
     y_lower100 = deltaT100 - delT_sterr100
     
+    # Apply smoothing to error bounds
+    y_upper_smooth0 = np.convolve(y_upper0, window, mode='valid')
+    y_lower_smooth0 = np.convolve(y_lower0, window, mode='valid')
+    y_upper_smooth5 = np.convolve(y_upper5, window, mode='valid')
+    y_lower_smooth5 = np.convolve(y_lower5, window, mode='valid')
+    y_upper_smooth10 = np.convolve(y_upper10, window, mode='valid')
+    y_lower_smooth10 = np.convolve(y_lower10, window, mode='valid')
+    y_upper_smooth25 = np.convolve(y_upper25, window, mode='valid')
+    y_lower_smooth25 = np.convolve(y_lower25, window, mode='valid')
+    y_upper_smooth50 = np.convolve(y_upper50, window, mode='valid')
+    y_lower_smooth50 = np.convolve(y_lower50, window, mode='valid')
+    y_upper_smooth100 = np.convolve(y_upper100, window, mode='valid')
+    y_lower_smooth100 = np.convolve(y_lower100, window, mode='valid')
+    
+    
+    '''
     # Plot the error envelope
     plt.fill_between(x0, y_lower0, y_upper0, color='red', alpha=0.2)  #, label='Error envelope')
     plt.fill_between(x5, y_lower5, y_upper5, color='orange', alpha=0.2) 
@@ -249,6 +260,34 @@ def get_deltaT_multiple(dict_in, text_str):
     plt.fill_between(x25, y_lower25, y_upper25, color='green', alpha=0.2) 
     plt.fill_between(x50, y_lower50, y_upper50, color='blue', alpha=0.2) 
     plt.fill_between(x100, y_lower100, y_upper100, color='purple', alpha=0.2) 
+    
+    plt.plot(x0, y_lower0, color='red', linestyle='--')  # can add label but might be too much
+    plt.plot(x0, y_upper0, color='red', linestyle='--')
+    plt.plot(x5, y_lower5, color='orange', linestyle='--')
+    plt.plot(x5, y_upper5, color='orange', linestyle='--')
+    plt.plot(x10, y_lower10, color='yellow', linestyle='--')
+    plt.plot(x10, y_upper10, color='yellow', linestyle='--')
+    plt.plot(x25, y_lower25, color='green', linestyle='--')
+    plt.plot(x25, y_upper25, color='green', linestyle='--')
+    plt.plot(x50, y_lower50, color='blue', linestyle='--')
+    plt.plot(x50, y_upper50, color='blue', linestyle='--')
+    plt.plot(x100, y_lower100, color='purple', linestyle='--')
+    plt.plot(x100, y_upper100, color='purple', linestyle='--')
+    '''
+    width = 0.8  # for linewidth parameters below
+    plt.plot(x_smooth0, y_lower_smooth0, color='red', lw=width, linestyle='--')  # can add label but might be too much
+    plt.plot(x_smooth0, y_upper_smooth0, color='red', lw=width, linestyle='--')
+    plt.plot(x_smooth5, y_lower_smooth5, color='orange', lw=width, linestyle='--')
+    plt.plot(x_smooth5, y_upper_smooth5, color='orange', lw=width, linestyle='--')
+    plt.plot(x_smooth10, y_lower_smooth10, color='yellow', lw=width, linestyle='--')
+    plt.plot(x_smooth10, y_upper_smooth10, color='yellow', lw=width, linestyle='--')
+    plt.plot(x_smooth25, y_lower_smooth25, color='green', lw=width, linestyle='--')
+    plt.plot(x_smooth25, y_upper_smooth25, color='green', lw=width, linestyle='--')
+    plt.plot(x_smooth50, y_lower_smooth50, color='blue', lw=width, linestyle='--')
+    plt.plot(x_smooth50, y_upper_smooth50, color='blue', lw=width, linestyle='--')
+    plt.plot(x_smooth100, y_lower_smooth100, color='purple', lw=width, linestyle='--')
+    plt.plot(x_smooth100, y_upper_smooth100, color='purple', lw=width, linestyle='--')
+    
     
     x_smooth_list = [x_smooth0, x_smooth5, x_smooth10, x_smooth25, x_smooth50, x_smooth100]  # need to plot these all now
     y_smooth_list = [y_smooth0, y_smooth5, y_smooth10, y_smooth25, y_smooth50, y_smooth100]
