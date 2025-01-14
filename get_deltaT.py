@@ -2,6 +2,7 @@
 """
 Created on Sat Sep 28 09:36:21 2024
 
+(older version)
 Python script with a function that calculates the delta T value, which
 represents the temperature difference from the reference 1:1 line of
 the calibrated raw data. It uses the outputs from the apply_calibration.py

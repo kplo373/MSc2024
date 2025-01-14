@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 14 10:03:48 2025
+Created on Fri Oct 11 11:58:29 2024
 
-New version - Includes no error envelope for all six 
-percentage lines in the plot, as was too messy to understand.
+Original version!! Includes error envelope or smoothed error bounds with all six 
+percentage lines in the plot, too messy to understand.
 
 Script for calculating multiple percentages of plastic's temperature difference
 (deltaT) at once, and then plotting them with a reference y=0 line.
 
-@author: adamk
+@author: kplo373
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -60,7 +60,7 @@ def get_deltaT_multiple(dict_in, text_str):
     lower_lim = normal_roundC(lower_limit) - 1
     upper_limit = max(y0[-1], x0[-1])
     upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
-    r'''
+    
     plt.figure(figsize=(5, 5))
     plt.plot(x0, y0, label='Calibrated Data')
     plt.plot(x0, x0, label='Reference')
@@ -72,7 +72,7 @@ def get_deltaT_multiple(dict_in, text_str):
     plt.legend()
     plt.grid()
     plt.show()
-    '''
+    
     
     # For actual plot:
     lower_limit = min(x0[0], x5[0], x10[0], x25[0], x50[0], x100[0],
@@ -128,12 +128,12 @@ def get_deltaT_multiple(dict_in, text_str):
 
     # Specify the percentage labels
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
-    #colors = ['r', 'Orange', 'gold', 'Green', 'Blue', 'Purple']  # just using the colours of the rainbow for now  
+    colors = ['r', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple']  # just using the colours of the rainbow for now  
     
     # Set the colormap to 'Blues' and get 6 shades of blue
     #cmap = cm.get_cmap('Reds', 6)
     #colors = cmap(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker green
-    r'''
+
     for i in range(6):
         #plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'$\Delta T {labels[i]}$', alpha=0.6)
         label_str = labels[i]
@@ -146,10 +146,25 @@ def get_deltaT_multiple(dict_in, text_str):
     plt.title(text_str +' Temperature Difference')
     plt.grid()
     plt.legend()
+    
+    # To save the figure in the SavedPlots\TempDiff_Separate folder
+    if 'hav' in text_str:
+        if 'and' in text_str:
+            final_folder = 'MP_sand'
+        elif 'ater' in text_str:
+            final_folder = 'MP_water'
+        file_str = r'\TempDiff_' + text_str.replace("% Shavings", "_MP") + '.png'  # not sure if I can have % signs in a filename, so taking it out to be safe...
+    elif 'ellet' in text_str:
+        if 'and' in text_str:
+            final_folder = 'Nurdle_sand'
+        elif 'ater' in text_str:
+            final_folder = 'Nurdle_water'
+        file_str = r'\TempDiff_' + text_str.replace("% Pellets", "_nurd") + '.png'
+    file_path = r"D:\MSc Results\SavedPlots\TempDiff_Separate" + '\\' + final_folder
+    
+    print(file_path + file_str)
+    plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
-    '''
-    
-    
     
     # Creating two dictionaries to transfer/return the data arrays used to make this deltaT plot
     dict_x = {'x0': x0, 'x5': x5, 'x10': x10, 'x25': x25, 'x50': x50, 'x100': x100}
@@ -185,7 +200,7 @@ def get_deltaT_multiple(dict_in, text_str):
     y_list = [deltaT0, deltaT5, deltaT10, deltaT25, deltaT50, deltaT100]
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
     colors_list = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']  # just using the colours of the rainbow for now 
-    r'''
+
     for i in range(6):
         label_str = labels[i]  # using the same labels as the plot above (0, 5, 10% etc.)
         plt.plot(x_smooth_list[i], y_smooth_list[i], lw=2, color=colors_list[i], label=rf'$\Delta T$ {label_str}', alpha=1.0)
@@ -199,9 +214,9 @@ def get_deltaT_multiple(dict_in, text_str):
     plt.legend()
     plt.grid()
     plt.show()
-    '''
     
-    r'''
+    
+    
     ## Making the plot with background error envelope and thin dark lines of smoothed data
     # Using the standard error measurements for y_corrected and x to calculate standard error for deltaT
     delT_sterr0 = np.sqrt( (df0['y_corr_sterr'])**2 + (df0['sterr_CS'])**2 )  # = sqrt(y_corr_sterr^2 + x_sterr^2)
@@ -239,7 +254,8 @@ def get_deltaT_multiple(dict_in, text_str):
     y_upper_smooth100 = np.convolve(y_upper100, window, mode='valid')
     y_lower_smooth100 = np.convolve(y_lower100, window, mode='valid')
     
-
+    
+    
     # Plot the error envelope
     plt.fill_between(x0, y_lower0, y_upper0, color='red', alpha=0.2)  #, label='Error envelope')
     plt.fill_between(x5, y_lower5, y_upper5, color='orange', alpha=0.2) 
@@ -248,7 +264,7 @@ def get_deltaT_multiple(dict_in, text_str):
     plt.fill_between(x50, y_lower50, y_upper50, color='blue', alpha=0.2) 
     plt.fill_between(x100, y_lower100, y_upper100, color='purple', alpha=0.2) 
     
-    plt.plot(x0, y_lower0, color='red', linestyle='--')  # can add label but might be too much - this is for error bounds as dashed lines
+    plt.plot(x0, y_lower0, color='red', linestyle='--')  # can add label but might be too much
     plt.plot(x0, y_upper0, color='red', linestyle='--')
     plt.plot(x5, y_lower5, color='orange', linestyle='--')
     plt.plot(x5, y_upper5, color='orange', linestyle='--')
@@ -260,8 +276,7 @@ def get_deltaT_multiple(dict_in, text_str):
     plt.plot(x50, y_upper50, color='blue', linestyle='--')
     plt.plot(x100, y_lower100, color='purple', linestyle='--')
     plt.plot(x100, y_upper100, color='purple', linestyle='--')
-    
-    
+    r'''
     width = 0.8  # for linewidth parameters below
     plt.plot(x_smooth0, y_lower_smooth0, color='red', lw=width, linestyle='--')  # can add label but might be too much
     plt.plot(x_smooth0, y_upper_smooth0, color='red', lw=width, linestyle='--')
@@ -277,13 +292,13 @@ def get_deltaT_multiple(dict_in, text_str):
     plt.plot(x_smooth100, y_upper_smooth100, color='purple', lw=width, linestyle='--')
     '''
     
-    x_smooth_list = [x_smooth0, x_smooth5, x_smooth10, x_smooth25, x_smooth50, x_smooth100]  # need to plot these all now - plotting no error envelopes!
+    x_smooth_list = [x_smooth0, x_smooth5, x_smooth10, x_smooth25, x_smooth50, x_smooth100]  # need to plot these all now
     y_smooth_list = [y_smooth0, y_smooth5, y_smooth10, y_smooth25, y_smooth50, y_smooth100]
 
     x_list = [x0, x5, x10, x25, x50, x100]
     y_list = [deltaT0, deltaT5, deltaT10, deltaT25, deltaT50, deltaT100]
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
-    colors_list = ['red', 'orange', 'darkgoldenrod', 'green', 'blue', 'purple']  # just using the colours of the rainbow for now 
+    colors_list = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']  # just using the colours of the rainbow for now 
 
     for i in range(6):
         label_str = labels[i]  # using the same labels as the plot above (0, 5, 10% etc.)
@@ -296,24 +311,6 @@ def get_deltaT_multiple(dict_in, text_str):
     plt.title(text_str +' Temperature Difference')  # with error envelope included
     plt.legend()
     plt.grid()
-    
-    # To save the figure in the SavedPlots\TempDiff_Separate folder
-    if 'hav' in text_str:
-        if 'and' in text_str:
-            final_folder = 'MP_sand'
-        elif 'ater' in text_str:
-            final_folder = 'MP_water'
-        file_str = r'\TempDiff_' + text_str.replace("% Shavings", "_MP") + '.png'  # not sure if I can have % signs in a filename, so taking it out to be safe...
-    elif 'ellet' in text_str:
-        if 'and' in text_str:
-            final_folder = 'Nurdle_sand'
-        elif 'ater' in text_str:
-            final_folder = 'Nurdle_water'
-        file_str = r'\TempDiff_' + text_str.replace("% Pellets", "_nurd") + '.png'
-    file_path = r"D:\MSc Results\SavedPlots\TempDiff_Separate" + '\\' + final_folder
-    
-    print(file_path + file_str)
-    plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
     

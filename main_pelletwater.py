@@ -236,11 +236,20 @@ def main():
     from apply_calibration_multiple import apply_calibration_multiple
     df_calib_dict = apply_calibration_multiple(df_full_dict, text_str)
     
-    # Then calculate deltaT from calibration less the reference 1:1 line
+    # Then calculate deltaT from calibration less the reference 1:1 line - for all 6 %s without error envelope
     from get_deltaT_multiple import get_deltaT_multiple
     dict_x, dict_deltaT = get_deltaT_multiple(df_calib_dict, text_str)
     #print(dict_deltaT.keys())  # including temperature difference plot
     
+    # Now need to also plot the 6 %s separately for their deltaT plots, with error envelopes each***
+    from get_deltaT_errors import get_deltaT_errors  # feed through the percentages one by one in this function
+    df_list = [df_full0, df_full5, df_full10, df_full25, df_full50, df_full100]
+    percentages = ['0', '5', '10', '25', '50', '100']
+    colours = ['red', 'orange', 'darkgoldenrod', 'green', 'blue', 'purple']  #'gold' is too light on white
+    for j in range(len(df_list)):
+        get_deltaT_errors(df_list[j], text_str, percentages[j], colours[j])  # should plot 6 plots, per plastic percentage, as individual deltaTs
+    
+
     
     
     return 

@@ -213,7 +213,7 @@ def apply_calibration_multiple(df_in_dict, str_expt):
 
     # Specify the percentage labels
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
-    colors = ['r', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple']  # just using the colours of the rainbow for now    
+    colors = ['r', 'Orange', 'gold', 'Green', 'Blue', 'Purple']  # just using the colours of the rainbow for now    
     
     # Set the colormap to 'cool' and get 6 shades of blue, purple, pink
     #cmap = cm.get_cmap('jet', 6)

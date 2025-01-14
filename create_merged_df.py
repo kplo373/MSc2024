@@ -14,6 +14,7 @@ as the index. Only the common time data should be included in the dataframe.
 #sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions in the second cell
 
 import pandas as pd
+import numpy as np
 
 def create_merged_df(Optris_df, CampbellSci_df):    
     mean_Op = Optris_df['Op_temp']
@@ -38,17 +39,61 @@ def create_merged_df(Optris_df, CampbellSci_df):
     # Merge the resampled Optris data with the C1 data
     df_merged = df_CS.join(df_Op, how='inner', lsuffix='_CS', rsuffix='_Op')  # this only includes values from both arrays
     
-    return df_merged
+    
+    # Trimming the end off if approximately constant temperatures for over an hour
+    timestamps = df_merged.index
+    #time_hrs = (timestamps - timestamps[0]).total_seconds() / 3600
+    #print(time_hrs)
 
-'''
+    #T_CS = df_merged['temperature_CS'].values  # these didn't really give clear temperatures like Optris does below
+    T_CS = df_merged['temperature_Op'].values  # named it T_CS to not change everything below but it is actually T_Op data!
+
+    # Trimming parameters
+    window_size = 360  # 10-second intervals in a 1-hour rolling window
+    threshold = 0.07  # for "approximately constant" temperature - can increase/decrease if needed!
+    stabil_len = 2000  # require stabilisation for at least 300 consecutive pts
+
+    # Compute rolling standard deviation
+    rolling_std_CS = pd.Series(T_CS).rolling(window=window_size, min_periods=1).std()  # just try with thermocouples (Optris actually) first
+    #rolling_std_Op = pd.Series(T_Op).rolling(window=window_size, min_periods=1).std()
+
+    # Find last point where temperature becomes stable
+    stable_ind = np.where(rolling_std_CS < threshold)[0]
+    if len(stable_ind) > stabil_len:
+        # Check for consecutive points
+        for i in range(len(stable_ind) - stabil_len):
+            if np.all(np.diff(stable_ind[i:i + stabil_len]) == 1):
+                trim_ind = stable_ind[i]
+                break
+        else:
+            trim_ind = len(T_CS)
+    else: 
+        trim_ind = len(T_CS)
+
+    # Trim Data
+    #T_CS_trim = T_CS[:trim_ind]  # need to put these back into df_merged to make a difference!
+    #timestamps_trim = timestamps[:trim_ind]
+    df_merged_trim = df_merged.iloc[:trim_ind]  # doing it all at once!
+    
+    
+    
+    return df_merged_trim
+
+
+
+r'''
 #%% Required functions to test the function above
-
 # To get the filepath
 from get_filepaths import get_filepaths
-path, files = get_filepaths('13/08/2024', 'AM')
+path, files = get_filepaths('07/08/2024', 'PM')  # cold 25% pellets & water, has spike (unless hot one does)
 # path gives a folder, and files are the files in that folder. Need to select specific file from files list
 path_CS = path + '\\' + files[0]
 path_Op = path + '\\' + files[2]
+
+#path_CS = r"D:\MSc Results\August_2024\Wednesday07AugPM\CR3000_Table1.dat"
+#path_Op = r"D:/MSc Results/August_2024/Wednesday07AugPM/Wed7AugPMOptris.dat"
+path_CS = r"D:\MSc Results\August_2024\Tuesday20AugPM\CR3000_Table1.dat"
+path_Op = r"D:\MSc Results\August_2024\Tuesday20AugPM\Tues20AugPMOptris.dat"
 
 # To collect the Campbell Scientific thermocouple data
 from read_CampbellSci import read_CampbellSci
@@ -73,7 +118,33 @@ avgOp_df = average_Optris(resampled_df_a1, resampled_df_a3)
 # print(avgOp_df)
 
 
-#%% Test this actual function
+# Test this actual function
 df_merged = create_merged_df(avgOp_df, df_sand_avgCS)
 print(df_merged)
 '''
+
+#%%
+#import matplotlib.pyplot as plt
+
+
+r'''  # this is just to show results if needed
+# Plot rolling stdev
+plt.plot(rolling_std_CS, label='Rolling Std Dev')  # will need to make sure these separate variables for plotting are returned
+plt.axhline(threshold, color='red', linestyle='--', label='Threshold')
+plt.title('Rolling Standard Deviation of Temperature')
+plt.xlabel('Index')
+plt.ylabel('Std Dev')
+plt.legend()
+plt.grid()
+plt.show()
+
+# Plot results after trimming
+plt.plot(timestamps, T_CS, label='Original T', alpha=0.2)  # will need to plot Optris too!
+plt.plot(timestamps_trim, T_CS_trim, label='Trimmed T', lw=2)
+plt.xlabel('Time')
+plt.ylabel('Optris Temperature (deg C)')
+plt.grid()
+plt.legend()
+plt.show()
+'''
+
