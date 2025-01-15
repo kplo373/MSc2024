@@ -19,16 +19,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-
-def get_deltaT_errors(df_in, text_str, percentage, colour):
+# y_limits parameter below is a list of two elements: the minimum y value, then the max y
+def get_deltaT_errors(df_in, text_str, percentage, colour, y_limits):
     print(df_in.columns)
     x = np.array(df_in['temperature_CS']).ravel()
-    
-    if 'ater' in text_str:
-        y = np.array(df_in['y_corrected']).ravel()
-    elif 'and' in text_str:
-        y = np.array(df_in['y_corrected_sand']).ravel()
-    
+    y = np.array(df_in['y_corrected']).ravel()  # both sand and water calibrations are saved as y_corrected columns
 
     lower_limit = min(x[0], y[0])
     upper_limit = max( max(x), max(y) )
@@ -80,7 +75,7 @@ def get_deltaT_errors(df_in, text_str, percentage, colour):
     plt.xlabel('Environmental Temperature (degrees Celsius)')
     plt.ylabel(r'$\Delta T$ (degrees Celsius)')
     plt.title(percentage + '% ' + text_str + ' Temperature Difference')
-    plt.ylim(-1.2, 5.5)
+    plt.ylim(y_limits[0], y_limits[1])
     plt.legend
     plt.grid()
     if 'hav' in text_str:
@@ -101,4 +96,4 @@ def get_deltaT_errors(df_in, text_str, percentage, colour):
     plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
-    return
+    return delT_sterr

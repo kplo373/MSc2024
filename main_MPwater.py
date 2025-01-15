@@ -239,7 +239,30 @@ def main():
     from get_deltaT_multiple import get_deltaT_multiple
     dict_x, dict_deltaT = get_deltaT_multiple(df_calib_dict, text_str)
     #print(dict_deltaT.keys())  # including temperature difference plot
-       
+    
+    # Now need to also plot the 6 %s separately for their deltaT plots, with error envelopes each
+    from get_deltaT_errors import get_deltaT_errors  # feed through the percentages one by one in this function
+    y_lims = [-1.2, 3.4]
+    df_list = [df_full0, df_full5, df_full10, df_full25, df_full50, df_full100]
+    percentages = ['0', '5', '10', '25', '50', '100']
+    colours = ['red', 'orange', 'darkgoldenrod', 'green', 'blue', 'purple']  #'gold' is too light on white
+    
+    stats_results = []  # empty list to put uncertainties dictionaries below into
+
+    from calculate_uncertainty import calculate_uncertainty
+    for j in range(len(df_list)):
+        delT_sterr = get_deltaT_errors(df_list[j], text_str, percentages[j], colours[j], y_lims)  # should plot 6 plots, per plastic percentage, as individual deltaTs
+        unc_dict = calculate_uncertainty(delT_sterr)
+        unc_dict["Plastic Percentage"] = percentages[j]
+        stats_results.append(unc_dict)
+        
+    df_results = pd.DataFrame(stats_results)  # converting list to df
+    
+    # Exporting to Excel        
+    excel_filename = 'uncertainty_shavings_water.xlsx'
+    df_results.to_excel(excel_filename, index=False)
+    print(f"Results saved to {excel_filename}")
+    
     
     return
 
