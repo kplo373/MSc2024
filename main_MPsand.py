@@ -245,6 +245,7 @@ def main():
     dict_x, dict_deltaT = get_deltaT_multiple(df_calib_dict, text_str)
     #print(dict_deltaT.keys())  # including temperature difference plot
     
+    r'''
     # Now need to also plot the 6 %s separately for their deltaT plots, with error envelopes each
     from get_deltaT_errors import get_deltaT_errors  # feed through the percentages one by one in this function
     y_lims = [-5.5, 2]
@@ -267,7 +268,7 @@ def main():
     excel_filename = 'uncertainty_shavings_sand.xlsx'
     df_results.to_excel(excel_filename, index=False)
     print(f"Results saved to {excel_filename}")
-    
+    '''
     
     return dict_x, dict_deltaT
 

@@ -103,7 +103,7 @@ def plot1to1_multiple(dict_parameters, str_expt):
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
     plt.grid()
-    plt.legend()
+    plt.legend(title='Plastic Concentration')
     plt.show()
     
     

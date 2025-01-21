@@ -224,7 +224,7 @@ def apply_calibration_multiple(df_in_dict, str_expt):
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference')
  
     for i in range(6):
-        plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'Calibrated {labels[i]}', alpha=0.6)  # plotting the data in a green spectrum
+        plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'{labels[i]}', alpha=0.6)  # 'Calibrated ' was included in legend, but unnecessary
         
     #plt.text(23, 12, '(Using Pure Water)')  # adding in text to the plot in the bottom RH corner
     plt.axvline(x=21, color='k', linestyle='dotted')
@@ -234,7 +234,7 @@ def apply_calibration_multiple(df_in_dict, str_expt):
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')
     plt.title('Calibrated Comparison For ' + str_expt)
-    plt.legend()
+    plt.legend(title='Plastic Concentration')
     plt.grid()
     if 'hav' in str_expt:
         if 'and' in str_expt:

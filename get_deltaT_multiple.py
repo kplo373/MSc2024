@@ -287,14 +287,14 @@ def get_deltaT_multiple(dict_in, text_str):
 
     for i in range(6):
         label_str = labels[i]  # using the same labels as the plot above (0, 5, 10% etc.)
-        plt.plot(x_smooth_list[i], y_smooth_list[i], lw=2, color=colors_list[i], label=rf'$\Delta T$ {label_str}', alpha=1.0)
+        plt.plot(x_smooth_list[i], y_smooth_list[i], lw=2, color=colors_list[i], label=rf'{label_str}', alpha=1.0)  # $\Delta T$ (was in legend label)
     
     plt.axhline(y=0, color='k', linestyle='--')
     plt.axvline(x=21, color='k', linestyle='dotted')
     plt.xlabel('Environmental Temperature (degrees Celsius)')
     plt.ylabel(r'$\Delta T$ (degrees Celsius)')
     plt.title(text_str +' Temperature Difference')  # with error envelope included
-    plt.legend()
+    plt.legend(title='Plastic Concentration')
     plt.grid()
     
     # To save the figure in the SavedPlots\TempDiff_Separate folder
