@@ -222,7 +222,7 @@ def main():
     df_full25 = pd.concat([df_trimmed_c25, df_trim_hot_rev25])
     df_full50 = pd.concat([df_trimmed_c50, df_trim_hot_rev50])
     df_full100 = pd.concat([df_trimmed_c100, df_trim_hot_rev100])
-
+    
 
     # To plot the 1-1 temperature plot
     from plot1to1_multiple import plot1to1_multiple
@@ -240,6 +240,11 @@ def main():
     from get_deltaT_multiple import get_deltaT_multiple
     dict_x, dict_deltaT = get_deltaT_multiple(df_calib_dict, text_str)
     #print(dict_deltaT.keys())  # including temperature difference plot
+    
+    print()
+    print(df_calib_dict['df0'].columns)
+    print()
+    
     
     r'''
     # Now need to also plot the 6 %s separately for their deltaT plots, with error envelopes each

@@ -125,8 +125,8 @@ def apply_calibration_sand(df_in, str_expt):   # df_in is the df from after wate
     # Plot SVM Results, Add in Reference Line too
     plt.figure(figsize=(7, 7))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
     #plt.plot(x_pred, y_comb, 'o', color='lightgreen', label='Calibrated Data (Using Pure Water SVM)')
-    plt.plot(x_nctrl, y_nctrl_corrected, color='green', lw=2, label='Pure Sand Calibration')
-    plt.plot(x_nctrl, y_nctrl, 'r', label='Pure Water Calibration')
+    plt.plot(x_nctrl, y_nctrl_corrected, color='violet', lw=4, label='Pure Sand Calibration')
+    plt.plot(x_nctrl, y_nctrl, 'green', label='Pure Water Calibration')
     # Plot the 1:1 line across the entire plot from corner to corner
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')
     
