@@ -49,7 +49,7 @@ def main():
     dt_CSc5, temps_arrCSc5, stdevs_arrCSc5 = read_CampbellSci(pathCSc5)  # continuing as above, with cold 5% MP-water thermocouple data...
     df_water_avgCSc5 = water_avgCS(dt_CSc5, temps_arrCSc5, stdevs_arrCSc5)
     dt_CSh5, temps_arrCSh5, stdevs_arrCSh5 = read_CampbellSci(pathCSh5)
-    df_water_avgCSh5 = water_avgCS(dt_CSh5, temps_arrCSh5, stdevs_arrCSh5)
+    df_water_avgCSh5 = water_avgCS(dt_CSh5, temps_arrCSh5, stdevs_arrCSh5, 'y')  # only hot 5% MP-water and cold 100% MP-water tests need to remove H6 thermocouple, rest are defaulting on 'n'
     
     dt_CSc10, temps_arrCSc10, stdevs_arrCSc10 = read_CampbellSci(pathCSc10)  # cold 10% MP-water thermocouple data...
     df_water_avgCSc10 = water_avgCS(dt_CSc10, temps_arrCSc10, stdevs_arrCSc10)
@@ -67,7 +67,7 @@ def main():
     df_water_avgCSh50 = water_avgCS(dt_CSh50, temps_arrCSh50, stdevs_arrCSh50)
     
     dt_CSc100, temps_arrCSc100, stdevs_arrCSc100 = read_CampbellSci(pathCSc100)  # cold 100% MP-water (pure MP) thermocouple data...
-    df_water_avgCSc100 = water_avgCS(dt_CSc100, temps_arrCSc100, stdevs_arrCSc100)
+    df_water_avgCSc100 = water_avgCS(dt_CSc100, temps_arrCSc100, stdevs_arrCSc100, 'y')
     dt_CSh100, temps_arrCSh100, stdevs_arrCSh100 = read_CampbellSci(pathCSh100)
     df_water_avgCSh100 = water_avgCS(dt_CSh100, temps_arrCSh100, stdevs_arrCSh100)
     
@@ -240,7 +240,7 @@ def main():
     dict_x, dict_deltaT = get_deltaT_multiple(df_calib_dict, text_str)
     #print(dict_deltaT.keys())  # including temperature difference plot
     
-    r'''
+    
     # Now need to also plot the 6 %s separately for their deltaT plots, with error envelopes each
     from get_deltaT_errors import get_deltaT_errors  # feed through the percentages one by one in this function
     y_lims = [-1.2, 3.4]
@@ -263,7 +263,7 @@ def main():
     excel_filename = 'uncertainty_shavings_water.xlsx'
     df_results.to_excel(excel_filename, index=False)
     print(f"Results saved to {excel_filename}")
-    '''
+    
     
     return
 

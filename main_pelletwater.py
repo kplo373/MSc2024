@@ -55,7 +55,7 @@ def main():
     dt_CSc10, temps_arrCSc10, stdevs_arrCSc10 = read_CampbellSci(pathCSc10)  # cold 10% pellet-water thermocouple data...
     df_water_avgCSc10 = water_avgCS(dt_CSc10, temps_arrCSc10, stdevs_arrCSc10)
     dt_CSh10, temps_arrCSh10, stdevs_arrCSh10 = read_CampbellSci(pathCSh10)
-    df_water_avgCSh10 = water_avgCS(dt_CSh10, temps_arrCSh10, stdevs_arrCSh10)
+    df_water_avgCSh10 = water_avgCS(dt_CSh10, temps_arrCSh10, stdevs_arrCSh10, 'y')
     
     dt_CSc25, temps_arrCSc25, stdevs_arrCSc25 = read_CampbellSci(pathCSc25)  # cold 25% pellet-water thermocouple data...
     df_water_avgCSc25 = water_avgCS(dt_CSc25, temps_arrCSc25, stdevs_arrCSc25)
@@ -65,12 +65,12 @@ def main():
     dt_CSc50, temps_arrCSc50, stdevs_arrCSc50 = read_CampbellSci(pathCSc50)  # cold 50% pellet-water thermocouple data...
     df_water_avgCSc50 = water_avgCS(dt_CSc50, temps_arrCSc50, stdevs_arrCSc50)
     dt_CSh50, temps_arrCSh50, stdevs_arrCSh50 = read_CampbellSci(pathCSh50)
-    df_water_avgCSh50 = water_avgCS(dt_CSh50, temps_arrCSh50, stdevs_arrCSh50)
+    df_water_avgCSh50 = water_avgCS(dt_CSh50, temps_arrCSh50, stdevs_arrCSh50, 'y')
     
     dt_CSc100, temps_arrCSc100, stdevs_arrCSc100 = read_CampbellSci(pathCSc100)  # cold 100% pellet-water (pure pellets) thermocouple data...
     df_water_avgCSc100 = water_avgCS(dt_CSc100, temps_arrCSc100, stdevs_arrCSc100)
     dt_CSh100, temps_arrCSh100, stdevs_arrCSh100 = read_CampbellSci(pathCSh100)
-    df_water_avgCSh100 = water_avgCS(dt_CSh100, temps_arrCSh100, stdevs_arrCSh100)
+    df_water_avgCSh100 = water_avgCS(dt_CSh100, temps_arrCSh100, stdevs_arrCSh100, 'y')
     
     
     # Collect the Optris thermal camera data
@@ -246,7 +246,7 @@ def main():
     print()
     
     
-    r'''
+    
     # Now need to also plot the 6 %s separately for their deltaT plots, with error envelopes each
     from get_deltaT_errors import get_deltaT_errors  # feed through the percentages one by one in this function
     y_lims = [-1.2, 5.5]  # these just fit the max and min of all 6 of these tests, will set all y axes in this range
@@ -268,7 +268,7 @@ def main():
     excel_filename = 'uncertainty_pelletwater.xlsx'
     df_results.to_excel(excel_filename, index=False)
     print(f"Results saved to {excel_filename}")
-    '''
+    
     
     return 
 
