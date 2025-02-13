@@ -93,6 +93,7 @@ def apply_calibration_multiple(df_in_dict, str_expt):
         df50['y_corr_sterr'] = np.sqrt( (df50['sterr_Op'])**2 + ( np.sqrt(df50['sterr_Op']**2 + df50['sterr_CS']**2) )**2 )
         df100['y_corr_sterr'] = np.sqrt( (df100['sterr_Op'])**2 + ( np.sqrt(df100['sterr_Op']**2 + df100['sterr_CS']**2) )**2 )
         
+        print()
         # Calculate the mean standard errors for both x (thermocouples) and y_corrected (Optris) data
         xSE0 = np.mean(df0['sterr_CS'])
         xSE5 = np.mean(df5['sterr_CS'])
@@ -100,6 +101,7 @@ def apply_calibration_multiple(df_in_dict, str_expt):
         xSE25 = np.mean(df25['sterr_CS'])
         xSE50 = np.mean(df50['sterr_CS'])
         xSE100 = np.mean(df100['sterr_CS'])
+        print('Thermocouple standard error after calibration:')
         print(xSE0, xSE5, xSE10, xSE25, xSE50, xSE100)
         
         
@@ -109,7 +111,10 @@ def apply_calibration_multiple(df_in_dict, str_expt):
         ycSE25 = np.mean(df25['y_corr_sterr'])
         ycSE50 = np.mean(df50['y_corr_sterr'])
         ycSE100 = np.mean(df100['y_corr_sterr'])
+        print()
+        print('Optris corrected standard error after calibration:')
         print(ycSE0, ycSE5, ycSE10, ycSE25, ycSE50, ycSE100)
+        print()
         
 
     # Load pure sand calibration table for sand experiments as a second step
@@ -169,8 +174,9 @@ def apply_calibration_multiple(df_in_dict, str_expt):
         xSE25 = np.mean(df25['sterr_CS'])
         xSE50 = np.mean(df50['sterr_CS'])
         xSE100 = np.mean(df100['sterr_CS'])
+        print('Mean standard errors for thermocouples after calibration:')
         print(xSE0, xSE5, xSE10, xSE25, xSE50, xSE100)
-        
+        print()
         
         ycSE0 = np.mean(df0['y_corr_sterr'])
         ycSE5 = np.mean(df5['y_corr_sterr'])
@@ -178,7 +184,9 @@ def apply_calibration_multiple(df_in_dict, str_expt):
         ycSE25 = np.mean(df25['y_corr_sterr'])
         ycSE50 = np.mean(df50['y_corr_sterr'])
         ycSE100 = np.mean(df100['y_corr_sterr'])
+        print('Mean standard errors for corrected Optris after calibration:')
         print(ycSE0, ycSE5, ycSE10, ycSE25, ycSE50, ycSE100)
+        print()
 
     # Need to create limits for the plots below so that the plots are square-shaped
     import math

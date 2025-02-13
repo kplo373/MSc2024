@@ -79,7 +79,7 @@ def get_deltaT_multiple(dict_in, text_str):
                       y0[0], y5[0], y10[0], y25[0], y50[0], y100[0])
     upper_limit = max(x0[-1], x5[-1], x10[-1], x25[-1], x50[-1], x100[-1],
                       y0[-1], y5[-1], y10[-1], y25[-1], y50[-1], y100[-1])
-    print(lower_limit, upper_limit)  # looks good: 11.213333333333333 32.632147450277685
+    print('delta T limits:', lower_limit, upper_limit)  # looks good: 11.213333333333333 32.632147450277685
     
     
     # If I can maybe plot the y=x line here (or get data from previous plot) then can use this for x-axis data
@@ -297,7 +297,7 @@ def get_deltaT_multiple(dict_in, text_str):
     plt.legend(title='Plastic Concentration')
     plt.grid()
     
-    # To save the figure in the SavedPlots\TempDiff_Separate folder
+    # To save the figure in the SavedPlots\TempDiff_Separate folder - these aren't getting updated properly anymore...
     if 'hav' in text_str:
         if 'and' in text_str:
             final_folder = 'MP_sand'
@@ -312,7 +312,7 @@ def get_deltaT_multiple(dict_in, text_str):
         file_str = r'\TempDiff_' + text_str.replace("% Pellets", "_nurd") + '.png'
     file_path = r"D:\MSc Results\SavedPlots\TempDiff_Separate" + '\\' + final_folder
     
-    print(file_path + file_str)
+    #print(file_path + file_str)
     plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
