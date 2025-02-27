@@ -11,11 +11,10 @@ script and function.
 DeltaT will be used to plot against the environmental temperature in 
 the next plot...
 
-@author: adamk
+@author: kplo373
 """
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
 
 
 def get_deltaT(df_in, text_str):
@@ -55,7 +54,7 @@ def get_deltaT(df_in, text_str):
             final_folder = 'MP_sand'
         elif 'ater' in text_str:
             final_folder = 'MP_water'
-        file_str = r'\TempDiff_' + text_str.replace("% Shavings", "_MP") + '.png'  # not sure if I can have % signs in a filename, so taking it out to be safe...
+        file_str = r'\TempDiff_' + text_str.replace("% Shavings", "_MP") + '.png'
     elif 'ellet' in text_str:
         if 'and' in text_str:
             final_folder = 'Nurdle_sand'

@@ -2,27 +2,18 @@
 """
 Created on Wed Sep 18 12:42:13 2024
 
-Script for plotting 1:1 plots of raw data from the thermocouples
-and thermal camera dataframe.
+Script for plotting 1:1 plots of raw temperature data from the 
+thermocouples and thermal camera dataframe.
 
 @author: kplo373
 """
-
-import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 import sys
 
 # str_expt parameter should be a string of the type of experiment done, e.g. '50% Pellet-Sand'
 def plot1to1(df_in, str_expt):
     T_Op = df_in['temperature_Op']  # extracting the temperature arrays
     T_CS = df_in['temperature_CS']
-    
-    stdOp = df_in['stdev_Op']  # extracting the standard deviation arrays
-    stdCS = df_in['stdev_CS']
-
-    sterrOp = df_in['sterr_Op']  # extracting the standard error arrays
-    sterrCS = df_in['sterr_CS']
     
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
@@ -42,14 +33,9 @@ def plot1to1(df_in, str_expt):
     plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
     plt.ylim(lower_lim, upper_lim)
 
-    # To plot the 1:1 reference line - can do it x_comb vs. x_comb, but don't have this variable yet...
+    # To plot the 1:1 reference line
     plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference Line (y=x)')
-    #plt.errorbar(tempCScold, tempOpcold, yerr=seOpcold, xerr=seCScold, color='k')  # just include one errorbar maybe? Is there a better way to show them separately?
-    #plt.errorbar(tempCScold, tempOpcold, yerr=seOpcold, color='k')
-    plt.plot(T_CS, T_Op, 'b', label='Raw Data')  # listing this after errorbars and as dots allow it to show up over black errorbars
-
-    #can add a plt.errorbar() here too for the hot data - assuming using standard error like Tom said
-    
+    plt.plot(T_CS, T_Op, 'b', label='Raw Data')  # listing this after errorbars and as dots allow it to show up over black errorbars    
     plt.title('Sensor Comparison For ' + str_expt)  # including what percentage of plastic etc.
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')
     plt.ylabel('Thermal Camera Temperature (degrees Celsius)')

@@ -11,7 +11,6 @@ These are: mean, approximate mode, 90th percentile, 10th percentile.
 @author: kplo373
 """
 import numpy as np
-from scipy import stats
 
 def calculate_uncertainty(SE_arr):  # use this function on one percentage's standard errors at once
     #print(SE_arr) 

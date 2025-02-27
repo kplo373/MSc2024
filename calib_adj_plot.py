@@ -7,7 +7,6 @@ To briefly plot the distribution of calibration adjustments applied to the data
 
 @author: kplo373
 """
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -26,7 +25,6 @@ wadjs = wdf.iloc[:, 1]
 stemps = sdf.iloc[:, 0]
 sadjs = sdf.iloc[:, 1]
 
-#'.',
 plt.plot(wtemps, wadjs, '.', label='Water')  # can add a 'markersize=' parameter before label to change dot size
 plt.plot(stemps, sadjs, '.', color='orange', label='Sand')
 plt.title('Thermal Camera Calibration Table Adjustments')
@@ -39,7 +37,7 @@ plt.show()
 
 
 
-# can try plot the sand one as different data on here too - or is it too different to this water data??
+# can try plot the sand one as different data on here too
 #%%
 plt.plot(stemps, sadjs, '.', color='orange', label='Sand')
 plt.title('Thermal Camera Calibration Table Adjustments')

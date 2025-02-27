@@ -10,31 +10,17 @@ which we create in this script.
 @author: kplo373
 """
 
-#import joblib
-#import pickle
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-from scipy.interpolate import interp1d
 from sklearn.linear_model import LinearRegression
 
 
 def apply_calibration(df_in, str_expt):    
-    # Load the saved model and scalers
-    #svr_rbf = joblib.load(r"D:\MSc Results\svr_rbf_pure_water.pkl")  # for pure water
-        #r"D:\MSc Results\svr_rbf_pure_water.pkl")
-    # 2. Apply the correction to control sample, load SVR model first
-    #with open(r'D:\MSc Results\svr_model.pkl', 'rb') as f:
-        #svr_model = pickle.load(f)  # for pure water
-    
-    # 3. Apply correction to non-control samples, load non-control sample data (x and y are independent)
+    # Apply correction to non-control samples, load non-control sample data (x and y are independent)
     x_nctrl = np.array(df_in['temperature_CS']).reshape(-1, 1)
     y_nctrl = np.array(df_in['temperature_Op']).reshape(-1, 1)
-    
-    # Apply the correction using the model from the control sample
-    #y_predict = svr_model.predict(x_nctrl.reshape(-1, 1))  # correcting based on x values (thermocouples)
-    # not using the y_predict above, shall I remove it and the fit_SVR2.py associated??***
     
     y_cal_vals =  y_nctrl - x_nctrl
     y_nctrl_corrected = y_nctrl - y_cal_vals
@@ -74,58 +60,15 @@ def apply_calibration(df_in, str_expt):
     extended_calTable_df = pd.concat([extended_df, calTable_unique_df]).sort_index()
     
     
-    
     # Save the extended calibration table for future use
     extended_calTable_df.to_csv(r'D:\MSc Results\calTable.csv')
-    
-    
-    
-    r'''
-    # Get the nearest y value in the cal_table_df.index to the y variables in the different mixtures' data
-    sel_cal_vals = np.zeros(len(y_nctrl))  # Preallocate for the nearest_y_vals collected in the for loop
-    for i in range(len(y_nctrl)):
-        y = float(y_nctrl[i][0])  # extract the first element from the array, as y_ntrl is 2D
-        nearest_index = calTable_unique_df.index.get_indexer([y], method='nearest')[0]  # get nearest index
-        
-        # Check if the nearest_index is valid
-        if nearest_index >= 0 and nearest_index < len(calTable_unique_df):
-            nearest_y_val = calTable_unique_df.iloc[nearest_index, 0]  # collecting values from the calibrated column of the lookup table, not the index
-            sel_cal_vals[i] = nearest_y_val  # Store the nearest y value
-        else:
-            print(f"Warning: Nearest index for y={y} is not valid.")
-    
-    # what am I doing with this sel_cal_vals array after all?? Is an array of selected calibration values.
-    #print(sel_cal_vals)  # do I need to plot them? Or are these the adjustments to apply?
-    # put them into the df_in??
-    # my sel_cal_vals are currently the same as y_nctrl. Need to be same as y_nctrl_corrected! Wrong column
-    # tried first column, now they are just the actual differences, ranging 0.66 to 6.4...
-    # the index is y_val = y_nctrl, first column (0) is y_cal_adj, ranging from 5.94 up and down to 1.39
-    # can't use the index, so have to apply the first column to the y_nctrl somehow, like done above, minus??
-    cal_y = y_nctrl[:, 0] - sel_cal_vals  # use these for the actual mixture data
-    print(cal_y)  # this cal_y is a noisy version of y_nctrl_corrected!
-    '''
 
-         
-    
     # Save the corrected non-control sample as csv file
     df_in.to_csv(r'D:\MSc Results\corrected_control_sample.csv')  # this only gives a y_corrected column though. Need adj column!
 
     #print(y_nctrl)
     print(y_nctrl_corrected)
    
-
-    r'''
-    # Predict using the SVM model trained on pure water data
-    #x_pred_plastic_scaled = svr_rbf.predict(x_comb_scaled)
-    correction_y = svr_rbf.predict(y)  # need to reshape this correction_y from (16674, 16674) to (16674, 1)? Or (16674,)
-    corr_y = correction_y.flatten()
-    cor_y = corr_y.reshape(-1, 1)
-    print(cor_y.shape)
-    corrected_y = y + cor_y  
-    '''
-    # Inverse transform the predicted values to get them back to the original scale
-    #x_pred_plastic = scaler_x.inverse_transform(x_pred_plastic_scaled.reshape(-1, 1))  # use this ndarray while plotting! Has the calibration applied to it
-
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
     def normal_roundH(n):  # create a hot function to round up if .27 or higher, or round down if less than .27. Calibration makes data flick up.
@@ -146,7 +89,6 @@ def apply_calibration(df_in, str_expt):
 
     # Plot SVM Results, Add in Reference Line too
     plt.figure(figsize=(7, 7))  # controlling size of font used by making it bigger or smaller (keep same x and y sizes so square!)
-    #plt.plot(x_pred, y_comb, 'o', color='lightgreen', label='Calibrated Data (Using Pure Water SVM)')
     plt.plot(x_nctrl, y_nctrl_corrected, color='lime', lw=4, label='Pure Water Calibration')
     plt.plot(x_nctrl, y_nctrl, 'r', label='Raw Data')
     # Plot the 1:1 line across the entire plot from corner to corner
@@ -165,13 +107,13 @@ def apply_calibration(df_in, str_expt):
             final_folder = 'MP_sand'
         elif 'ater' in str_expt:
             final_folder = 'MP_water'
-        file_str = r'\Cal_' + str_expt.replace("% Shavings", "_MP") + '.png'  # not sure if I can have % signs in a filename...
+        file_str = r'\Cal_' + str_expt.replace("% Shavings", "_MP") + '.png'
     elif 'ellet' in str_expt:
         if 'and' in str_expt:
             final_folder = 'Nurdle_sand'
         elif 'ater' in str_expt:
             final_folder = 'Nurdle_water'
-        file_str = r'\Cal_' + str_expt.replace("% ", "_") + '.png'  # this didn't work but that's okay...
+        file_str = r'\Cal_' + str_expt.replace("% ", "_") + '.png'
     elif 'hav' and 'ellet' not in str_expt:
         print('Invalid name given as str_expt parameter. Please use Shaved Plastic or Shavings for MP, and Pellets for Nurdles.')
         sys.exit()  # want to exit this script and not save the plot
@@ -181,6 +123,6 @@ def apply_calibration(df_in, str_expt):
     plt.savefig(file_path + file_str, bbox_inches='tight')  # removes whitespace in the file once saved
     plt.show()
     
-    return df_in    #y_nctrl_corrected, y_nctrl, x_nctrl
+    return df_in
 
 # run this script through the main() function script

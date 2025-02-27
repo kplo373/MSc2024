@@ -16,7 +16,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 from scipy.interpolate import interp1d
-#import matplotlib.cm as cm
 from types import SimpleNamespace
 
 

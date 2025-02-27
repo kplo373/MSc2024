@@ -40,7 +40,6 @@ t6 = temps_arrT[5]
 
 # Setting up a thermocouple dataframe with all these temperature readings and the datetimes as the index
 df_CS = pd.DataFrame({'temp_T1': t1, 'temp_T2': t2, 'temp_T3': t3, 'temp_T4': t4, 'temp_T5': t5, 'temp_T6': t6}, index = dt_objsT)
-# ^don't really need this dataframe anymore then if not merging? It's here anyway!
 
 # skipping the time correction for RBR since the Campbell Sci logger had the right internal time already
 # not cutting out any time initially either

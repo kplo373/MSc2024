@@ -6,7 +6,7 @@ Quick Python script to import the shaded-in Quartz sand image and calculate
 the percentage of Quartz present.
 ChatGPT was used to help :)
 
-@author: adamk
+@author: kplo373
 """
 import cv2  # may need to install opencv-python numpy to anaconda prompt if isn't there already, don't use pip though
 import numpy as np

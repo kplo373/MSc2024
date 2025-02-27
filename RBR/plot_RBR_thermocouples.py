@@ -8,12 +8,10 @@ for checking the thermocouples' accuracy.
 @author: kplo373
 """
 import sys
-sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # for uni MSc room computer
-#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
+sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")
 from read_CampbellSci import read_CampbellSci
 
 sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024\RBR")
-#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024\RBR")
 #from read_RBR import read_RBR
 from read_RBR_excel import read_RBR_excel
 import numpy as np
@@ -22,14 +20,14 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # Get RBR data
-#filepathR = r"D:\MSc Results\RBR_Test\Part1redo\060728_20241112_1014.xlsx"  # Part 1
-filepathR = r"D:\MSc Results\RBR_Test\Part2redo\060728_20241112_1055.xlsx"  # Part 2
+filepathR = r"D:\MSc Results\RBR_Test\Part1redo\060728_20241112_1014.xlsx"  # Part 1
+#filepathR = r"D:\MSc Results\RBR_Test\Part2redo\060728_20241112_1055.xlsx"  # Part 2
 timestampsR, tempsR = read_RBR_excel(filepathR)
 
 
 # Get Thermocouple data
-#filepathT = r"D:\MSc Results\RBR_Test\Part1redo\CR3000_Table1.dat"  # Part 1
-filepathT = r"D:\MSc Results\RBR_Test\Part2redo\CR3000_Table1.dat"  # Part 2
+filepathT = r"D:\MSc Results\RBR_Test\Part1redo\CR3000_Table1.dat"  # Part 1
+#filepathT = r"D:\MSc Results\RBR_Test\Part2redo\CR3000_Table1.dat"  # Part 2
 dt_objsT, temps_arrT, stdevsT = read_CampbellSci(filepathT)  # this should give 6x thermocouple arrays of temperature and standard deviation
 print(temps_arrT)  # has shape (6, 794) - will have to split them up into each thermocouple if wanting to plot each of them
 
@@ -42,8 +40,7 @@ tempT5 = temps_arrT[4]
 tempT6 = temps_arrT[5]
 
 
-r'''
-# Using 5th Percentile Minimum Value (from ChatGPT) for both arrays, using the RBR data - skip this for Part 2 onwards, as devices already warmed up!!
+# Using 5th Percentile Minimum Value for both arrays, using the RBR data - skip this for Part 2 onwards, as devices were already warmed up!!
 # 1. Calculate the 5th percentile (minimum 5%) value
 percentile_5_value = np.percentile(tempsR, 5)
 # 2. Find the index of the closest value in tempsR to the 5th percentile value
@@ -53,7 +50,7 @@ print(f"5th percentile value: {percentile_5_value}")
 print(f"Index of 5th percentile value in RBR temperatures: {index_5}")
 tempsR = tempsR[index_5:]
 timestampsR = timestampsR[index_5:]   # this ndarray is of datetime64s
-'''
+
 
 df_R = pd.DataFrame({'temp_RBR': tempsR}, index = timestampsR)
 df_CS = pd.DataFrame({'temp_T1': tempT1, 'temp_T2': tempT2, 'temp_T3': tempT3, 'temp_T4': tempT4, 'temp_T5': tempT5, 'temp_T6': tempT6}, index = dt_objsT)
@@ -105,7 +102,7 @@ plt.plot(dt, t4, label='Thermocouple 4')
 plt.plot(dt, t5, label='Thermocouple 5')
 plt.plot(dt, t6, label='Thermocouple 6')
 plt.xlim(dt[0], dt[-1])
-plt.title('RBR and Thermocouple Comparison - Pump off')
+plt.title('RBR and Thermocouple Comparison - Pump on')
 plt.ylabel('Temperature (degrees Celsius)')
 plt.xlabel(dt_py.strftime('%d %B %Y'))  # having the actual date on the line below the x-axis time labels for context
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))  #'%d-%b\n%Y' = %b for month, %Y for year, \n for new line
@@ -121,7 +118,7 @@ avgt = (t1 + t2 + t3 + t4 + t5 + t6) / 6
 
 plt.plot(dt, tR, label='RBR')
 plt.plot(dt, avgt, label='Average Thermocouples')
-plt.title('RBR and Thermocouple Average Comparison - Pump off')
+plt.title('RBR and Thermocouple Average Comparison - Pump on')
 plt.ylabel('Temperature (degrees Celsius)')
 plt.xlabel(dt_py.strftime('%d %B %Y'))  # having the actual date on the line below the x-axis time labels for context
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))  #'%d-%b\n%Y' = %b for month, %Y for year, \n for new line
@@ -137,7 +134,7 @@ print(diff_arr)
 
 plt.plot(dt, diff_arr)
 plt.axhline(y=0, color='k', linestyle='-')
-plt.title('Average Temperature Differences - Pump off')
+plt.title('Average Temperature Differences - Pump on')
 plt.ylabel(r'$\Delta T$ (degrees Celsius)')
 plt.xlabel(dt_py.strftime('%d %B %Y'))
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
@@ -147,5 +144,5 @@ plt.grid()
 plt.show()
 
 # To show range of temperature differences
-print(max(diff_arr))  # now can use this value, 0.442 deg C, as the thermocouples' uncertainty - do I need to add it to the RBR's uncertainty?? That is 0.01, making 0.45 deg C uncertainty.
+print(max(diff_arr))  # now can use this value, 0.442 deg C, as the thermocouples' uncertainty, after adding it to the RBR's uncertainty
 print(min(diff_arr))

@@ -38,12 +38,6 @@ def create_merged_df(Optris_df, CampbellSci_df):
     
     # Merge the resampled Optris data with the C1 data
     df_merged = df_CS.join(df_Op, how='inner', lsuffix='_CS', rsuffix='_Op')  # this only includes values from both arrays
-    
-    
-    # Trimming the end off if approximately constant temperatures for over an hour
-    timestamps = df_merged.index
-    #time_hrs = (timestamps - timestamps[0]).total_seconds() / 3600
-    #print(time_hrs)
 
     #T_CS = df_merged['temperature_CS'].values  # these didn't really give clear temperatures like Optris does below
     T_CS = df_merged['temperature_Op'].values  # named it T_CS to not change everything below but it is actually T_Op data!
@@ -71,11 +65,7 @@ def create_merged_df(Optris_df, CampbellSci_df):
         trim_ind = len(T_CS)
 
     # Trim Data
-    #T_CS_trim = T_CS[:trim_ind]  # need to put these back into df_merged to make a difference!
-    #timestamps_trim = timestamps[:trim_ind]
     df_merged_trim = df_merged.iloc[:trim_ind]  # doing it all at once!
-    
-    
     
     return df_merged_trim
 

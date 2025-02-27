@@ -12,9 +12,8 @@ from datetime import datetime
 import numpy as np
 
 filepath = r"D:\MSc Results\WEATHER_-_2156970_22_11_2024___1_20_00_PM.csv"
-
 data_reversed = pd.read_csv(filepath, header=4)
-#print(data)
+
 # Reverse the entire DataFrame to give oldest dates first
 data = data_reversed.iloc[::-1]
 

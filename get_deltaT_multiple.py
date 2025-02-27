@@ -8,12 +8,10 @@ percentage lines in the plot, as was too messy to understand.
 Script for calculating multiple percentages of plastic's temperature difference
 (deltaT) at once, and then plotting them with a reference y=0 line.
 
-@author: adamk
+@author: kplo373
 """
 import numpy as np
 import matplotlib.pyplot as plt
-#import sys
-import matplotlib.cm as cm
 from types import SimpleNamespace
 
 
@@ -26,7 +24,7 @@ def get_deltaT_multiple(dict_in, text_str):
     df25 = params.df25
     df50 = params.df50
     df100 = params.df100
-    print(df0.columns)  # need to include the standard error arrays in the background noise data - maybe just the vertical (y) direction?
+    print(df0.columns)  # need to include the standard error arrays in the background noise data - maybe just the vertical (y) direction
     
     x0 = df0['temperature_CS'].to_numpy()  # extracting the series
     x5 = df5['temperature_CS'].to_numpy()
@@ -56,23 +54,7 @@ def get_deltaT_multiple(dict_in, text_str):
             return math.floor(n)
         return math.ceil(n)
     
-    lower_limit = min(y0[0], x0[0])
-    lower_lim = normal_roundC(lower_limit) - 1
-    upper_limit = max(y0[-1], x0[-1])
-    upper_lim = normal_roundH(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
-    r'''
-    plt.figure(figsize=(5, 5))
-    plt.plot(x0, y0, label='Calibrated Data')
-    plt.plot(x0, x0, label='Reference')
-    plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
-    plt.ylim(lower_lim, upper_lim)
-    plt.title('0% '+ text_str)
-    plt.xlabel('Thermocouple Temperature (degrees Celsius)')
-    plt.ylabel('Calibrated Camera Temperature (degrees Celsius)')
-    plt.legend()
-    plt.grid()
-    plt.show()
-    '''
+
     
     # For actual plot:
     lower_limit = min(x0[0], x5[0], x10[0], x25[0], x50[0], x100[0],
@@ -81,9 +63,6 @@ def get_deltaT_multiple(dict_in, text_str):
                       y0[-1], y5[-1], y10[-1], y25[-1], y50[-1], y100[-1])
     print('delta T limits:', lower_limit, upper_limit)  # looks good: 11.213333333333333 32.632147450277685
     
-    
-    # If I can maybe plot the y=x line here (or get data from previous plot) then can use this for x-axis data
-    #ref_line = plt.plot(x_comb, x_comb)
     x_ref0 = x0  # not sure why I made these separate actually, could have just used x0 etc. below in deltaT calculations
     x_ref5 = x5
     x_ref10 = x10
@@ -128,36 +107,15 @@ def get_deltaT_multiple(dict_in, text_str):
 
     # Specify the percentage labels
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
-    #colors = ['r', 'Orange', 'gold', 'Green', 'Blue', 'Purple']  # just using the colours of the rainbow for now  
-    
-    # Set the colormap to 'Blues' and get 6 shades of blue
-    #cmap = cm.get_cmap('Reds', 6)
-    #colors = cmap(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker green
-    r'''
-    for i in range(6):
-        #plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=f'$\Delta T {labels[i]}$', alpha=0.6)
-        label_str = labels[i]
-        plt.plot(x_list[i], y_list[i], lw=1, color=colors[i], label=rf'$\Delta T$ {label_str}', alpha=0.6)
-
-    plt.axhline(y=0, color='k', linestyle='--')
-    plt.axvline(x=21, color='k', linestyle='dotted')
-    plt.xlabel('Environmental Temperature (degrees Celsius)')
-    plt.ylabel(r'$\Delta T$ (degrees Celsius)')
-    plt.title(text_str +' Temperature Difference')
-    plt.grid()
-    plt.legend()
-    plt.show()
-    '''
+    #colors = ['r', 'Orange', 'gold', 'Green', 'Blue', 'Purple']  # just using the colours of the rainbow for now    
     
     
-    
-    # Creating two dictionaries to transfer/return the data arrays used to make this deltaT plot
+    # Creating two dictionaries to transfer/return the unsmoothed data arrays at the end of this function
     dict_x = {'x0': x0, 'x5': x5, 'x10': x10, 'x25': x25, 'x50': x50, 'x100': x100}
     dict_deltaT = {'delT0': deltaT0, 'delT5': deltaT5, 'delT10': deltaT10, 'delT25': deltaT25, 'delT50': deltaT50, 'delT100': deltaT100}
       
     
-    # SMOOTHING / MOVING AVERAGE
-    # Using ChatGPT to try the moving average to smooth these deltaT lines
+    # SMOOTHING / MOVING AVERAGE for deltaT lines
     window_size = 50  # window for the moving average
     window = np.ones(window_size) / window_size  # moving average filter
 
@@ -185,102 +143,12 @@ def get_deltaT_multiple(dict_in, text_str):
     y_list = [deltaT0, deltaT5, deltaT10, deltaT25, deltaT50, deltaT100]
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
     colors_list = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']  # just using the colours of the rainbow for now 
-    r'''
-    for i in range(6):
-        label_str = labels[i]  # using the same labels as the plot above (0, 5, 10% etc.)
-        plt.plot(x_smooth_list[i], y_smooth_list[i], lw=2, color=colors_list[i], label=rf'$\Delta T$ {label_str}', alpha=1.0)
-        plt.plot(x_list[i], y_list[i], lw=1, color=colors_list[i], alpha=0.5)  # for the noisy data
 
-    plt.axhline(y=0, color='k', linestyle='--')
-    plt.axvline(x=21, color='k', linestyle='dotted')
-    plt.xlabel('Environmental Temperature (degrees Celsius)')
-    plt.ylabel(r'$\Delta T$ (degrees Celsius)')
-    plt.title(text_str +' Temperature Difference')
-    plt.legend()
-    plt.grid()
-    plt.show()
-    '''
-    
-    r'''
-    ## Making the plot with background error envelope and thin dark lines of smoothed data
-    # Using the standard error measurements for y_corrected and x to calculate standard error for deltaT
-    delT_sterr0 = np.sqrt( (df0['y_corr_sterr'])**2 + (df0['sterr_CS'])**2 )  # = sqrt(y_corr_sterr^2 + x_sterr^2)
-    delT_sterr5 = np.sqrt( (df5['y_corr_sterr'])**2 + (df5['sterr_CS'])**2 )
-    delT_sterr10 = np.sqrt( (df10['y_corr_sterr'])**2 + (df10['sterr_CS'])**2 )
-    delT_sterr25 = np.sqrt( (df25['y_corr_sterr'])**2 + (df25['sterr_CS'])**2 )
-    delT_sterr50 = np.sqrt( (df50['y_corr_sterr'])**2 + (df50['sterr_CS'])**2 )
-    delT_sterr100 = np.sqrt( (df100['y_corr_sterr'])**2 + (df100['sterr_CS'])**2 )
-    
-    # Compute the error envelope bounds per plastic % - using ChatGPT
-    y_upper0 = deltaT0 + delT_sterr0
-    y_lower0 = deltaT0 - delT_sterr0
-    y_upper5 = deltaT5 + delT_sterr5
-    y_lower5 = deltaT5 - delT_sterr5
-    y_upper10 = deltaT10 + delT_sterr10
-    y_lower10 = deltaT10 - delT_sterr10
-    y_upper25 = deltaT25 + delT_sterr25
-    y_lower25 = deltaT25 - delT_sterr25
-    y_upper50 = deltaT50 + delT_sterr50
-    y_lower50 = deltaT50 - delT_sterr50
-    y_upper100 = deltaT100 + delT_sterr100
-    y_lower100 = deltaT100 - delT_sterr100
-    
-    # Apply smoothing to error bounds
-    y_upper_smooth0 = np.convolve(y_upper0, window, mode='valid')
-    y_lower_smooth0 = np.convolve(y_lower0, window, mode='valid')
-    y_upper_smooth5 = np.convolve(y_upper5, window, mode='valid')
-    y_lower_smooth5 = np.convolve(y_lower5, window, mode='valid')
-    y_upper_smooth10 = np.convolve(y_upper10, window, mode='valid')
-    y_lower_smooth10 = np.convolve(y_lower10, window, mode='valid')
-    y_upper_smooth25 = np.convolve(y_upper25, window, mode='valid')
-    y_lower_smooth25 = np.convolve(y_lower25, window, mode='valid')
-    y_upper_smooth50 = np.convolve(y_upper50, window, mode='valid')
-    y_lower_smooth50 = np.convolve(y_lower50, window, mode='valid')
-    y_upper_smooth100 = np.convolve(y_upper100, window, mode='valid')
-    y_lower_smooth100 = np.convolve(y_lower100, window, mode='valid')
-    
-
-    # Plot the error envelope
-    plt.fill_between(x0, y_lower0, y_upper0, color='red', alpha=0.2)  #, label='Error envelope')
-    plt.fill_between(x5, y_lower5, y_upper5, color='orange', alpha=0.2) 
-    plt.fill_between(x10, y_lower10, y_upper10, color='yellow', alpha=0.2) 
-    plt.fill_between(x25, y_lower25, y_upper25, color='green', alpha=0.2) 
-    plt.fill_between(x50, y_lower50, y_upper50, color='blue', alpha=0.2) 
-    plt.fill_between(x100, y_lower100, y_upper100, color='purple', alpha=0.2) 
-    
-    plt.plot(x0, y_lower0, color='red', linestyle='--')  # can add label but might be too much - this is for error bounds as dashed lines
-    plt.plot(x0, y_upper0, color='red', linestyle='--')
-    plt.plot(x5, y_lower5, color='orange', linestyle='--')
-    plt.plot(x5, y_upper5, color='orange', linestyle='--')
-    plt.plot(x10, y_lower10, color='yellow', linestyle='--')
-    plt.plot(x10, y_upper10, color='yellow', linestyle='--')
-    plt.plot(x25, y_lower25, color='green', linestyle='--')
-    plt.plot(x25, y_upper25, color='green', linestyle='--')
-    plt.plot(x50, y_lower50, color='blue', linestyle='--')
-    plt.plot(x50, y_upper50, color='blue', linestyle='--')
-    plt.plot(x100, y_lower100, color='purple', linestyle='--')
-    plt.plot(x100, y_upper100, color='purple', linestyle='--')
-    
-    
-    width = 0.8  # for linewidth parameters below
-    plt.plot(x_smooth0, y_lower_smooth0, color='red', lw=width, linestyle='--')  # can add label but might be too much
-    plt.plot(x_smooth0, y_upper_smooth0, color='red', lw=width, linestyle='--')
-    plt.plot(x_smooth5, y_lower_smooth5, color='orange', lw=width, linestyle='--')
-    plt.plot(x_smooth5, y_upper_smooth5, color='orange', lw=width, linestyle='--')
-    plt.plot(x_smooth10, y_lower_smooth10, color='yellow', lw=width, linestyle='--')
-    plt.plot(x_smooth10, y_upper_smooth10, color='yellow', lw=width, linestyle='--')
-    plt.plot(x_smooth25, y_lower_smooth25, color='green', lw=width, linestyle='--')
-    plt.plot(x_smooth25, y_upper_smooth25, color='green', lw=width, linestyle='--')
-    plt.plot(x_smooth50, y_lower_smooth50, color='blue', lw=width, linestyle='--')
-    plt.plot(x_smooth50, y_upper_smooth50, color='blue', lw=width, linestyle='--')
-    plt.plot(x_smooth100, y_lower_smooth100, color='purple', lw=width, linestyle='--')
-    plt.plot(x_smooth100, y_upper_smooth100, color='purple', lw=width, linestyle='--')
-    '''
     
     x_smooth_list = [x_smooth0, x_smooth5, x_smooth10, x_smooth25, x_smooth50, x_smooth100]  # need to plot these all now - plotting no error envelopes!
     y_smooth_list = [y_smooth0, y_smooth5, y_smooth10, y_smooth25, y_smooth50, y_smooth100]
 
-    x_list = [x0, x5, x10, x25, x50, x100]
+    x_list = [x0, x5, x10, x25, x50, x100]  # unsmoothed data to use below for comparison
     y_list = [deltaT0, deltaT5, deltaT10, deltaT25, deltaT50, deltaT100]
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
     colors_list = ['red', 'orange', 'darkgoldenrod', 'green', 'blue', 'purple']  # just using the colours of the rainbow for now 

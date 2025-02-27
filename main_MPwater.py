@@ -13,8 +13,6 @@ and: nurdles = pellets
 """
 import sys
 sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
-#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
-
 import pandas as pd
 
 def main():
@@ -40,7 +38,7 @@ def main():
     pathCSh100, pathOph100 = get_filepaths('06/08/2024', 'AM')  # hot 100% MP-water (pure MP)
     
     # Collect the Campbell Scientific thermocouple data
-    from read_CampbellSci import read_CampbellSci, water_avgCS  # function used depends on type of experiment done!***
+    from read_CampbellSci import read_CampbellSci, water_avgCS
     dt_CSc0, temps_arrCSc0, stdevs_arrCSc0 = read_CampbellSci(pathCSc0)  # cold 0% MP-water mixture (pure water) thermocouple data
     df_water_avgCSc0 = water_avgCS(dt_CSc0, temps_arrCSc0, stdevs_arrCSc0)  # and getting the averages in a dataframe for the cold 0% MP-water
     dt_CSh0, temps_arrCSh0, stdevs_arrCSh0 = read_CampbellSci(pathCSh0)  # hot 0% MP-water thermocouple data

@@ -5,7 +5,7 @@ Created on Fri Nov  1 18:09:57 2024
 Retry of applying pure water calibration to all other mixture raw data.
 This function is run through main() after the plot1to1.py.
 
-@author: adamk
+@author: kplo373
 """
 
 import pandas as pd
@@ -87,7 +87,7 @@ def apply_calibration(df_in, str_expt):
             final_folder = 'MP_sand'
         elif 'ater' in str_expt:
             final_folder = 'MP_water'
-        file_str = r'\Cal_' + str_expt.replace("% Shavings", "_MP") + '.png'  # not sure if I can have % signs in a filename...
+        file_str = r'\Cal_' + str_expt.replace("% Shavings", "_MP") + '.png'
     elif 'ellet' in str_expt:
         if 'and' in str_expt:
             final_folder = 'Nurdle_sand'

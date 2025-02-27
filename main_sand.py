@@ -2,14 +2,13 @@
 """
 Created on Fri Nov 15 12:44:30 2024
 
-Main script to test the pure sand calibration.
+Main script to create and test the pure sand calibration adjustments.
 
-@author: adamk
+@author: kplo373
 """
 # Just in case it can't find the right data folder, use these two lines below
 import sys
-#sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
-sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
+sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
 import pandas as pd
 
 
@@ -45,12 +44,10 @@ def main():
     from read_Optris import average_Optris
     avgOp_dfcold = average_Optris(resampled_df_a1cold, resampled_df_a3cold)
     avgOp_dfhot = average_Optris(resampled_df_a1hot, resampled_df_a3hot)  
-    # print(avgOp_dfcold)
 
     from create_merged_df import create_merged_df
     df_merged_cold = create_merged_df(avgOp_dfcold, df_sand_avgCScold)
     df_merged_hot = create_merged_df(avgOp_dfhot, df_sand_avgCShot) 
-    #print(df_mergedcold) 
     
     # Removing first 15 minutes of each cold data record
     df_ready_cold = df_merged_cold.copy()
@@ -71,10 +68,10 @@ def main():
     
     # To plot the 1-1 temperature plot
     from plot1to1 import plot1to1
-    text_str = '0% Shavings-Sand'  # ***
+    text_str = '0% Shavings-Sand'
     plot1to1(df_full, text_str)
     
-    # then the apply_calibration() function to apply this pure sand fit to each sand mixture.
+    # Then the apply_calibration() function to apply this pure sand fit to each sand mixture
     from apply_calibration import apply_calibration  # apply the base pure water calibration first
     df_out_water = apply_calibration(df_full, text_str)
     print(df_out_water.columns)
@@ -83,12 +80,12 @@ def main():
     df_out_sand = apply_calibration_sand(df_out_water, text_str)
 
     
-    # then calculate deltaT from calibration SVM less the reference 1:1 line (which is the same as the x array for y)
+    # Then calculate deltaT from calibration SVM less the reference 1:1 line (which is the same as the x array for y)
     from get_deltaT import get_deltaT
-    deltaT = get_deltaT(df_out_sand, text_str)  # (df_out, text_str)  And change within function!!
+    deltaT = get_deltaT(df_out_sand, text_str)
     #print(deltaT)  # including temperature difference plot
         
-    return #y_nctrl_corrected, y_nctrl, x_nctrl
+    return
 
 
 

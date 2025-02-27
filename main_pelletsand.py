@@ -14,8 +14,6 @@ and: nurdles = pellets
 
 import sys
 sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # to allow it to find the different functions called in the main function
-#sys.path.append(r"C:\Users\adamk\Documents\GitHub\MSc2024")  # for home computer
-
 import pandas as pd
 
 def main():
@@ -41,14 +39,11 @@ def main():
     pathCSh100, pathOph100 = get_filepaths('24/07/2024', 'AM')  # hot 100% pellet-sand (pure pellets)
     
     # Collect the Campbell Scientific thermocouple data
-    from read_CampbellSci import read_CampbellSci, sand_avgCS  #, water_avgCS  # function used depends on type of experiment done!***
+    from read_CampbellSci import read_CampbellSci, sand_avgCS
     dt_CSc0, temps_arrCSc0, stdevs_arrCSc0 = read_CampbellSci(pathCSc0)  # cold 0% pellet-sand mixture (pure sand) thermocouple data
     df_sand_avgCSc0 = sand_avgCS(dt_CSc0, temps_arrCSc0, stdevs_arrCSc0)  # and getting the averages in a dataframe for the cold 0% pellet-sand
     dt_CSh0, temps_arrCSh0, stdevs_arrCSh0 = read_CampbellSci(pathCSh0)  # hot 0% pellet-sand thermocouple data
     df_sand_avgCSh0 = sand_avgCS(dt_CSh0, temps_arrCSh0, stdevs_arrCSh0)  # and averaging hot 0% pellet-sand
-    
-    #df_water_avgCScold = water_avgCS(dt_objsCScold, temps_arrCScold, stdevs_arrCScold)  # use these lines if it involves a water experiment rather than sand
-    #df_water_avgCShot = water_avgCS(dt_objsCShot, temps_arrCShot, stdevs_arrCShot)
     
     dt_CSc5, temps_arrCSc5, stdevs_arrCSc5 = read_CampbellSci(pathCSc5)  # continuing as above, with cold 5% pellet-sand thermocouple data...
     df_sand_avgCSc5 = sand_avgCS(dt_CSc5, temps_arrCSc5, stdevs_arrCSc5)
@@ -135,8 +130,8 @@ def main():
     
     # Merge these different sensors together into a cold and hot dataframe per percentage of plastic
     from create_merged_df import create_merged_df
-    df_merged_c0 = create_merged_df(avgOp_dfc0, df_sand_avgCSc0)  #df_water_avgCSc0)
-    df_merged_h0 = create_merged_df(avgOp_dfh0, df_sand_avgCSh0)  #df_water_avgCSh0) 
+    df_merged_c0 = create_merged_df(avgOp_dfc0, df_sand_avgCSc0)
+    df_merged_h0 = create_merged_df(avgOp_dfh0, df_sand_avgCSh0)
     
     df_merged_c5 = create_merged_df(avgOp_dfc5, df_sand_avgCSc5)
     df_merged_h5 = create_merged_df(avgOp_dfh5, df_sand_avgCSh5)
@@ -243,7 +238,6 @@ def main():
     dict_x, dict_deltaT = get_deltaT_multiple(df_calib_dict, text_str)
     print(dict_deltaT.keys())  # including temperature difference plot
     
-    r'''
     # Now need to also plot the 6 %s separately for their deltaT plots, with error envelopes each
     from get_deltaT_errors import get_deltaT_errors  # feed through the percentages one by one in this function
     y_lims = [-6, 2]
@@ -266,7 +260,6 @@ def main():
     excel_filename = 'uncertainty_pelletsand.xlsx'
     df_results.to_excel(excel_filename, index=False)
     print(f"Results saved to {excel_filename}")
-    '''
     
     return 
 

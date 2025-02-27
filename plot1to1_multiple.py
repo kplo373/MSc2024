@@ -2,16 +2,13 @@
 """
 Created on Thu Oct  3 13:18:28 2024
 
-Updated version of plot1to1.py, plotting multiple percentages of the same type
-of situation (microplastic and sand) in one plot.
+Updated version of plot1to1.py, for plotting multiple percentages of the 
+same mixture group (e.g. microplastic and sand) in one plot.
 
 @author: kplo373
 """
-import numpy as np
-import pandas as pd
 from types import SimpleNamespace
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm  # for creating colour spectrums and legends
 
 # str_expt parameter should be a string of the type of experiment done, e.g. 'Pellet-Sand', or 'Shaved Plastic and Sand'
 def plot1to1_multiple(dict_parameters, str_expt):
@@ -27,18 +24,11 @@ def plot1to1_multiple(dict_parameters, str_expt):
 
     T_Op0 = df0['temperature_Op']  # extracting the temperature arrays from 0% (pure sand/water)
     T_CS0 = df0['temperature_CS']
-    '''
-    stdOp0 = df0['stdev_Op']  # extracting the standard deviation arrays from 0% (pure sand)
-    stdCS0 = df0['stdev_CS']
-    sterrOp0 = df0['sterr_Op']  # extracting the standard error arrays from 0% MP-sand (pure sand)
-    sterrCS0 = df0['sterr_CS']
-    '''
+
     T_Op5 = df5['temperature_Op']  # extracting the temperature arrays from 5% MP-sand
     T_CS5 = df5['temperature_CS']
 
-    # can get stdev and sterr for 5% after this too...
-    # and then the 10, 25, 50, and 100% temperature and uncertainty values!
-    T_Op10 = df10['temperature_Op']  # extracting the temperature arrays from 10%
+    T_Op10 = df10['temperature_Op']  # extracting the temperature arrays from 10% MP-sand
     T_CS10 = df10['temperature_CS']
     
     T_Op25 = df25['temperature_Op']  # extracting the temperature arrays from 25% MP-sand
@@ -49,7 +39,6 @@ def plot1to1_multiple(dict_parameters, str_expt):
 
     T_Op100 = df100['temperature_Op']  # extracting the temperature arrays from 100% MP-sand (pure microplastic shavings!)
     T_CS100 = df100['temperature_CS']
-    
     # These dataframes are already trimmed, so have removed the 5th and 95th percentile limits
     
     # Combine all x and y arrays into lists (for plotting in red and blue spectrums)
@@ -59,13 +48,6 @@ def plot1to1_multiple(dict_parameters, str_expt):
     # Specify the percentage labels
     labels = ['0%', '5%', '10%', '25%', '50%', '100%']
     colors = ['r', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple']  # just using the colours of the rainbow for now
-    
-    # Set the colormap to 'Blues' and get 6 shades of blue
-    #cmap1 = cm.get_cmap('twilight', 6)
-    #colors1 = cmap1(np.linspace(0.4, 1, 6))  # Creates 6 shades ranging from lighter to darker blue - should range the other way for blue, but good for red...
-    #cmap2 = cm.get_cmap('Reds', 6)
-    #colors2 = cmap2(np.linspace(0.4, 1, 6))
-
     
     # Need to create limits for the plots below so that the plots are square-shaped
     import math
@@ -83,21 +65,16 @@ def plot1to1_multiple(dict_parameters, str_expt):
     upper_lim = normal_round(upper_limit) + 1   # now set the x and y axes limits to lower_lim, upper_lim below
     print('Limits:', lower_lim, upper_lim)
     
-    plt.figure(figsize=(5, 5))  # make it into a square shape, same axes limits!
+    plt.figure(figsize=(5, 5))  # make it into a square shape, with same axes limits!
     plt.xlim(lower_lim, upper_lim)  # for a square-shaped plot
     plt.ylim(lower_lim, upper_lim)
 
     # To plot the 1:1 reference line
-    plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference')
-    #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, xerr=seCSc0, color='k')  # just include one errorbar maybe? Is there a better way to show them separately?
-    #plt.errorbar(tempCSc0, tempOpc0, yerr=seOpc0, color='k')   
+    plt.plot([lower_lim, upper_lim], [lower_lim, upper_lim], color='black', linestyle='--', label='1:1 Reference') 
     plt.axvline(x=21, color='k', linestyle='dotted')  # for approximate ambient temperature
     
     for i in range(6):
-        plt.plot(x_arr[i], y_arr[i], lw=1, color=colors[i], label=f'{labels[i]}', alpha=0.6)  #color=colors1[i]
-    
-    #for j in range(6):  # doing a second separate loop so that the legend lists all cold then hot experiments in the plot
-        #plt.plot(x_hot_arr[j], y_hot_arr[j], lw=1, color=colors2[j], label=f'Hot {labels[j]}', alpha=0.6)  # alpha parameter sets transparency/opacity
+        plt.plot(x_arr[i], y_arr[i], lw=1, color=colors[i], label=f'{labels[i]}', alpha=0.6)
     
     plt.title('Raw Comparison For ' + str_expt)  # including what percentage of plastic etc.
     plt.xlabel('Thermocouple Temperature (degrees Celsius)')

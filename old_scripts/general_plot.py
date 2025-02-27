@@ -53,7 +53,6 @@ stdev6_C1 = np.zeros(len(df_Campbell1))
 count = 0  # use this iterating variable to allocate the values found below to the correct index, rather than i (which starts at 4)
 for i in range(0, len(df_Campbell1)):
     row_seriesC1 = df_Campbell1.iloc[i]
-    #print(row_seriesC1)
     timestr = str(row_seriesC1[0])  # e.g. 2024-06-13 10:59:55, type string
     #print(timestr)  # now need to convert it to a datetime object
     the_date = timestr[:10]  # extracting the date to print along x-axis
@@ -219,7 +218,6 @@ df_Op['Datetime'] = df_Op.iloc[:-2, 0].apply(lambda x: start_datetimeobj + time_
 print(df_Op['Datetime'])  # looks good, now the 0th column in the dataframe has been changed to the full datetime.
 # still has the last two rows as 'NaT' but we don't really want these rows included at all...
 
-#now get the other columns!!
 #%% Assign new names to the data columns
 print(df_Op.columns)  # has 5 columns...
 
@@ -239,7 +237,7 @@ area4 = df_Op['Area4']  # temperature avg of water surface above submerged therm
 datetimeOp = df_Op['Datetime']
 
 print(area1)  # starts at 25.40 deg C, ends at 28.11 deg C (so maybe includes initial room temp)
-# has 2 NaN values at the end... can I just plot it and it be okay? or do I need to cut these off?
+# has 2 NaN values at the end...
 
 #%% Plotting Optris data
 start_t = datetimeOp[0]  # to cut off the initial spike from room temp, as the Optris was collecting data for like 8 mins before the expt started...
@@ -285,8 +283,8 @@ plt.show()
 mean_Op_half = np.zeros(len(area1))
 mean_Op_small = np.zeros(len(area1))
 
-mean_Op_half = (area1 + area3)/2   # taking the average, what is new stdev??
-mean_Op_small = (area2 + area4)/2  # and this stdev??
+mean_Op_half = (area1 + area3)/2   # taking the average
+mean_Op_small = (area2 + area4)/2
 
 
 plt.plot(datetimeOp, area1, label='Half Surface 1')
@@ -361,7 +359,7 @@ resampled_df.columns = ['mean_temp_half', 'stdev_temp_half', 'sterr_temp_half',
 #print(resampled_df)
 print(resampled_df.columns)  # use this format to get the avg_temp, also printing datetime as index
 # now those names I gave 2 lines above are the ones that get printed as the dataframe's headers
-# and the index of resampled_df (the row names) are the datetimes - how to extract this?
+# and the index of resampled_df (the row names) are the datetimes
 
 #%% Plot the two resampled (mean) Optris temperature arrays
 resampled_dt = resampled_df.index
@@ -383,9 +381,7 @@ plt.grid()
 plt.show()
 
 
-#%%
-#need to cut out some of the times where only one sensor collects data... can print dt_objsC1 and resampled_dt for Optris
-
+#%% Need to cut out some of the times where only one sensor collects data... can print dt_objsC1 and resampled_dt for Optris
 # Create DataFrames for both sensors
 dfOp = pd.DataFrame({
     'datetime': resampled_dt,

@@ -11,7 +11,6 @@ from my MSc Results folder using the get_filepaths.py script function.
 Two functions for calculating the averages of the consistent 
 thermocouples are included below as well (for sand and water experiments).
 
-
 @author: kplo373
 """
 import pandas as pd
@@ -21,7 +20,7 @@ from datetime import datetime
 
 # filepath should be a full string path to one Campbell Sci Table 1 file
 def read_CampbellSci(filepath):
-    df = pd.read_csv(filepath, delimiter=',', header=4)  # make a dataframe
+    df = pd.read_csv(filepath, delimiter=',', header=4)  # to make a dataframe
     
     # Preallocating the datetime object, temperature, and standard deviation arrays
     dt_objs = np.zeros(len(df), dtype='datetime64[s]')
@@ -43,9 +42,7 @@ def read_CampbellSci(filepath):
     count = 0  # use this iterating variable to allocate the values found below to the correct index, rather than i (which starts at 4)
     for i in range(0, len(df)):
         row_series = df.iloc[i]
-        #print(row_series)
         timestr = str(row_series.iloc[0])  # e.g. 2024-06-13 10:59:55, type string
-        #print(timestr)  # now need to convert it to a datetime object
         the_date = timestr[:10]  # extracting the date to print along x-axis
         dt = datetime.strptime(timestr, "%Y-%m-%d %H:%M:%S")  # to convert string to datetimeobj   
         dt_objs[count] = dt  # to insert this datetime object into the preallocated array, swapping it for a zero
@@ -109,7 +106,7 @@ the_filepath = r"D:\MSc Results\August_2024\Tuesday13AugAM\CR3000_Table1.dat"
 dt_objs, temps_arr, stdevs_arr = read_CampbellSci(the_filepath)
 '''
 
-#%% Averaging Function for Sand and Pure Experiments (used different thermocouples to Water Experiments)
+#%% Averaging Function for Sand and Pure Experiments (used different thermocouples to the water experiments)
 def sand_avgCS(dt_objs, temps_arr, prev_std_arr):
     # Take the mean/average of all consistent thermocouples (only H1-3 for sand experiments, starting Wed 31 July PM and onwards)
     ref_dt = np.datetime64('2024-07-31T15:00:00')  # the 31 July PM experiment started at 15:09:30 PM and the AM test had the faulty computer so didn't work
@@ -118,7 +115,6 @@ def sand_avgCS(dt_objs, temps_arr, prev_std_arr):
     sterr_arr = np.zeros(len(temps_arr[0,:]))
     therm_std = 0.45  # was 1.75 deg C, this is standard deviation uncertainty per thermocouple, from the manual specifications - used below to calculate mean stdev
     # 0.45 deg C is after comparing to RBR sensors (thermocouple's largest difference was 0.44 deg C + 0.01 deg C for RBR uncertainty = 0.45 deg C!)
-    
     
     if dt_objs[0] < ref_dt:
         # Taking the average of all 6 thermocouple temps before Wed 31 July PM
@@ -174,14 +170,12 @@ def water_avgCS(dt_objs, temps_arr, prev_std_arr, yn='n'):
     sterr_arr = np.zeros(len(temps_arr[0,:]))
     therm_std = 0.45  # was 1.75 deg C, this is standard deviation uncertainty per thermocouple, from the manual specifications - used below to calculate mean stdev
     
-    ##something about yn here... if statement - start with no maybe as that is majority?? **will need to go back to main water scripts to put y or n in for this function
-    # if 'y', need to remove H6 thermocouple = temps_arr[5]
-    # if 'y' AND date given is 25/07/2024 PM - have to check the dt_objs! (what format are they in?) - then remove H6 AND H3 thermocouples = temps_arr[5], temps_arr[2]
+    # if 'y' for yn term, need to remove H6 thermocouple = temps_arr[5]
+    # if 'y' AND date given is 25/07/2024 PM - have to check the dt_objs! - then remove H6 AND H3 thermocouples = temps_arr[5], temps_arr[2]
     # if 'n', use all thermocouples as usual :)
     
     special_dti = np.datetime64('2024-07-25T00:00:00')  # experiment done on 25 July 2024 PM needs H6 AND H3 removed, not just H6
     special_dtf = np.datetime64('2024-07-26T00:00:00')
-    
     
     if dt_objs[0] < ref_dt:
         
@@ -233,7 +227,6 @@ def water_avgCS(dt_objs, temps_arr, prev_std_arr, yn='n'):
                 sterr = stdev / np.sqrt(5)
                 sterr_arr[s] = sterr
                 
-            
 
 
     elif dt_objs[0] >= ref_dt:
@@ -268,7 +261,6 @@ def water_avgCS(dt_objs, temps_arr, prev_std_arr, yn='n'):
                 sterr_arr[s] = sterr
             
             
-                
     #print(avg_temps)
     df_water_avgCS = pd.DataFrame({     # creating a new dataframe
         'datetimes': dt_objs,
