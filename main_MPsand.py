@@ -2,9 +2,8 @@
 """
 Created on Thu Oct  3 10:36:55 2024
 
-A main script/function to plot all the different percentages of plastic
-in one single plot, for the first of the four different scenarios (microplastic 
-and sand, microplastic and water, nurdles and sand, nurdles and water).
+The main script/function to plot all the different percentages of plastic
+together, for all the microplastic and sand mixtures.
 
 Remember: microplastic = shavings/shaved plastic
 and: nurdles = pellets
