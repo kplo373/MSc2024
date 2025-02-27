@@ -11,7 +11,7 @@ read in and plotting. Excluding the trimming at 5th percentile too,
 as these two tests were done subsequently after the first two and
 so the sensors were all warmed up already.
 
-@author: adamk
+@author: kplo373
 """
 import sys
 #sys.path.append(r"C:\Users\kplo373\Documents\GitHub\MSc2024")  # for uni MSc room computer
