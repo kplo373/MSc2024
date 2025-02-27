@@ -2,10 +2,8 @@
 """
 Created on Thu Sep 19 10:33:25 2024
 
-**Fitting the Pure Water Calibration to this raw data, and setting up the calibration table here.**
-Have left in the SVR stuff just in case we want to go back to it...
-but only using look up table for calibration in apply_calibration.py,
-which we create in this script.
+Fitting the pure water calibration to the raw temperature data, and setting 
+up the calibration table here.
 
 @author: kplo373
 """
