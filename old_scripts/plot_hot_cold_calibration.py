@@ -13,7 +13,6 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 import joblib
 
 # If wanting to change the file naming convention, do ctrl+F+R to find and replace!
@@ -54,7 +53,6 @@ stdev6_C1hot = np.zeros(len(df_C1_hot))
 count = 0  # use this iterating variable to allocate the values found below to the correct index, rather than i (which starts at 4)
 for i in range(0, len(df_C1_hot)):
     row_seriesC1 = df_C1_hot.iloc[i]
-    #print(row_seriesC1)
     timestr = str(row_seriesC1[0])  # e.g. 2024-06-13 10:59:55, type string
     #print(timestr)  # now need to convert it to a datetime object
     the_date_hot = timestr[:10]  # extracting the date to print along x-axis
@@ -115,7 +113,6 @@ stdev6_C1cold = np.zeros(len(df_C1_cold))
 count = 0  # use this iterating variable to allocate the values found below to the correct index, rather than i (which starts at 4)
 for i in range(0, len(df_C1_cold)):
     row_seriesC1 = df_C1_cold.iloc[i]
-    #print(row_seriesC1)
     timestr = str(row_seriesC1[0])  # e.g. 2024-06-13 10:59:55, type string
     #print(timestr)  # now need to convert it to a datetime object
     the_date_cold = timestr[:10]  # extracting the date to print along x-axis
@@ -185,8 +182,7 @@ with open(path_Opcold, 'r') as file:
 print(headers_cold)  # Now, there are 4x different measurement areas
 
 
-#%%
-# Extract date and time from the relevant lines
+#%% Extract date and time from the relevant lines
 date_line_hot = headers_hot[1]  # This is line Date: 13/06/2024
 time_line_hot = headers_hot[2]  # This is line Time: 10:51:17.112
 
@@ -204,7 +200,7 @@ print(f"Date: {date_val_hot}")
 print(f"Time: {time_val_hot}")
 print(f"Date: {date_val_cold}")
 print(f"Time: {time_val_cold}")  # nice, this is it! Now need to add on the individual seconds time for each measurement...
-# time is a string, so need to turn into datetime obj? to add it to seconds later?
+# time is a string, so need to turn into datetime obj to add it to seconds later
 
 # Combine date and time to a single string
 datetime_strhot = date_val_hot + ' ' + time_val_hot   #f"{date_value} {time_value}"  is chatGPT's method
@@ -216,9 +212,8 @@ start_datetimeobjhot = datetime.strptime(datetime_strhot, datetime_format)
 start_datetimeobjcold = datetime.strptime(datetime_strcold, datetime_format)
 print(start_datetimeobjhot)
 print(start_datetimeobjcold)
-#%%
 
-# Read the file, ignoring errors (chatGPT)
+#%% Read the file, ignoring errors
 try: 
     df_Ophot = pd.read_csv(path_Ophot, delimiter='\t', encoding='utf-8', header=7)
     df_Opcold = pd.read_csv(path_Opcold, delimiter='\t', encoding='utf-8', header=7)
@@ -227,10 +222,7 @@ except UnicodeDecodeError as e:
     print(f"UnicodeDecodeError: {e}")
 
 
-
-#%%
-
-# Function to convert time string to timedelta
+#%% Function to convert time string to timedelta
 def time_str_to_timedelta(time_str):
     # Time string format is 'HH:MM:SS.sss'
     hours, minutes, seconds = time_str.split(':')
@@ -246,11 +238,10 @@ print(df_Ophot['Datetime'])
 print(df_Opcold['Datetime'])  # looks good, now the 0th column in the dataframe has been changed to the full datetime.
 # still has the last two rows as 'NaT' but we don't really want these rows included at all...
 
-#now get the other columns!!
 #%% Assign new names to the data columns
 print(df_Ophot.columns)   # has 9 columns
 print(df_Opcold.columns)  # has only 5 columns
-#%%
+
 new_column_names_9 = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']  # not sure what 'Unnamed: 3' column is for? so made it 'nan'
 new_column_names_5 = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']
 
@@ -284,8 +275,8 @@ mean_Op_smallhot = np.zeros(len(area1hot))
 mean_Op_halfcold = np.zeros(len(area1cold))
 mean_Op_smallcold = np.zeros(len(area1cold))
 
-mean_Op_halfhot = (area1hot + area3hot)/2   # taking the average, what is new stdev??
-mean_Op_smallhot = (area2hot + area4hot)/2  # and this stdev??
+mean_Op_halfhot = (area1hot + area3hot)/2   # taking the average
+mean_Op_smallhot = (area2hot + area4hot)/2
 mean_Op_halfcold = (area1cold + area3cold)/2
 mean_Op_smallcold = (area2cold + area4cold)/2
 
@@ -293,7 +284,7 @@ mean_Op_smallcold = (area2cold + area4cold)/2
 #%% To get average of mean/average Optris measurements - RESAMPLING
 #new_datetimes has 26 OR MORE measurements for each second. can't depend on an integer 26, need to actually just collect all the readings for that second and avg them!
 
-#using chatgpt to help resample the data into 5-second intervals, after loading the 2 arrays into pd dataframe
+# Resample the data into 5-second intervals, after loading the 2 arrays into pd dataframe
 df_newhot = pd.DataFrame({               # creating a new dataframe for hotnesday 3rd
     'datetimes': datetimeOphot,
     'Op_temp_half': mean_Op_halfhot,
@@ -337,8 +328,7 @@ resampled_dtcold = resampled_dfcold.index
 Op_halfcold = resampled_dfcold['mean_temp_half']
 Op_smallcold = resampled_dfcold['mean_temp_small']
 
-#%%
-#need to cut out some of the times where only one sensor collects data... can print dt_objsC1 and resampled_dt for Optris
+#%% Need to cut out some of the times where only one sensor collects data... can print dt_objsC1 and resampled_dt for Optris
 
 # Create DataFrames for both sensors and both days
 dfOphot = pd.DataFrame({'datetime': resampled_dthot,
@@ -417,7 +407,6 @@ plt.grid()
 plt.show()
 
 
-#need to fit a SVM line and curve of best fit to this plot!
 #%% Fitting SVM curve (using ChatGPT)
 from sklearn.preprocessing import StandardScaler  # used to scale the combined arrays below
 from sklearn.svm import SVR  # used to train the SVM below
@@ -485,8 +474,7 @@ y_pred_linear = scaler_y.inverse_transform(y_pred_linear_scaled.reshape(-1,1))  
 # takes a while to run this cell^^
 
 
-#%%
-# Calculate RMSE for both models (root mean square error)
+#%% Calculate RMSE for both models (root mean square error)
 y_true_scaled = scaler_y.transform(y_comb.reshape(-1, 1)).ravel()
 y_pred_rbf_comb_scaled = svr_rbf.predict(x_comb_scaled)
 y_pred_rbf_comb = scaler_y.inverse_transform(y_pred_rbf_comb_scaled.reshape(-1,1))

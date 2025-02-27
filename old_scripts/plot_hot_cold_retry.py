@@ -8,14 +8,13 @@ This script will be used to plot a hot and cold test together
 on the same axes, to interpolate a line between any missing
 temperatures (likely between 22-24 deg C).
 
-@author: katep
+@author: kplo373
 """
 
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 
 
 fileC1_hot = r"D:\MSc Results\July_2024\Friday19JulyAM\CR3000_Table1.dat"
@@ -54,7 +53,6 @@ stdev6_C1hot = np.zeros(len(df_C1_hot))
 count = 0  # use this iterating variable to allocate the values found below to the correct index, rather than i (which starts at 4)
 for i in range(0, len(df_C1_hot)):
     row_seriesC1 = df_C1_hot.iloc[i]
-    #print(row_seriesC1)
     timestr = str(row_seriesC1[0])  # e.g. 2024-06-13 10:59:55, type string
     #print(timestr)  # now need to convert it to a datetime object
     the_date_hot = timestr[:10]  # extracting the date to print along x-axis
@@ -157,7 +155,7 @@ print(count, len(temp1_C1cold))
 
 # not going to be easy to plot their temperature data on top of each other because the dt_objs are different
 # so go straight to scatterplot lines below...
-#%% Take the mean/average of all consistent thermocouples (think it's all of them??)
+#%% Take the mean/average of all consistent thermocouples
 ref_temps_C1hot = np.zeros(len(temp1_C1hot))
 ref_temps_C1hot = (temp1_C1hot + temp2_C1hot + temp3_C1hot + temp4_C1hot + temp5_C1hot + temp6_C1hot)/6  # taking the average. what is new stdev??
 print(ref_temps_C1hot)
@@ -203,7 +201,7 @@ print(f"Date: {date_val_hot}")
 print(f"Time: {time_val_hot}")
 print(f"Date: {date_val_cold}")
 print(f"Time: {time_val_cold}")  # nice, this is it! Now need to add on the individual seconds time for each measurement...
-# time is a string, so need to turn into datetime obj? to add it to seconds later?
+# time is a string, so need to turn into datetime obj to add it to seconds later
 
 # Combine date and time to a single string
 datetime_strhot = date_val_hot + ' ' + time_val_hot   #f"{date_value} {time_value}"  is chatGPT's method
@@ -242,12 +240,11 @@ print(df_Ophot['Datetime'])
 print(df_Opcold['Datetime'])  # looks good, now the 0th column in the dataframe has been changed to the full datetime.
 # still has the last two rows as 'NaT' but we don't really want these rows included at all...
 
-# Now get the other columns!!
 # Assign new names to the data columns
 print(df_Ophot.columns)   # has 9 columns
 print(df_Opcold.columns)  # has only 5 columns
 
-new_column_names_9 = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']  # not sure what 'Unnamed: 3' column is for? so made it 'nan'
+new_column_names_9 = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']  # not sure what 'Unnamed: 3' column is for, so made it 'nan'
 new_column_names_5 = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']
 
 df_Ophot.columns = new_column_names_9      # assigning them to the DataFrame by correct length
@@ -280,8 +277,8 @@ mean_Op_smallhot = np.zeros(len(area1hot))
 mean_Op_halfcold = np.zeros(len(area1cold))
 mean_Op_smallcold = np.zeros(len(area1cold))
 
-mean_Op_halfhot = (area1hot + area3hot)/2   # taking the average, what is new stdev??
-mean_Op_smallhot = (area2hot + area4hot)/2  # and this stdev??
+mean_Op_halfhot = (area1hot + area3hot)/2   # taking the average
+mean_Op_smallhot = (area2hot + area4hot)/2
 mean_Op_halfcold = (area1cold + area3cold)/2
 mean_Op_smallcold = (area2cold + area4cold)/2
 
@@ -289,7 +286,7 @@ mean_Op_smallcold = (area2cold + area4cold)/2
 #%% To get average of mean/average Optris measurements - RESAMPLING (this bit is in resample_Optris.py)
 #new_datetimes has 26 OR MORE measurements for each second. can't depend on an integer 26, need to actually just collect all the readings for that second and avg them!
 
-#using chatgpt to help resample the data into 5-second intervals, after loading the 2 arrays into pd dataframe
+# Resample the data into 5-second intervals, after loading the 2 arrays into pd dataframe
 df_newhot = pd.DataFrame({               # creating a new dataframe for wednesday 3rd
     'datetimes': datetimeOphot,
     'Op_temp_half': mean_Op_halfhot,
@@ -392,7 +389,7 @@ tempC1_origcold = Tcold_C1_aligned
 
 
 
-#%% Using 5th Percentile Minimum Value (from ChatGPT) for Cold and Hot Arrays
+#%% Using 5th Percentile Minimum Value for Cold and Hot Arrays
 # 1. Calculate the 5th percentile value
 percentile_5_value = np.percentile(tempOp_origcold, 5)
 # 2. Find the index of the closest value in y_cold to the 95th percentile value
@@ -428,7 +425,7 @@ plt.show()
 
 
 
-#%% Fitting the Pure Water Calibration SVM curve (using ChatGPT)
+#%% Fitting the Pure Water Calibration SVM curve
 import joblib
 
 # Load the saved model and scalers
@@ -514,20 +511,6 @@ plt.legend()
 plt.grid()
 plt.show()
 
-
-#%% haven't got this cell working yet...
-# Calculate RMSE for both models (root mean square error)
-y_true_scaled = scaler_y.transform(y_comb.reshape(-1, 1)).ravel()
-y_pred_rbf_comb_scaled = svr_rbf.predict(x_comb_scaled)
-y_pred_rbf_comb = scaler_y.inverse_transform(y_pred_rbf_comb_scaled.reshape(-1,1))
-y_pred_linear_comb_scaled = linear_svr.predict(x_comb_scaled)
-y_pred_linear_comb = scaler_y.inverse_transform(y_pred_linear_comb_scaled.reshape(-1,1))
-
-rmse_rbf = np.sqrt(mean_squared_error(y_comb, y_pred_rbf_comb))
-rmse_linear = np.sqrt(mean_squared_error(y_comb, y_pred_linear_comb))
-
-print(f'Root Mean Square Error (RMSE) for RBF SVR: {rmse_rbf}')
-print(f'Root Mean Square Error (RMSE) for Linear SVR: {rmse_linear}')
 
 
 

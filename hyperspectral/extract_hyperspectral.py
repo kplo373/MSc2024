@@ -5,6 +5,7 @@ Created on Mon Sep  9 09:26:07 2024
 Python script to try to put the processed hyperspectral data from the 
 hard drive into a dataframe for plotting.
 
+Have not completed this, as was beyond the scope of my MSc project.
 
 @author: kplo373
 """
@@ -32,7 +33,7 @@ data = np.fromfile(fid)  # has shape: (179714048,) and is a np.ndarray
 #print(data)
 
 
-#%% Then put these variables into the dataframe
+#%% Then put these variables into the dataframe...
 
 
 

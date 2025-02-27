@@ -46,7 +46,6 @@ stdev6_C150 = np.zeros(len(df_C1_50))
 count = 0  # use this iterating variable to allocate the values found below to the correct index, rather than i (which starts at 4)
 for i in range(0, len(df_C1_50)):
     row_seriesC1 = df_C1_50.iloc[i]
-    #print(row_seriesC1)
     timestr = str(row_seriesC1[0])  # e.g. 2024-06-13 10:59:55, type string
     #print(timestr)  # now need to convert it to a datetime object
     the_date_50 = timestr[:10]  # extracting the date to print along x-axis
@@ -147,13 +146,12 @@ for i in range(0, len(df_C1_wed)):
 print(count, len(temp1_C1wed)) 
 
 
-# not going to be easy to plot their temperature data on top of each other because the dt_objs are different
+# not easy to plot their temperature data on top of each other, because the dt_objs are different
 # so go straight to scatterplot lines below...
 #%% Take the mean/average of all consistent thermocouples (think it's all of them??)
 ref_temps_C150 = np.zeros(len(temp1_C150))
 ref_temps_C150 = (temp1_C150 + temp2_C150 + temp3_C150 + temp4_C150 + temp5_C150 + temp6_C150)/6  # taking the average. what is new stdev??
 print(ref_temps_C150)
-
 
 ref_temps_C1wed = np.zeros(len(temp1_C1wed))
 ref_temps_C1wed = (temp1_C1wed + temp2_C1wed + temp3_C1wed + temp4_C1wed + temp5_C1wed + temp6_C1wed)/6  # taking the average. what is new stdev??
@@ -194,7 +192,7 @@ print(f"Date: {date_val_50}")
 print(f"Time: {time_val_50}")
 print(f"Date: {date_val_wed}")
 print(f"Time: {time_val_wed}")  # nice, this is it! Now need to add on the individual seconds time for each measurement...
-# time is a string, so need to turn into datetime obj? to add it to seconds later?
+# time is a string, so need to turn into datetime obj to add seconds onto it
 
 # Combine date and time to a single string
 datetime_str50 = date_val_50 + ' ' + time_val_50   #f"{date_value} {time_value}"  is chatGPT's method
@@ -230,11 +228,10 @@ print(df_Op50['Datetime'])
 print(df_Opwed['Datetime'])  # looks good, now the 0th column in the dataframe has been changed to the full datetime.
 # still has the last two rows as 'NaT' but we don't really want these rows included at all...
 
-#now get the other columns!!
 #%% Assign new names to the data columns
 print(df_Op50.columns)   # has 9 columns
 print(df_Opwed.columns)  # has only 5 columns
-#%%
+
 new_column_names_9 = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'Area5', 'Area6', 'Area7', 'Area8', 'nan', 'Datetime']  # not sure what 'Unnamed: 3' column is for? so made it 'nan'
 new_column_names_5 = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']
 
@@ -268,8 +265,8 @@ mean_Op_small50 = np.zeros(len(area150))
 mean_Op_halfwed = np.zeros(len(area1wed))
 mean_Op_smallwed = np.zeros(len(area1wed))
 
-mean_Op_half50 = (area150 + area350)/2   # taking the average, what is new stdev??
-mean_Op_small50 = (area250 + area450)/2  # and this stdev??
+mean_Op_half50 = (area150 + area350)/2   # taking the average
+mean_Op_small50 = (area250 + area450)/2
 mean_Op_halfwed = (area1wed + area3wed)/2
 mean_Op_smallwed = (area2wed + area4wed)/2
 
@@ -313,7 +310,6 @@ resampled_df50.columns = ['mean_temp_half', 'stdev_temp_half', 'sterr_temp_half'
 resampled_dfwed.columns = ['mean_temp_half', 'stdev_temp_half', 'sterr_temp_half', 
                         'mean_temp_small', 'stdev_temp_small', 'sterr_temp_small']  # renaming columns
 
-
 print(resampled_df50.columns)
 
 
@@ -326,8 +322,7 @@ resampled_dtwed = resampled_dfwed.index
 Op_halfwed = resampled_dfwed['mean_temp_half']
 Op_smallwed = resampled_dfwed['mean_temp_small']
 
-#%%
-#need to cut out some of the times where only one sensor collects data... can print dt_objsC1 and resampled_dt for Optris
+#%% Need to cut out some of the times where only one sensor collects data... can print dt_objsC1 and resampled_dt for Optris
 
 # Create DataFrames for both sensors and both days
 dfOp50 = pd.DataFrame({
@@ -419,7 +414,7 @@ p_wed = np.poly1d(np.polyfit(tempC1wed, tempOpwed, 1))
 plt.plot(tempC1wed, p_wed(tempC1wed), label="Best Fit Line Wed 3 July")
 plt.plot(tempC150, p_50(tempC150), label="Best Fit Line Fri 12 July")
 
-plt.title(f'Comparison of Optris vs. Thermocouples')
+plt.title('Comparison of Optris vs. Thermocouples')
 plt.xlabel('Campbell Scientific Table 1 Temperature (degrees Celsius)')
 plt.ylabel('Optris Temperature (degrees Celsius)')
 plt.legend()

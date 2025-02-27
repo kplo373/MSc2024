@@ -3,7 +3,7 @@
 Created on Wed Aug 21 09:50:02 2024
 
 A function to extract data from the Optris .dat files
-(representing the thermocouple readings).
+(representing the thermal camera readings).
 
 The Optris files (and filepaths) will be extracted from my 
 MSc Results folder using the get_filepaths.py script function.
@@ -22,41 +22,49 @@ from datetime import datetime, timedelta
 
 
 # filepath should be a full string path to one Optris.dat file, and it usually needs 'r' to convert it to a raw string
-# e.g. r"C:\Users\kplo373\OneDrive - The University of Auckland\MSc Kate\PlottingMScResults\August_2024\Thursday1AugAM\Thurs1AugAMOptris.dat"
 def read_Optris(filepath):
     # To extract the data from the headers of the Optris data, read the first 7 lines
     headers = []
-    with open(filepath, 'r') as file:
+    with open(filepath, 'r', encoding='cp1252') as file:  # added this encoding parameter as was getting an error
         headers = [next(file).strip() for _ in range(7)]
-    print(headers)  # There are 4x different measurement areas
     
     # Extract date and time from the relevant lines
     date_line = headers[1]  # This is the line e.g. Date: 13/06/2024
     time_line = headers[2]  # e.g. Time: 10:51:17.112
+    #print(date_line, time_line)  # and these are strings
+    
+    if '\t' in date_line and time_line:  # the columns are separated by either commas or tabs
+        delim = '\t'
+    elif ',' in date_line and time_line:  
+        delim = ','
+    else:
+        print('unidentified separator between date and time in Optris files')
+    # older Optris data files are likely to be tab delimited, and newer ones comma delimited
     
     # Split the lines to get the actual date and time values
-    date_val = date_line.split(',')[1]  # the columns are separated by commas
-    time_val = time_line.split(',')[1]
+    date_val = date_line.split(delim)[1]
+    time_val = time_line.split(delim)[1]    
     
-    print(f"Date: {date_val}")
-    print(f"Time: {time_val}")
+    print(f"Date: {date_val}, Time: {time_val}")  # to show that the code is still running when used in a main script
     
     # Combine date and time to a single string
-    datetime_str = date_val + ' ' + time_val   # f"{date_value} {time_value}"  is chatGPT's method
+    datetime_str = date_val + ' ' + time_val
     
     # Convert the combined string to a datetime object
     datetime_format = "%d/%m/%Y %H:%M:%S.%f"
     start_datetimeobj = datetime.strptime(datetime_str, datetime_format)
     
-    # Read the Optris files, ignoring errors (from chatGPT)
+    # Read the Optris files, ignoring errors
     try: 
-        df_Optris = pd.read_csv(filepath, delimiter=',', encoding='utf-8', header=7)
+        df_Optris = pd.read_csv(filepath, delimiter=delim, encoding='utf-8', header=7)  # need to be weary of if the delimiter is ',' or '\t'
     except UnicodeDecodeError as e:
         print(f"UnicodeDecodeError: {e}")
-        
-    
+
     # Function to convert time string to timedelta
     def time_str_to_timedelta(time_str):
+        if ',' in time_str:
+            time_str = time_str.split(',')[0]  # only include the first column (actual time) if all columns are included
+        #print(time_str)
         # Time string format is 'HH:MM:SS.sss'
         hours, minutes, seconds = time_str.split(':')
         seconds, milliseconds = map(float, seconds.split('.'))
@@ -70,12 +78,13 @@ def read_Optris(filepath):
     # Now get the other columns!!
     # Assign new names to the data columns
     #print(df_Optris.columns)   # has 11 columns
-    new_column_names = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']  # not sure what 'Unnamed: 5' column is for? so made it 'nan'
+    
+    new_column_names = ['Time', 'Area1', 'Area2', 'Area3', 'Area4', 'nan', 'Datetime']  # not sure what 'Unnamed: 5' column is for, so made it 'nan'
 
     df_Optris.columns = new_column_names      # assigning them to the DataFrame by correct length
     df_Optris = df_Optris.drop(columns=['Time'])  # drop the 'Time' column if only 'Datetime' is needed
     df_Optris = df_Optris.drop(columns=['nan'])   # remove the unnecessary 'Unnamed: 5' column too
-    print(df_Optris.columns)
+    #print(df_Optris.columns)
     
     # Extract the data from these columns, into separate arrays
     area1 = df_Optris['Area1']  # temperature avg of whole/half [as excluding return pump] of water surface
@@ -107,11 +116,10 @@ print(datetimes)
 
 # datetimeOp has 26 OR MORE measurements for each second. can't depend on an integer 26, need to actually just collect all the readings for that second and avg them!
 def resample_Optris(datetimeOp, areaOp):
-    #using chatgpt to help resample the data into 5-second intervals, after loading the 2 arrays into pd dataframe
+    # Resample the data into 5-second intervals, after loading the 2 arrays into pd dataframe
     df_new = pd.DataFrame({     # creating a new dataframe
         'datetimes': datetimeOp,
         'Op_temp': areaOp})    # can only read in one mean Optris temperature array at once from the averaging Optris function, this could be half or small area
-    
     
     df_new.set_index('datetimes', inplace=True)  # setting the datetimes column as the index
     # can extract datetimes using e.g. df_new.index
@@ -138,7 +146,7 @@ resampled_df_a3 = resample_Optris(datetimes, a3)
 #%% Averaging and Uncertainties Function
     
 def average_Optris(resampled_dfa1, resampled_dfa2):  # resampled_dfa1 and resampled_dfa2 represent 2 like areas: area1 & area3 for half the surface, or area2 & area4 for thermocouple surface
-    std_specs = 2.4  # deg C, the accuracy for the Optris thermal PI450 camera
+    std_specs = 0.04 # K=degC. Initially thought it was 2.4 deg C but checked optics, this is accuracy/thermal sensitivity for the Optris thermal PI450 camera
     stdev_arr = np.zeros(len(resampled_dfa1.index))
     sterr_arr = np.zeros(len(resampled_dfa1.index))
     
@@ -147,7 +155,7 @@ def average_Optris(resampled_dfa1, resampled_dfa2):  # resampled_dfa1 and resamp
     area2 = resampled_dfa2.iloc[:,0].to_numpy()
     std_resampled1 = resampled_dfa1.iloc[:,1].to_numpy()  # add each element of these squared together as part of standard deviation calculation
     std_resampled2 = resampled_dfa2.iloc[:,1].to_numpy()
-    print(np.shape(area1))  # changed from pandas series to np.ndarray with shape (4539,)
+    #print(np.shape(area1))  # changed from pandas series to np.ndarray with shape (4539,)
     
     if len(area1) == len(area2):
         mean_Op = np.zeros(len(area1))  # preallocating a mean temperature array
